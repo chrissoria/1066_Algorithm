@@ -1,0 +1,1760 @@
+--------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /hdir/0/chrissoria/1066/ADAMS_1066_aggressive_98_to_0.log
+  log type:  text
+ opened on:   1 May 2024, 21:26:13
+
+. 
+. ** set sample inclusion
+. egen in_samp = rowmiss(AAGE RELSCORE COGSCORE dementia cogtot27_imp2002 ragender raeduc)
+
+. *525 people have no missingness across the board, mostly due to the cogscore variable
+. *nobody is missing age
+. egen in_AAGE = rowmiss(AAGE)
+
+. *nobody is missing relscore
+. egen in_RELSCORE = rowmiss(RELSCORE)
+
+. *927 people missing a cogscore, only 589 people have a full cogscore
+. egen in_COGSCORE = rowmiss(COGSCORE)
+
+. *nobody is missing the dementia score
+. egen in_dementia = rowmiss(dementia)
+
+. *416 people are missing this score, 1,100 people have a score
+. egen in_cogtot27_imp2002 = rowmiss(cogtot27_imp2002)
+
+. *nobody is missing gender or education
+. egen in_ragender = rowmiss(ragender)
+
+. keep if in_samp == 0
+(939 observations deleted)
+
+. count
+  577
+
+. egen in_samp2 = rowmiss(hurd_p expert_p lasso_p)
+
+. 
+. keep if in_samp2 == 0
+(69 observations deleted)
+
+. count
+  508
+
+. 
+. ** table 2 **
+. tab female
+
+     female |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        226       44.49       44.49
+          1 |        282       55.51      100.00
+------------+-----------------------------------
+      Total |        508      100.00
+
+. tab AAGE_cat
+
+   AAGE_cat |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |        258       50.79       50.79
+          2 |        250       49.21      100.00
+------------+-----------------------------------
+      Total |        508      100.00
+
+. tab educat
+
+     educat |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |        230       45.28       45.28
+          2 |        123       24.21       69.49
+          3 |        155       30.51      100.00
+------------+-----------------------------------
+      Total |        508      100.00
+
+. 
+. 
+. ** table 3 **
+. ** identify cutpoints to maximize sensitivity and specificity [optimal]
+. * http://www.haghish.com/statistics/stata-blog/stata-programming/download/cutpt.html
+. *  1066
+. logit dementia COGSCORE RELSCORE aRECALLcs
+
+Iteration 0:  Log likelihood = -226.18291  
+Iteration 1:  Log likelihood = -104.93261  
+Iteration 2:  Log likelihood = -78.895697  
+Iteration 3:  Log likelihood = -76.676462  
+Iteration 4:  Log likelihood = -76.640369  
+Iteration 5:  Log likelihood = -76.640297  
+Iteration 6:  Log likelihood = -76.640297  
+
+Logistic regression                                     Number of obs =    508
+                                                        LR chi2(3)    = 299.09
+                                                        Prob > chi2   = 0.0000
+Log likelihood = -76.640297                             Pseudo R2     = 0.6612
+
+------------------------------------------------------------------------------
+    dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    COGSCORE |  -.6329605   .1182599    -5.35   0.000    -.8647455   -.4011754
+    RELSCORE |   .5849615   .1063135     5.50   0.000     .3765909     .793332
+   aRECALLcs |  -.6330902   .1365565    -4.64   0.000    -.9007359   -.3654444
+       _cons |   6.943367   1.397317     4.97   0.000     4.204677    9.682058
+------------------------------------------------------------------------------
+
+. gen inreg1066=e(sample)
+
+. predict dem_pred_1066
+(option pr assumed; Pr(dementia))
+
+. estat classification, cutoff(.25)
+
+Logistic model for dementia
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |        71            29  |        100
+     -     |        12           396  |        408
+-----------+--------------------------+-----------
+   Total   |        83           425  |        508
+
+Classified + if predicted Pr(D) >= .25
+True D defined as dementia != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   85.54%
+Specificity                     Pr( -|~D)   93.18%
+Positive predictive value       Pr( D| +)   71.00%
+Negative predictive value       Pr(~D| -)   97.06%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)    6.82%
+False - rate for true D         Pr( -| D)   14.46%
+False + rate for classified +   Pr(~D| +)   29.00%
+False - rate for classified -   Pr( D| -)    2.94%
+--------------------------------------------------
+Correctly classified                        91.93%
+--------------------------------------------------
+
+. estat classification, cutoff(.50)
+
+Logistic model for dementia
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |        59            16  |         75
+     -     |        24           409  |        433
+-----------+--------------------------+-----------
+   Total   |        83           425  |        508
+
+Classified + if predicted Pr(D) >= .5
+True D defined as dementia != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   71.08%
+Specificity                     Pr( -|~D)   96.24%
+Positive predictive value       Pr( D| +)   78.67%
+Negative predictive value       Pr(~D| -)   94.46%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)    3.76%
+False - rate for true D         Pr( -| D)   28.92%
+False + rate for classified +   Pr(~D| +)   21.33%
+False - rate for classified -   Pr( D| -)    5.54%
+--------------------------------------------------
+Correctly classified                        92.13%
+--------------------------------------------------
+
+. estat classification, cutoff(.11898708)
+
+Logistic model for dementia
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |        80            48  |        128
+     -     |         3           377  |        380
+-----------+--------------------------+-----------
+   Total   |        83           425  |        508
+
+Classified + if predicted Pr(D) >= .1189871
+True D defined as dementia != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   96.39%
+Specificity                     Pr( -|~D)   88.71%
+Positive predictive value       Pr( D| +)   62.50%
+Negative predictive value       Pr(~D| -)   99.21%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)   11.29%
+False - rate for true D         Pr( -| D)    3.61%
+False + rate for classified +   Pr(~D| +)   37.50%
+False - rate for classified -   Pr( D| -)    0.79%
+--------------------------------------------------
+Correctly classified                        89.96%
+--------------------------------------------------
+
+. cutpt dementia dem_pred_1066
+
+Empirical cutpoint estimation
+Method:                                Liu
+Reference variable:                    dementia (0=neg, 1=pos)
+Classification variable:               dem_pred_1066
+Empirical optimal cutpoint:            .11898708
+Sensitivity at cutpoint:               0.96
+Specificity at cutpoint:               0.89
+Area under ROC curve at cutpoint:      0.93
+
+. 
+. 
+. *below is where Jordan identified the ideal cutoff point that maximizes the product of sensitivity and
+>  specificity
+. *however, we'll also want to try .5 (the traditional indicator) and .25 (Prince 2003) stated on page 9
+> 15 that, 
+. *"A predicted probability of more than 0·25 produced the best sensitivity and specificity
+. 
+. *Chris is updating this slightly to reflect slightly revised computation of relscore
+. rocreg dementia dem_pred_1066
+(running rocregstat on estimation sample)
+
+Bootstrap replications (1,000): .........10.........20.........30.........40.........50.........60......
+> ...70.........80.........90.........100.........110.........120.........130.........140.........150...
+> ......160.........170.........180.........190.........200.........210.........220.........230.........
+> 240.........250.........260.........270.........280.........290.........300.........310.........320...
+> ......330.........340.........350.........360.........370.........380.........390.........400.........
+> 410.........420.........430.........440.........450.........460.........470.........480.........490...
+> ......500.........510.........520.........530.........540.........550.........560.........570.........
+> 580.........590.........600.........610.........620.........630.........640.........650.........660...
+> ......670.........680.........690.........700.........710.........720.........730.........740.........
+> 750.........760.........770.........780.........790.........800.........810.........820.........830...
+> ......840.........850.........860.........870.........880.........890.........900.........910.........
+> 920.........930.........940.........950.........960.........970.........980.........990.........1,000 
+> done
+
+Bootstrap results                                        Number of obs =   508
+                                                         Replications  = 1,000
+
+Nonparametric ROC estimation
+
+Control standardization: empirical
+ROC method             : empirical
+
+Area under the ROC curve
+
+   Status    : dementia
+   Classifier: dem_pred_1066
+------------------------------------------------------------------------------
+             |    Observed               Bootstrap
+         AUC | coefficient       Bias    std. err.     [95% conf. interval]
+-------------+----------------------------------------------------------------
+             |    .9732672   -.000244    .0062329     .9610509   .9854835  (N)
+             |                                        .9594528   .9841149  (P)
+             |                                        .9595654   .9842481 (BC)
+------------------------------------------------------------------------------
+
+.         gen dem_pred_bin_1066 = (dem_pred_1066 >= .11898708) if !missing(dem_pred_1066)
+
+. tab dementia dem_pred_bin_1066, matcell(conf_matrix)
+
+           |   dem_pred_bin_1066
+  dementia |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       377         48 |       425 
+         1 |         3         80 |        83 
+-----------+----------------------+----------
+     Total |       380        128 |       508 
+
+. display "Predicted Prevalence from 1066 optimal cutoff: " (128/508) * 100
+Predicted Prevalence from 1066 optimal cutoff: 25.19685
+
+. 
+. *ascribed
+. gen dem_pred_bin_1066a50= (dem_pred_1066 >= .5) if !missing(dem_pred_1066)
+
+. tab dem_pred_bin_1066a50
+
+dem_pred_bi |
+  n_1066a50 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        433       85.24       85.24
+          1 |         75       14.76      100.00
+------------+-----------------------------------
+      Total |        508      100.00
+
+. tab dementia dem_pred_bin_1066a50, matcell(conf_matrix)
+
+           | dem_pred_bin_1066a50
+  dementia |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       409         16 |       425 
+         1 |        24         59 |        83 
+-----------+----------------------+----------
+     Total |       433         75 |       508 
+
+. 
+. matrix list conf_matrix
+
+conf_matrix[2,2]
+     c1   c2
+r1  409   16
+r2   24   59
+
+. 
+. scalar TN = conf_matrix[1,1]
+
+. scalar FN = conf_matrix[1,2]
+
+. scalar FP = conf_matrix[2,1]
+
+. scalar TP = conf_matrix[2,2]
+
+. 
+. scalar Sensitivity = TP / (TP + FN)
+
+. scalar Specificity = TN / (TN + FP)
+
+. scalar Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+. 
+. display "Sensitivity for 1066 .5: " Sensitivity
+Sensitivity for 1066 .5: .78666667
+
+. display "Specificity for 1066 .5: " Specificity
+Specificity for 1066 .5: .94457275
+
+. display "Accuracy for 1066 .5: " Accuracy
+Accuracy for 1066 .5: .92125984
+
+. display "Predicted Prevalence for 1066 .5: " ((TP+FP) / (TP + TN + FP + FN))*100
+Predicted Prevalence for 1066 .5: 16.338583
+
+. 
+. roctab dementia dem_pred_bin_1066a50
+
+                      ROC                     Asymptotic normal  
+           Obs       area     Std. err.      [95% conf. interval]
+     ------------------------------------------------------------
+           508     0.8366       0.0255        0.78670     0.88649
+
+. 
+. gen dem_pred_bin_1066a25 = (dem_pred_1066 >= .25) if !missing(dem_pred_1066)
+
+. tab dem_pred_bin_1066a25
+
+dem_pred_bi |
+  n_1066a25 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        408       80.31       80.31
+          1 |        100       19.69      100.00
+------------+-----------------------------------
+      Total |        508      100.00
+
+. tab dementia dem_pred_bin_1066a25, matcell(conf_matrix)
+
+           | dem_pred_bin_1066a25
+  dementia |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       396         29 |       425 
+         1 |        12         71 |        83 
+-----------+----------------------+----------
+     Total |       408        100 |       508 
+
+. 
+. matrix list conf_matrix
+
+conf_matrix[2,2]
+     c1   c2
+r1  396   29
+r2   12   71
+
+. 
+. scalar TN = conf_matrix[1,1]
+
+. scalar FN = conf_matrix[1,2]
+
+. scalar FP = conf_matrix[2,1]
+
+. scalar TP = conf_matrix[2,2]
+
+. 
+. scalar Sensitivity = TP / (TP + FN)
+
+. scalar Specificity = TN / (TN + FP)
+
+. scalar Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+. 
+. display "Sensitivity for 1066 .25: " Sensitivity
+Sensitivity for 1066 .25: .71
+
+. display "Specificity for 1066 .25: " Specificity
+Specificity for 1066 .25: .97058824
+
+. display "Accuracy for 1066 .25: " Accuracy
+Accuracy for 1066 .25: .91929134
+
+. display "Predicted Prevalence for 1066 .25: " ((TP+FP) / (TP + TN + FP + FN))*100
+Predicted Prevalence for 1066 .25: 16.338583
+
+. 
+. roctab dementia dem_pred_bin_1066a25
+
+                      ROC                     Asymptotic normal  
+           Obs       area     Std. err.      [95% conf. interval]
+     ------------------------------------------------------------
+           508     0.8936       0.0204        0.85369     0.93350
+
+. 
+. *****  hrs, tics   ******
+. 
+. *************************
+. 
+. gen cogtot27_imp2002_binary = 2 if cogtot27_imp2002 <7
+(417 missing values generated)
+
+. replace cogtot27_imp2002_binary = 0 if cogtot27_imp2002 >6
+(417 real changes made)
+
+. 
+. gen cogtot27_imp2002_categorical = 2 if cogtot27_imp2002 < 7
+(417 missing values generated)
+
+. replace cogtot27_imp2002_categorical = 1 if cogtot27_imp2002 >= 7 & cogtot27_imp2002 < 12
+(174 real changes made)
+
+. replace cogtot27_imp2002_categorical = 0 if cogtot27_imp2002 >= 12
+(243 real changes made)
+
+. 
+. *binary tics
+. 
+. logit dementia cogtot27_imp2002
+
+Iteration 0:  Log likelihood = -226.18291  
+Iteration 1:  Log likelihood = -185.14281  
+Iteration 2:  Log likelihood = -178.35767  
+Iteration 3:  Log likelihood = -178.29112  
+Iteration 4:  Log likelihood = -178.29112  
+
+Logistic regression                                     Number of obs =    508
+                                                        LR chi2(1)    =  95.78
+                                                        Prob > chi2   = 0.0000
+Log likelihood = -178.29112                             Pseudo R2     = 0.2117
+
+----------------------------------------------------------------------------------
+        dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-----------------+----------------------------------------------------------------
+cogtot27_imp2002 |  -.3061744   .0385548    -7.94   0.000    -.3817404   -.2306084
+           _cons |   1.235009   .3321542     3.72   0.000     .5839983    1.886019
+----------------------------------------------------------------------------------
+
+. gen inregtics=e(sample)
+
+. predict dem_pred_lw
+(option pr assumed; Pr(dementia))
+
+. estat classification, cutoff(.15900329)
+
+Logistic model for dementia
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |        68           131  |        199
+     -     |        15           294  |        309
+-----------+--------------------------+-----------
+   Total   |        83           425  |        508
+
+Classified + if predicted Pr(D) >= .1590033
+True D defined as dementia != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   81.93%
+Specificity                     Pr( -|~D)   69.18%
+Positive predictive value       Pr( D| +)   34.17%
+Negative predictive value       Pr(~D| -)   95.15%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)   30.82%
+False - rate for true D         Pr( -| D)   18.07%
+False + rate for classified +   Pr(~D| +)   65.83%
+False - rate for classified -   Pr( D| -)    4.85%
+--------------------------------------------------
+Correctly classified                        71.26%
+--------------------------------------------------
+
+. cutpt dementia dem_pred_lw
+
+Empirical cutpoint estimation
+Method:                                Liu
+Reference variable:                    dementia (0=neg, 1=pos)
+Classification variable:               dem_pred_lw
+Empirical optimal cutpoint:            .15900329
+Sensitivity at cutpoint:               0.82
+Specificity at cutpoint:               0.69
+Area under ROC curve at cutpoint:      0.76
+
+. display "Predicted Prevalence from HRS TICS optimal cutoff: " (199/508) * 100
+Predicted Prevalence from HRS TICS optimal cutoff: 39.173228
+
+. 
+. 
+. rocreg dementia dem_pred_lw
+(running rocregstat on estimation sample)
+
+Bootstrap replications (1,000): .........10.........20.........30.........40.........50.........60......
+> ...70.........80.........90.........100.........110.........120.........130.........140.........150...
+> ......160.........170.........180.........190.........200.........210.........220.........230.........
+> 240.........250.........260.........270.........280.........290.........300.........310.........320...
+> ......330.........340.........350.........360.........370.........380.........390.........400.........
+> 410.........420.........430.........440.........450.........460.........470.........480.........490...
+> ......500.........510.........520.........530.........540.........550.........560.........570.........
+> 580.........590.........600.........610.........620.........630.........640.........650.........660...
+> ......670.........680.........690.........700.........710.........720.........730.........740.........
+> 750.........760.........770.........780.........790.........800.........810.........820.........830...
+> ......840.........850.........860.........870.........880.........890.........900.........910.........
+> 920.........930.........940.........950.........960.........970.........980.........990.........1,000 
+> done
+
+Bootstrap results                                        Number of obs =   508
+                                                         Replications  = 1,000
+
+Nonparametric ROC estimation
+
+Control standardization: empirical
+ROC method             : empirical
+
+Area under the ROC curve
+
+   Status    : dementia
+   Classifier: dem_pred_lw
+------------------------------------------------------------------------------
+             |    Observed               Bootstrap
+         AUC | coefficient       Bias    std. err.     [95% conf. interval]
+-------------+----------------------------------------------------------------
+             |    .7975337  -.0006595    .0231724     .7521166   .8429507  (N)
+             |                                         .749264   .8417155  (P)
+             |                                         .749635   .8423585 (BC)
+------------------------------------------------------------------------------
+
+.         gen dem_pred_bin_lw = (dem_pred_lw >= .15900329) if !missing(dem_pred_lw)
+
+. tab dementia dem_pred_bin_lw
+
+           |    dem_pred_bin_lw
+  dementia |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       294        131 |       425 
+         1 |        15         68 |        83 
+-----------+----------------------+----------
+     Total |       309        199 |       508 
+
+. 
+. gen dem_pred_lwa = 0
+
+.         replace dem_pred_lwa = 1 if cogtot27_imp2002 >= 0 & cogtot27_imp2002 <= 6
+(91 real changes made)
+
+. 
+. 
+. tab dem_pred_lwa
+
+dem_pred_lw |
+          a |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        417       82.09       82.09
+          1 |         91       17.91      100.00
+------------+-----------------------------------
+      Total |        508      100.00
+
+. tab dementia dem_pred_lwa, matcell(conf_matrix)
+
+           |     dem_pred_lwa
+  dementia |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       373         52 |       425 
+         1 |        44         39 |        83 
+-----------+----------------------+----------
+     Total |       417         91 |       508 
+
+. 
+. matrix list conf_matrix
+
+conf_matrix[2,2]
+     c1   c2
+r1  373   52
+r2   44   39
+
+. 
+. scalar TN = conf_matrix[1,1]
+
+. scalar FN = conf_matrix[1,2]
+
+. scalar FP = conf_matrix[2,1]
+
+. scalar TP = conf_matrix[2,2]
+
+. 
+. scalar Sensitivity = TP / (TP + FN)
+
+. scalar Specificity = TN / (TN + FP)
+
+. scalar Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+. 
+. display "Sensitivity for tics ascribed: " Sensitivity
+Sensitivity for tics ascribed: .42857143
+
+. display "Specificity for tics ascribed: " Specificity
+Specificity for tics ascribed: .89448441
+
+. display "Accuracy for tics ascribed: " Accuracy
+Accuracy for tics ascribed: .81102362
+
+. 
+. display "Predicted Prevalence from HRS TICS ascribed: " ((TP+FP) / (TP + TN + FP + FN))*100
+Predicted Prevalence from HRS TICS ascribed: 16.338583
+
+. 
+. *****  expert *****
+. 
+. *******************
+. logit dementia expert_p
+
+Iteration 0:  Log likelihood = -226.18291  
+Iteration 1:  Log likelihood = -166.80883  
+Iteration 2:  Log likelihood = -155.62078  
+Iteration 3:  Log likelihood = -155.17994  
+Iteration 4:  Log likelihood = -155.17908  
+Iteration 5:  Log likelihood = -155.17908  
+
+Logistic regression                                     Number of obs =    508
+                                                        LR chi2(1)    = 142.01
+                                                        Prob > chi2   = 0.0000
+Log likelihood = -155.17908                             Pseudo R2     = 0.3139
+
+------------------------------------------------------------------------------
+    dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    expert_p |   4.934526   .4784397    10.31   0.000     3.996802    5.872251
+       _cons |  -3.204674   .2422253   -13.23   0.000    -3.679427   -2.729921
+------------------------------------------------------------------------------
+
+. gen inregexpert=e(sample)
+
+. predict dem_pred_expert
+(option pr assumed; Pr(dementia))
+
+. estat classification, cutoff(.5)
+
+Logistic model for dementia
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |        36            23  |         59
+     -     |        47           402  |        449
+-----------+--------------------------+-----------
+   Total   |        83           425  |        508
+
+Classified + if predicted Pr(D) >= .5
+True D defined as dementia != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   43.37%
+Specificity                     Pr( -|~D)   94.59%
+Positive predictive value       Pr( D| +)   61.02%
+Negative predictive value       Pr(~D| -)   89.53%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)    5.41%
+False - rate for true D         Pr( -| D)   56.63%
+False + rate for classified +   Pr(~D| +)   38.98%
+False - rate for classified -   Pr( D| -)   10.47%
+--------------------------------------------------
+Correctly classified                        86.22%
+--------------------------------------------------
+
+. estat classification, cutoff(.09578772)
+
+Logistic model for dementia
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |        73            94  |        167
+     -     |        10           331  |        341
+-----------+--------------------------+-----------
+   Total   |        83           425  |        508
+
+Classified + if predicted Pr(D) >= .0957877
+True D defined as dementia != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   87.95%
+Specificity                     Pr( -|~D)   77.88%
+Positive predictive value       Pr( D| +)   43.71%
+Negative predictive value       Pr(~D| -)   97.07%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)   22.12%
+False - rate for true D         Pr( -| D)   12.05%
+False + rate for classified +   Pr(~D| +)   56.29%
+False - rate for classified -   Pr( D| -)    2.93%
+--------------------------------------------------
+Correctly classified                        79.53%
+--------------------------------------------------
+
+. cutpt dementia dem_pred_expert
+
+Empirical cutpoint estimation
+Method:                                Liu
+Reference variable:                    dementia (0=neg, 1=pos)
+Classification variable:               dem_pred_expert
+Empirical optimal cutpoint:            .09578772
+Sensitivity at cutpoint:               0.88
+Specificity at cutpoint:               0.78
+Area under ROC curve at cutpoint:      0.83
+
+. 
+. display "Predicted Prevalence from expert optimal cutoff: " (167/508) * 100
+Predicted Prevalence from expert optimal cutoff: 32.874016
+
+. 
+. rocreg dementia dem_pred_expert
+(running rocregstat on estimation sample)
+
+Bootstrap replications (1,000): .........10.........20.........30.........40.........50.........60......
+> ...70.........80.........90.........100.........110.........120.........130.........140.........150...
+> ......160.........170.........180.........190.........200.........210.........220.........230.........
+> 240.........250.........260.........270.........280.........290.........300.........310.........320...
+> ......330.........340.........350.........360.........370.........380.........390.........400.........
+> 410.........420.........430.........440.........450.........460.........470.........480.........490...
+> ......500.........510.........520.........530.........540.........550.........560.........570.........
+> 580.........590.........600.........610.........620.........630.........640.........650.........660...
+> ......670.........680.........690.........700.........710.........720.........730.........740.........
+> 750.........760.........770.........780.........790.........800.........810.........820.........830...
+> ......840.........850.........860.........870.........880.........890.........900.........910.........
+> 920.........930.........940.........950.........960.........970.........980.........990.........1,000 
+> done
+
+Bootstrap results                                        Number of obs =   508
+                                                         Replications  = 1,000
+
+Nonparametric ROC estimation
+
+Control standardization: empirical
+ROC method             : empirical
+
+Area under the ROC curve
+
+   Status    : dementia
+   Classifier: dem_pred_expert
+------------------------------------------------------------------------------
+             |    Observed               Bootstrap
+         AUC | coefficient       Bias    std. err.     [95% conf. interval]
+-------------+----------------------------------------------------------------
+             |    .8854429  -.0003873    .0185308     .8491232   .9217627  (N)
+             |                                        .8452605   .9187446  (P)
+             |                                        .8447803   .9181832 (BC)
+------------------------------------------------------------------------------
+
+.         gen dem_pred_bin_expert = (dem_pred_expert >= .09578772) if !missing(dem_pred_expert)
+
+. tab dementia dem_pred_bin_expert
+
+           |  dem_pred_bin_expert
+  dementia |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       331         94 |       425 
+         1 |        10         73 |        83 
+-----------+----------------------+----------
+     Total |       341        167 |       508 
+
+. 
+. *ascribed
+. gen dem_pred_experta = (dem_pred_expert >= .5) if !missing(dem_pred_expert)
+
+. tab dem_pred_experta
+
+dem_pred_ex |
+      perta |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        449       88.39       88.39
+          1 |         59       11.61      100.00
+------------+-----------------------------------
+      Total |        508      100.00
+
+. tab dementia dem_pred_experta, matcell(conf_matrix)
+
+           |   dem_pred_experta
+  dementia |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       402         23 |       425 
+         1 |        47         36 |        83 
+-----------+----------------------+----------
+     Total |       449         59 |       508 
+
+. 
+. matrix list conf_matrix
+
+conf_matrix[2,2]
+     c1   c2
+r1  402   23
+r2   47   36
+
+. 
+. scalar TN = conf_matrix[1,1]
+
+. scalar FN = conf_matrix[1,2]
+
+. scalar FP = conf_matrix[2,1]
+
+. scalar TP = conf_matrix[2,2]
+
+. 
+. scalar Sensitivity = TP / (TP + FN)
+
+. scalar Specificity = TN / (TN + FP)
+
+. scalar Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+. 
+. display "Sensitivity for expert ascribed: " Sensitivity
+Sensitivity for expert ascribed: .61016949
+
+. display "Specificity for expert ascribed: " Specificity
+Specificity for expert ascribed: .89532294
+
+. display "Accuracy for expert ascribed: " Accuracy
+Accuracy for expert ascribed: .86220472
+
+. display "Predicted Prevalence for expert ascribed: " ((TP+FP) / (TP + TN + FP + FN))*100
+Predicted Prevalence for expert ascribed: 16.338583
+
+. 
+. roctab dementia dem_pred_experta
+
+                      ROC                     Asymptotic normal  
+           Obs       area     Std. err.      [95% conf. interval]
+     ------------------------------------------------------------
+           508     0.6898       0.0279        0.63511     0.74451
+
+. 
+. *****  hurd  *****
+. 
+. ******************
+. 
+. logit dementia hurd_p
+
+Iteration 0:  Log likelihood = -226.18291  
+Iteration 1:  Log likelihood = -159.80446  
+Iteration 2:  Log likelihood = -150.56341  
+Iteration 3:  Log likelihood = -150.11395  
+Iteration 4:  Log likelihood = -150.11251  
+Iteration 5:  Log likelihood = -150.11251  
+
+Logistic regression                                     Number of obs =    508
+                                                        LR chi2(1)    = 152.14
+                                                        Prob > chi2   = 0.0000
+Log likelihood = -150.11251                             Pseudo R2     = 0.3363
+
+------------------------------------------------------------------------------
+    dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      hurd_p |   5.843858   .5743645    10.17   0.000     4.718124    6.969592
+       _cons |  -3.172233   .2336261   -13.58   0.000    -3.630131   -2.714334
+------------------------------------------------------------------------------
+
+. gen inreghurd=e(sample)
+
+. predict dem_pred_hurd
+(option pr assumed; Pr(dementia))
+
+. estat classification, cutoff(.5)
+
+Logistic model for dementia
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |        37            19  |         56
+     -     |        46           406  |        452
+-----------+--------------------------+-----------
+   Total   |        83           425  |        508
+
+Classified + if predicted Pr(D) >= .5
+True D defined as dementia != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   44.58%
+Specificity                     Pr( -|~D)   95.53%
+Positive predictive value       Pr( D| +)   66.07%
+Negative predictive value       Pr(~D| -)   89.82%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)    4.47%
+False - rate for true D         Pr( -| D)   55.42%
+False + rate for classified +   Pr(~D| +)   33.93%
+False - rate for classified -   Pr( D| -)   10.18%
+--------------------------------------------------
+Correctly classified                        87.20%
+--------------------------------------------------
+
+. estat classification, cutoff(.07790542)
+
+Logistic model for dementia
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |        77           112  |        189
+     -     |         6           313  |        319
+-----------+--------------------------+-----------
+   Total   |        83           425  |        508
+
+Classified + if predicted Pr(D) >= .0779054
+True D defined as dementia != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   92.77%
+Specificity                     Pr( -|~D)   73.65%
+Positive predictive value       Pr( D| +)   40.74%
+Negative predictive value       Pr(~D| -)   98.12%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)   26.35%
+False - rate for true D         Pr( -| D)    7.23%
+False + rate for classified +   Pr(~D| +)   59.26%
+False - rate for classified -   Pr( D| -)    1.88%
+--------------------------------------------------
+Correctly classified                        76.77%
+--------------------------------------------------
+
+. cutpt dementia dem_pred_hurd
+
+Empirical cutpoint estimation
+Method:                                Liu
+Reference variable:                    dementia (0=neg, 1=pos)
+Classification variable:               dem_pred_hurd
+Empirical optimal cutpoint:            .07790542
+Sensitivity at cutpoint:               0.93
+Specificity at cutpoint:               0.74
+Area under ROC curve at cutpoint:      0.83
+
+. display "Predicted Prevalence from hurd .5 cutoff: " (56/508) * 100
+Predicted Prevalence from hurd .5 cutoff: 11.023622
+
+. display "Predicted Prevalence from hurd optimal cutoff: " (189/508) * 100
+Predicted Prevalence from hurd optimal cutoff: 37.204724
+
+. 
+. *optimal
+. rocreg dementia dem_pred_hurd
+(running rocregstat on estimation sample)
+
+Bootstrap replications (1,000): .........10.........20.........30.........40.........50.........60......
+> ...70.........80.........90.........100.........110.........120.........130.........140.........150...
+> ......160.........170.........180.........190.........200.........210.........220.........230.........
+> 240.........250.........260.........270.........280.........290.........300.........310.........320...
+> ......330.........340.........350.........360.........370.........380.........390.........400.........
+> 410.........420.........430.........440.........450.........460.........470.........480.........490...
+> ......500.........510.........520.........530.........540.........550.........560.........570.........
+> 580.........590.........600.........610.........620.........630.........640.........650.........660...
+> ......670.........680.........690.........700.........710.........720.........730.........740.........
+> 750.........760.........770.........780.........790.........800.........810.........820.........830...
+> ......840.........850.........860.........870.........880.........890.........900.........910.........
+> 920.........930.........940.........950.........960.........970.........980.........990.........1,000 
+> done
+
+Bootstrap results                                        Number of obs =   508
+                                                         Replications  = 1,000
+
+Nonparametric ROC estimation
+
+Control standardization: empirical
+ROC method             : empirical
+
+Area under the ROC curve
+
+   Status    : dementia
+   Classifier: dem_pred_hurd
+------------------------------------------------------------------------------
+             |    Observed               Bootstrap
+         AUC | coefficient       Bias    std. err.     [95% conf. interval]
+-------------+----------------------------------------------------------------
+             |     .896584  -.0001394    .0185448     .8602368   .9329312  (N)
+             |                                         .855748   .9294752  (P)
+             |                                        .8507112   .9262552 (BC)
+------------------------------------------------------------------------------
+
+.         gen dem_pred_bin_hurd = (dem_pred_hurd >= .07790542) if !missing(dem_pred_hurd)
+
+. tab dementia dem_pred_bin_hurd
+
+           |   dem_pred_bin_hurd
+  dementia |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       313        112 |       425 
+         1 |         6         77 |        83 
+-----------+----------------------+----------
+     Total |       319        189 |       508 
+
+. 
+. *ascribed
+. gen dem_pred_hurda = (dem_pred_hurd >= .5) if !missing(dem_pred_hurd)
+
+. tab dem_pred_hurda
+
+dem_pred_hu |
+        rda |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        452       88.98       88.98
+          1 |         56       11.02      100.00
+------------+-----------------------------------
+      Total |        508      100.00
+
+. tab dementia dem_pred_hurda, matcell(conf_matrix)
+
+           |    dem_pred_hurda
+  dementia |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       406         19 |       425 
+         1 |        46         37 |        83 
+-----------+----------------------+----------
+     Total |       452         56 |       508 
+
+. 
+. matrix list conf_matrix
+
+conf_matrix[2,2]
+     c1   c2
+r1  406   19
+r2   46   37
+
+. 
+. scalar TN = conf_matrix[1,1]
+
+. scalar FN = conf_matrix[1,2]
+
+. scalar FP = conf_matrix[2,1]
+
+. scalar TP = conf_matrix[2,2]
+
+. 
+. scalar Sensitivity = TP / (TP + FN)
+
+. scalar Specificity = TN / (TN + FP)
+
+. scalar Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+. 
+. display "Sensitivity for hurd ascribed: " Sensitivity
+Sensitivity for hurd ascribed: .66071429
+
+. display "Specificity for hurd ascribed: " Specificity
+Specificity for hurd ascribed: .89823009
+
+. display "Accuracy for hurd ascribed: " Accuracy
+Accuracy for hurd ascribed: .87204724
+
+. display "Predicted Prevalence for hurd ascribed: " ((TP+FP) / (TP + TN + FP + FN))*100
+Predicted Prevalence for hurd ascribed: 16.338583
+
+. roctab dementia dem_pred_hurda
+
+                      ROC                     Asymptotic normal  
+           Obs       area     Std. err.      [95% conf. interval]
+     ------------------------------------------------------------
+           508     0.7005       0.0279        0.64586     0.75522
+
+. 
+. ******  lasso  *******
+. 
+. **********************
+. 
+. logit dementia lasso_p
+
+Iteration 0:  Log likelihood = -226.18291  
+Iteration 1:  Log likelihood = -147.07204  
+Iteration 2:  Log likelihood = -133.41822  
+Iteration 3:  Log likelihood = -132.71779  
+Iteration 4:  Log likelihood = -132.71705  
+Iteration 5:  Log likelihood = -132.71705  
+
+Logistic regression                                     Number of obs =    508
+                                                        LR chi2(1)    = 186.93
+                                                        Prob > chi2   = 0.0000
+Log likelihood = -132.71705                             Pseudo R2     = 0.4132
+
+------------------------------------------------------------------------------
+    dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     lasso_p |   6.408366   .5968135    10.74   0.000     5.238633    7.578099
+       _cons |  -3.766507   .2932718   -12.84   0.000    -4.341309   -3.191704
+------------------------------------------------------------------------------
+
+. gen inreglasso=e(sample)
+
+. predict dem_pred_lasso
+(option pr assumed; Pr(dementia))
+
+. estat classification, cutoff(.5)
+
+Logistic model for dementia
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |        47            17  |         64
+     -     |        36           408  |        444
+-----------+--------------------------+-----------
+   Total   |        83           425  |        508
+
+Classified + if predicted Pr(D) >= .5
+True D defined as dementia != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   56.63%
+Specificity                     Pr( -|~D)   96.00%
+Positive predictive value       Pr( D| +)   73.44%
+Negative predictive value       Pr(~D| -)   91.89%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)    4.00%
+False - rate for true D         Pr( -| D)   43.37%
+False + rate for classified +   Pr(~D| +)   26.56%
+False - rate for classified -   Pr( D| -)    8.11%
+--------------------------------------------------
+Correctly classified                        89.57%
+--------------------------------------------------
+
+. estat classification, cutoff(.16165452)
+
+Logistic model for dementia
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |        69            55  |        124
+     -     |        14           370  |        384
+-----------+--------------------------+-----------
+   Total   |        83           425  |        508
+
+Classified + if predicted Pr(D) >= .1616545
+True D defined as dementia != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   83.13%
+Specificity                     Pr( -|~D)   87.06%
+Positive predictive value       Pr( D| +)   55.65%
+Negative predictive value       Pr(~D| -)   96.35%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)   12.94%
+False - rate for true D         Pr( -| D)   16.87%
+False + rate for classified +   Pr(~D| +)   44.35%
+False - rate for classified -   Pr( D| -)    3.65%
+--------------------------------------------------
+Correctly classified                        86.42%
+--------------------------------------------------
+
+. cutpt dementia dem_pred_lasso
+
+Empirical cutpoint estimation
+Method:                                Liu
+Reference variable:                    dementia (0=neg, 1=pos)
+Classification variable:               dem_pred_lasso
+Empirical optimal cutpoint:            .16165452
+Sensitivity at cutpoint:               0.83
+Specificity at cutpoint:               0.87
+Area under ROC curve at cutpoint:      0.85
+
+. display "Predicted Prevalence from lasso .5 cutoff: " (64/508) * 100
+Predicted Prevalence from lasso .5 cutoff: 12.598425
+
+. display "Predicted Prevalence from lasso optimal cutoff: " (124/508) * 100
+Predicted Prevalence from lasso optimal cutoff: 24.409449
+
+. 
+. *optimal
+. rocreg dementia dem_pred_lasso
+(running rocregstat on estimation sample)
+
+Bootstrap replications (1,000): .........10.........20.........30.........40.........50.........60......
+> ...70.........80.........90.........100.........110.........120.........130.........140.........150...
+> ......160.........170.........180.........190.........200.........210.........220.........230.........
+> 240.........250.........260.........270.........280.........290.........300.........310.........320...
+> ......330.........340.........350.........360.........370.........380.........390.........400.........
+> 410.........420.........430.........440.........450.........460.........470.........480.........490...
+> ......500.........510.........520.........530.........540.........550.........560.........570.........
+> 580.........590.........600.........610.........620.........630.........640.........650.........660...
+> ......670.........680.........690.........700.........710.........720.........730.........740.........
+> 750.........760.........770.........780.........790.........800.........810.........820.........830...
+> ......840.........850.........860.........870.........880.........890.........900.........910.........
+> 920.........930.........940.........950.........960.........970.........980.........990.........1,000 
+> done
+
+Bootstrap results                                        Number of obs =   508
+                                                         Replications  = 1,000
+
+Nonparametric ROC estimation
+
+Control standardization: empirical
+ROC method             : empirical
+
+Area under the ROC curve
+
+   Status    : dementia
+   Classifier: dem_pred_lasso
+------------------------------------------------------------------------------
+             |    Observed               Bootstrap
+         AUC | coefficient       Bias    std. err.     [95% conf. interval]
+-------------+----------------------------------------------------------------
+             |     .914472   .0000338    .0165368     .8820604   .9468836  (N)
+             |                                        .8796065   .9445664  (P)
+             |                                        .8787271   .9442666 (BC)
+------------------------------------------------------------------------------
+
+.         gen dem_pred_bin_lasso = (dem_pred_lasso >= .16165452) if !missing(dem_pred_lasso)
+
+. tab dementia dem_pred_bin_lasso
+
+           |  dem_pred_bin_lasso
+  dementia |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       370         55 |       425 
+         1 |        14         69 |        83 
+-----------+----------------------+----------
+     Total |       384        124 |       508 
+
+. 
+. *ascribed (.9010816)
+. gen dem_pred_lassoa = (dem_pred_lasso >= .5) if !missing(dem_pred_lasso)
+
+. tab dem_pred_lassoa
+
+dem_pred_la |
+       ssoa |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        444       87.40       87.40
+          1 |         64       12.60      100.00
+------------+-----------------------------------
+      Total |        508      100.00
+
+. tab dementia dem_pred_lassoa, matcell(conf_matrix)
+
+           |    dem_pred_lassoa
+  dementia |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       408         17 |       425 
+         1 |        36         47 |        83 
+-----------+----------------------+----------
+     Total |       444         64 |       508 
+
+. 
+. matrix list conf_matrix
+
+conf_matrix[2,2]
+     c1   c2
+r1  408   17
+r2   36   47
+
+. 
+. scalar TN = conf_matrix[1,1]
+
+. scalar FN = conf_matrix[1,2]
+
+. scalar FP = conf_matrix[2,1]
+
+. scalar TP = conf_matrix[2,2]
+
+. 
+. scalar Sensitivity = TP / (TP + FN)
+
+. scalar Specificity = TN / (TN + FP)
+
+. scalar Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+. 
+. display "Sensitivity for lasso ascribed: " Sensitivity
+Sensitivity for lasso ascribed: .734375
+
+. display "Specificity for lasso ascribed: " Specificity
+Specificity for lasso ascribed: .91891892
+
+. display "Accuracy for lasso ascribed: " Accuracy
+Accuracy for lasso ascribed: .89566929
+
+. display "Predicted Prevalence for lasso ascribed: " ((TP+FP) / (TP + TN + FP + FN))*100
+Predicted Prevalence for lasso ascribed: 16.338583
+
+. 
+. roctab dementia dem_pred_lassoa
+
+                      ROC                     Asymptotic normal  
+           Obs       area     Std. err.      [95% conf. interval]
+     ------------------------------------------------------------
+           508     0.7631       0.0278        0.70869     0.81757
+
+. 
+. ** education gradients [optimal cutpoints]
+. foreach dem_var in dementia dem_pred_bin_1066 dem_pred_bin_lw dem_pred_bin_expert dem_pred_bin_hurd de
+> m_pred_bin_lasso {
+  2. forvalues r=1/2 {
+  3. display "****start: `dem_var' `r'****"
+  4. qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat == `r'
+  5.         margins educat, post
+  6.         eststo `dem_var'_`r'
+  7.         }
+  8. }
+****start: dementia 1****
+
+Predictive margins                                         Number of obs = 258
+Model VCE: OIM
+
+Expression: Pr(dementia), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .1334245   .0319917     4.17   0.000      .070722     .196127
+          2  |   .0434133   .0244684     1.77   0.076    -.0045438    .0913704
+          3  |   .0262196   .0182728     1.43   0.151    -.0095944    .0620336
+------------------------------------------------------------------------------
+****start: dementia 2****
+
+Predictive margins                                         Number of obs = 250
+Model VCE: OIM
+
+Expression: Pr(dementia), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .2332591   .0368038     6.34   0.000     .1611249    .3053932
+          2  |   .3324418   .0606255     5.48   0.000      .213618    .4512656
+          3  |   .2236924    .046566     4.80   0.000     .1324247    .3149601
+------------------------------------------------------------------------------
+****start: dem_pred_bin_1066 1****
+
+Predictive margins                                         Number of obs = 258
+Model VCE: OIM
+
+Expression: Pr(dem_pred_bin_1066), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .2587167   .0412006     6.28   0.000      .177965    .3394684
+          2  |   .0722187   .0310156     2.33   0.020     .0114293    .1330081
+          3  |   .0524076   .0254502     2.06   0.039     .0025261    .1022892
+------------------------------------------------------------------------------
+****start: dem_pred_bin_1066 2****
+
+Predictive margins                                         Number of obs = 250
+Model VCE: OIM
+
+Expression: Pr(dem_pred_bin_1066), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .4160949   .0432927     9.61   0.000     .3312428    .5009471
+          2  |   .4465065   .0647997     6.89   0.000     .3195015    .5735115
+          3  |   .2102638    .045658     4.61   0.000     .1207757    .2997519
+------------------------------------------------------------------------------
+****start: dem_pred_bin_lw 1****
+
+Predictive margins                                         Number of obs = 258
+Model VCE: OIM
+
+Expression: Pr(dem_pred_bin_lw), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .5861145   .0467737    12.53   0.000     .4944396    .6777893
+          2  |   .2280028     .05012     4.55   0.000     .1297693    .3262363
+          3  |   .0908921   .0327547     2.77   0.006      .026694    .1550901
+------------------------------------------------------------------------------
+****start: dem_pred_bin_lw 2****
+
+Predictive margins                                         Number of obs = 250
+Model VCE: OIM
+
+Expression: Pr(dem_pred_bin_lw), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .6130862   .0437348    14.02   0.000     .5273676    .6988049
+          2  |   .3911828   .0643992     6.07   0.000     .2649628    .5174029
+          3  |   .2208355   .0468471     4.71   0.000     .1290168    .3126542
+------------------------------------------------------------------------------
+****start: dem_pred_bin_expert 1****
+
+Predictive margins                                         Number of obs = 258
+Model VCE: OIM
+
+Expression: Pr(dem_pred_bin_expert), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .2638595    .040244     6.56   0.000     .1849826    .3427364
+          2  |   .1471214   .0418276     3.52   0.000     .0651408     .229102
+          3  |   .0793217   .0305731     2.59   0.009     .0193994    .1392439
+------------------------------------------------------------------------------
+****start: dem_pred_bin_expert 2****
+
+Predictive margins                                         Number of obs = 250
+Model VCE: OIM
+
+Expression: Pr(dem_pred_bin_expert), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .5374795   .0446226    12.04   0.000     .4500207    .6249383
+          2  |   .5770078    .065902     8.76   0.000     .4478423    .7061734
+          3  |   .3382505   .0527142     6.42   0.000     .2349326    .4415683
+------------------------------------------------------------------------------
+****start: dem_pred_bin_hurd 1****
+
+Predictive margins                                         Number of obs = 258
+Model VCE: OIM
+
+Expression: Pr(dem_pred_bin_hurd), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .3544928   .0443378     8.00   0.000     .2675923    .4413932
+          2  |   .1463769   .0421029     3.48   0.001     .0638567    .2288971
+          3  |   .0789201   .0306423     2.58   0.010     .0188623     .138978
+------------------------------------------------------------------------------
+****start: dem_pred_bin_hurd 2****
+
+Predictive margins                                         Number of obs = 250
+Model VCE: OIM
+
+Expression: Pr(dem_pred_bin_hurd), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |    .596603   .0436529    13.67   0.000      .511045     .682161
+          2  |   .5934841   .0649476     9.14   0.000     .4661891    .7207791
+          3  |   .3923844   .0536757     7.31   0.000     .2871819    .4975869
+------------------------------------------------------------------------------
+****start: dem_pred_bin_lasso 1****
+
+Predictive margins                                         Number of obs = 258
+Model VCE: OIM
+
+Expression: Pr(dem_pred_bin_lasso), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .1755131   .0348947     5.03   0.000     .1071208    .2439055
+          2  |   .0736113   .0312213     2.36   0.018     .0124187     .134804
+          3  |    .066113   .0281978     2.34   0.019     .0108464    .1213796
+------------------------------------------------------------------------------
+****start: dem_pred_bin_lasso 2****
+
+Predictive margins                                         Number of obs = 250
+Model VCE: OIM
+
+Expression: Pr(dem_pred_bin_lasso), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .4169178   .0425794     9.79   0.000     .3334638    .5003719
+          2  |   .4597316   .0635878     7.23   0.000     .3351018    .5843614
+          3  |   .2508092   .0480564     5.22   0.000     .1566205    .3449979
+------------------------------------------------------------------------------
+
+. 
+. *in this data there are zero cases of dem_pred_experta if AAGE_CAT == 1
+. *same thing for dem_pred_hurda and dem_pred_lassoa
+. *I will remove it for now and ask Jordan about it
+. tab AAGE_cat dem_pred_experta
+
+           |   dem_pred_experta
+  AAGE_cat |         0          1 |     Total
+-----------+----------------------+----------
+         1 |       252          6 |       258 
+         2 |       197         53 |       250 
+-----------+----------------------+----------
+     Total |       449         59 |       508 
+
+. tab AAGE_cat dem_pred_hurda
+
+           |    dem_pred_hurda
+  AAGE_cat |         0          1 |     Total
+-----------+----------------------+----------
+         1 |       251          7 |       258 
+         2 |       201         49 |       250 
+-----------+----------------------+----------
+     Total |       452         56 |       508 
+
+. tab AAGE_cat dem_pred_lassoa
+
+           |    dem_pred_lassoa
+  AAGE_cat |         0          1 |     Total
+-----------+----------------------+----------
+         1 |       248         10 |       258 
+         2 |       196         54 |       250 
+-----------+----------------------+----------
+     Total |       444         64 |       508 
+
+. 
+. ** education gradients [ascribed]
+. foreach dem_var in dementia dem_pred_bin_1066a25 dem_pred_bin_1066a50 dem_pred_lwa dem_pred_experta de
+> m_pred_hurda dem_pred_lassoa{
+  2. forvalues r=1/2 {
+  3. display "****start: `dem_var' `r'****"
+  4. qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat == `r'
+  5.         margins educat, post
+  6.         eststo `dem_var'_`r'
+  7.         }
+  8. }
+****start: dementia 1****
+
+Predictive margins                                         Number of obs = 258
+Model VCE: OIM
+
+Expression: Pr(dementia), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .1334245   .0319917     4.17   0.000      .070722     .196127
+          2  |   .0434133   .0244684     1.77   0.076    -.0045438    .0913704
+          3  |   .0262196   .0182728     1.43   0.151    -.0095944    .0620336
+------------------------------------------------------------------------------
+****start: dementia 2****
+
+Predictive margins                                         Number of obs = 250
+Model VCE: OIM
+
+Expression: Pr(dementia), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .2332591   .0368038     6.34   0.000     .1611249    .3053932
+          2  |   .3324418   .0606255     5.48   0.000      .213618    .4512656
+          3  |   .2236924    .046566     4.80   0.000     .1324247    .3149601
+------------------------------------------------------------------------------
+****start: dem_pred_bin_1066a25 1****
+
+Predictive margins                                         Number of obs = 258
+Model VCE: OIM
+
+Expression: Pr(dem_pred_bin_1066a25), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .1950895   .0370789     5.26   0.000     .1224162    .2677628
+          2  |   .0582191    .028131     2.07   0.038     .0030833    .1133548
+          3  |   .0394047   .0222326     1.77   0.076    -.0041704    .0829798
+------------------------------------------------------------------------------
+****start: dem_pred_bin_1066a25 2****
+
+Predictive margins                                         Number of obs = 250
+Model VCE: OIM
+
+Expression: Pr(dem_pred_bin_1066a25), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .3309105   .0410166     8.07   0.000     .2505193    .4113016
+          2  |     .29915   .0593474     5.04   0.000     .1828312    .4154687
+          3  |   .1981329   .0444825     4.45   0.000     .1109488    .2853171
+------------------------------------------------------------------------------
+****start: dem_pred_bin_1066a50 1****
+
+Predictive margins                                         Number of obs = 258
+Model VCE: OIM
+
+Expression: Pr(dem_pred_bin_1066a50), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .1244651   .0310761     4.01   0.000      .063557    .1853733
+          2  |   .0436149   .0245889     1.77   0.076    -.0045783    .0918082
+          3  |   .0261176   .0182084     1.43   0.151    -.0095702    .0618054
+------------------------------------------------------------------------------
+****start: dem_pred_bin_1066a50 2****
+
+Predictive margins                                         Number of obs = 250
+Model VCE: OIM
+
+Expression: Pr(dem_pred_bin_1066a50), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .2732837   .0383805     7.12   0.000     .1980593    .3485081
+          2  |   .2039792   .0520335     3.92   0.000     .1019954    .3059631
+          3  |   .1570062   .0412461     3.81   0.000     .0761654     .237847
+------------------------------------------------------------------------------
+****start: dem_pred_lwa 1****
+
+Predictive margins                                         Number of obs = 181
+Model VCE: OIM
+
+Expression: Pr(dem_pred_lwa), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .2688526   .0415922     6.46   0.000     .1873333    .3503719
+          2  |   .0723179   .0310101     2.33   0.020     .0115392    .1330966
+------------------------------------------------------------------------------
+****start: dem_pred_lwa 2****
+
+Predictive margins                                         Number of obs = 250
+Model VCE: OIM
+
+Expression: Pr(dem_pred_lwa), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .3362956    .042439     7.92   0.000     .2531166    .4194746
+          2  |   .1867546   .0524497     3.56   0.000      .083955    .2895541
+          3  |   .0690047   .0295266     2.34   0.019     .0111336    .1268758
+------------------------------------------------------------------------------
+****start: dem_pred_experta 1****
+
+Predictive margins                                         Number of obs = 181
+Model VCE: OIM
+
+Expression: Pr(dem_pred_experta), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .0442051   .0192727     2.29   0.022     .0064314    .0819789
+          2  |   .0147408   .0146163     1.01   0.313    -.0139066    .0433882
+------------------------------------------------------------------------------
+****start: dem_pred_experta 2****
+
+Predictive margins                                         Number of obs = 250
+Model VCE: OIM
+
+Expression: Pr(dem_pred_experta), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .2687309   .0383987     7.00   0.000     .1934707     .343991
+          2  |   .2373487   .0547607     4.33   0.000     .1300198    .3446776
+          3  |    .098119   .0343815     2.85   0.004     .0307325    .1655055
+------------------------------------------------------------------------------
+****start: dem_pred_hurda 1****
+
+Predictive margins                                         Number of obs = 181
+Model VCE: OIM
+
+Expression: Pr(dem_pred_hurda), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .0442793   .0193153     2.29   0.022      .006422    .0821366
+          2  |   .0293915   .0204349     1.44   0.150    -.0106602    .0694433
+------------------------------------------------------------------------------
+****start: dem_pred_hurda 2****
+
+Predictive margins                                         Number of obs = 250
+Model VCE: OIM
+
+Expression: Pr(dem_pred_hurda), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .2481199   .0368747     6.73   0.000     .1758468    .3203931
+          2  |   .2216551   .0529303     4.19   0.000     .1179135    .3253967
+          3  |   .0872326   .0328826     2.65   0.008     .0227839    .1516813
+------------------------------------------------------------------------------
+****start: dem_pred_lassoa 1****
+
+Predictive margins                                         Number of obs = 181
+Model VCE: OIM
+
+Expression: Pr(dem_pred_lassoa), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .0707747   .0239913     2.95   0.003     .0237526    .1177968
+          2  |    .029473   .0204676     1.44   0.150    -.0106428    .0695889
+------------------------------------------------------------------------------
+****start: dem_pred_lassoa 2****
+
+Predictive margins                                         Number of obs = 250
+Model VCE: OIM
+
+Expression: Pr(dem_pred_lassoa), predict()
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      educat |
+          1  |   .2574911    .037522     6.86   0.000     .1839494    .3310328
+          2  |   .2575759   .0556856     4.63   0.000     .1484341    .3667178
+          3  |   .1145082   .0366884     3.12   0.002     .0426002    .1864161
+------------------------------------------------------------------------------
+
+. 
+. 
+. log close
+      name:  <unnamed>
+       log:  /hdir/0/chrissoria/1066/ADAMS_1066_aggressive_98_to_0.log
+  log type:  text
+ closed on:   1 May 2024, 21:27:00
+--------------------------------------------------------------------------------------------------------
