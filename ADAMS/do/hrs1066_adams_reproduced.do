@@ -397,56 +397,32 @@ tab educat
 ** identify cutpoints to maximize sensitivity and specificity [optimal]
 * http://www.haghish.com/statistics/stata-blog/stata-programming/download/cutpt.html
 *  1066
-logit dementia COGSCORE RELSCORE aRECALLcs
-gen inreg1066=e(sample)
-predict dem_pred_1066
-estat classification, cutoff(.25)
-roctab dementia dem_pred_1066
 
-estat classification, cutoff(.50)
-estat classification, cutoff(.11898708)
-cutpt dementia dem_pred_1066
+set seed 12345
+gen fold = mod(_n, 10) + 1
+gen k_fold_dem_pred_1066 = .
 
+forvalues i = 1/10 {
+    local train = "fold != `i'"
+    local test = "fold == `i'"
+    logit dementia COGSCORE RELSCORE aRECALLcs if `train' 
+    predict p_`i' if `test', pr
+    replace k_fold_dem_pred_1066 = p_`i' if `test'
+    drop p_`i'
+}
 
-*below is where Jordan identified the ideal cutoff point that maximizes the product of sensitivity and specificity
-*however, we'll also want to try .5 (the traditional indicator) and .25 (Prince 2003) stated on page 915 that, 
-*"A predicted probability of more than 0·25 produced the best sensitivity and specificity
+estat classification, cutoff(.14220728)
 
-*Chris is updating this slightly to reflect slightly revised computation of relscore
-rocreg dementia dem_pred_1066
-	gen dem_pred_bin_1066 = (dem_pred_1066 >= .11898708) if !missing(dem_pred_1066)
-tab dementia dem_pred_bin_1066, matcell(conf_matrix)
-display "Predicted Prevalence from 1066 optimal cutoff: " (128/508) * 100
+cutpt dementia k_fold_dem_pred_1066
+roctab dementia k_fold_dem_pred_1066
+rocreg dementia k_fold_dem_pred_1066
+
+gen k_fold_dem_pred_1066_opt = (k_fold_dem_pred_1066 >= .14220728) if !missing(k_fold_dem_pred_1066)
+tab dementia k_fold_dem_pred_1066_opt, matcell(conf_matrix)
+display "Predicted Prevalence from 1066 optimal cutoff: " (120/508) * 100
 
 *ascribed
-gen dem_pred_bin_1066a50= (dem_pred_1066 >= .5) if !missing(dem_pred_1066)
-tab dem_pred_bin_1066a50
-tab dementia dem_pred_bin_1066a50, matcell(conf_matrix)
-
-matrix list conf_matrix
-
-scalar TN = conf_matrix[1,1]
-scalar FN = conf_matrix[2,1]
-scalar FP = conf_matrix[1,2]
-scalar TP = conf_matrix[2,2]
-
-scalar Sensitivity = TP / (TP + FN)
-scalar Specificity = TN / (TN + FP)
-scalar Accuracy = (TP + TN) / (TP + TN + FP + FN)
-scalar Prevalence = ((TP+FP) / (TP + TN + FP + FN))*100
-display TP+FP
-
-display "Sensitivity for 1066 .5: " Sensitivity
-display "Specificity for 1066 .5: " Specificity
-display "Accuracy for 1066 .5: " Accuracy
-display "Predicted Prevalence for 1066 .5: " Prevalence
-
-roctab dementia dem_pred_bin_1066a50
-
-matrix drop conf_matrix
-scalar drop TN FN FP TP Sensitivity Specificity Accuracy Prevalence
-
-gen dem_pred_bin_1066a25 = (dem_pred_1066 >= .25) if !missing(dem_pred_1066)
+gen dem_pred_bin_1066a25 = (k_fold_dem_pred_1066 >= .25) if !missing(k_fold_dem_pred_1066)
 tab dem_pred_bin_1066a25
 tab dementia dem_pred_bin_1066a25, matcell(conf_matrix)
 
@@ -527,23 +503,7 @@ roctab dementia dem_pred_lwa
 *****  expert *****
 
 *******************
-logit dementia expert_p
-gen inregexpert=e(sample)
-predict dem_pred_expert
-estat classification, cutoff(.5)
-estat classification, cutoff(.09578772)
-cutpt dementia dem_pred_expert
-
-display "Predicted Prevalence from expert optimal cutoff: " (167/508) * 100
-
-rocreg dementia dem_pred_expert
-	gen dem_pred_bin_expert = (dem_pred_expert >= .09578772) if !missing(dem_pred_expert)
-tab dementia dem_pred_bin_expert
-
-*ascribed
-gen dem_pred_experta = (dem_pred_expert >= .5) if !missing(dem_pred_expert)
-tab dem_pred_experta
-tab dementia dem_pred_experta, matcell(conf_matrix)
+tabulate dementia expert_dem, matcell(conf_matrix)
 
 matrix list conf_matrix
 
@@ -562,29 +522,12 @@ display "Specificity for expert ascribed: " Specificity
 display "Accuracy for expert ascribed: " Accuracy
 display "Predicted Prevalence for expert ascribed: " Prevalence
 
-roctab dementia dem_pred_experta
+roctab dementia expert_dem
 
 *****  hurd  *****
 
 ******************
-
-logit dementia hurd_p
-gen inreghurd=e(sample)
-predict dem_pred_hurd
-estat classification, cutoff(.5)
-estat classification, cutoff(.07790542)
-cutpt dementia dem_pred_hurd
-display "Predicted Prevalence from hurd optimal cutoff: " (189/508) * 100
-
-*optimal
-rocreg dementia dem_pred_hurd
-	gen dem_pred_bin_hurd = (dem_pred_hurd >= .07790542) if !missing(dem_pred_hurd)
-tab dementia dem_pred_bin_hurd
-
-*ascribed
-gen dem_pred_hurda = (dem_pred_hurd >= .5) if !missing(dem_pred_hurd)
-tab dem_pred_hurda
-tab dementia dem_pred_hurda, matcell(conf_matrix)
+tabulate dementia hurd_dem, matcell(conf_matrix)
 
 matrix list conf_matrix
 
@@ -602,29 +545,12 @@ display "Sensitivity for hurd ascribed: " Sensitivity
 display "Specificity for hurd ascribed: " Specificity
 display "Accuracy for hurd ascribed: " Accuracy
 display "Predicted Prevalence for hurd ascribed: " Prevalence
-roctab dementia dem_pred_hurda
+roctab dementia hurd_dem
 
 ******  lasso  *******
 
 **********************
-
-logit dementia lasso_p
-gen inreglasso=e(sample)
-predict dem_pred_lasso
-estat classification, cutoff(.5)
-estat classification, cutoff(.16165452)
-cutpt dementia dem_pred_lasso
-
-*optimal
-rocreg dementia dem_pred_lasso
-	gen dem_pred_bin_lasso = (dem_pred_lasso >= .16165452) if !missing(dem_pred_lasso)
-tab dementia dem_pred_bin_lasso
-display "Predicted Prevalence from lasso optimal cutoff: " (124/508) * 100
-
-*ascribed (.9010816)
-gen dem_pred_lassoa = (dem_pred_lasso >= .5) if !missing(dem_pred_lasso)
-tab dem_pred_lassoa
-tab dementia dem_pred_lassoa, matcell(conf_matrix)
+tabulate dementia lasso_dem, matcell(conf_matrix)
 
 matrix list conf_matrix
 
@@ -643,36 +569,28 @@ display "Specificity for lasso ascribed: " Specificity
 display "Accuracy for lasso ascribed: " Accuracy
 display "Predicted Prevalence for lasso ascribed: " Prevalence
 
-roctab dementia dem_pred_lassoa
+roctab dementia lasso_dem
 
-** education gradients [optimal cutpoints]
-foreach dem_var in dementia dem_pred_bin_1066 dem_pred_bin_lw dem_pred_bin_expert dem_pred_bin_hurd dem_pred_bin_lasso {
-forvalues r=1/2 {
-display "****start: `dem_var' `r'****"
-qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat == `r'
-	margins educat, post
-	eststo `dem_var'_`r'
-	}
+** education gradients [for all cutpoints]
+foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_bin_lw expert_dem hurd_dem lasso_dem {
+    forvalues r = 1/2 {
+        display "****start: `dem_var' `r'****"
+        qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat == `r'
+        margins educat, post  // Only use 'post' if necessary
+        eststo `dem_var'_`r'
+    }
 }
 
-*in this data there are zero cases of dem_pred_experta if AAGE_CAT == 1
-*same thing for dem_pred_hurda and dem_pred_lassoa
-*I will remove it for now and ask Jordan about it
-tab AAGE_cat dem_pred_experta
-tab AAGE_cat dem_pred_hurda
-tab AAGE_cat dem_pred_lassoa
-
-** education gradients [ascribed]
-foreach dem_var in dementia dem_pred_bin_1066a25 dem_pred_bin_1066a50 dem_pred_lwa dem_pred_experta dem_pred_hurda dem_pred_lassoa{
-forvalues r=1/2 {
-display "****start: `dem_var' `r'****"
-qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat == `r'
-	margins educat, post
-	eststo `dem_var'_`r'
-	}
-}
-
+*tabulating to see distribution
+tab AAGE_cat k_fold_dem_pred_1066_opt
+tab AAGE_cat dem_pred_bin_1066a25
+tab AAGE_cat dem_pred_bin_lw
+tab AAGE_cat expert_dem
+tab AAGE_cat hurd_dem
+tab AAGE_cat lasso_dem
+tab raracem expert_dem
+tab raracem hurd_dem
+tab raracem lasso_dem
 
 log close
 exit, clear
-
