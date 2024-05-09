@@ -396,9 +396,13 @@ tab educat
 ** table 3 **
 ** identify cutpoints to maximize sensitivity and specificity [optimal]
 * http://www.haghish.com/statistics/stata-blog/stata-programming/download/cutpt.html
-*  1066
 
-set seed 12345
+*****  1066 *****
+
+*****************
+
+* optimal
+set seed 1234
 gen fold = mod(_n, 10) + 1
 gen k_fold_dem_pred_1066 = .
 
@@ -411,16 +415,34 @@ forvalues i = 1/10 {
     drop p_`i'
 }
 
-estat classification, cutoff(.14220728)
-
 cutpt dementia k_fold_dem_pred_1066
-roctab dementia k_fold_dem_pred_1066
-rocreg dementia k_fold_dem_pred_1066
 
 gen k_fold_dem_pred_1066_opt = (k_fold_dem_pred_1066 >= .14220728) if !missing(k_fold_dem_pred_1066)
 tab dementia k_fold_dem_pred_1066_opt, matcell(conf_matrix)
-display "Predicted Prevalence from 1066 optimal cutoff: " (120/508) * 100
+matrix list conf_matrix
 
+scalar TN = conf_matrix[1,1]
+scalar FN = conf_matrix[2,1]
+scalar FP = conf_matrix[1,2]
+scalar TP = conf_matrix[2,2]
+
+scalar Sensitivity = TP / (TP + FN)
+scalar Specificity = TN / (TN + FP)
+scalar Accuracy = (TP + TN) / (TP + TN + FP + FN)
+scalar Prevalence = ((TP+FP) / (TP + TN + FP + FN))*100
+display TP+FP
+
+display "Sensitivity for 1066 .25: " Sensitivity
+display "Specificity for 1066 .25: " Specificity
+display "Accuracy for 1066 .25: " Accuracy
+display "Predicted Prevalence for 1066 optimal: " Prevalence
+
+display "Predicted Prevalence from 1066 optimal cutoff: " (120/508) * 100
+roctab dementia k_fold_dem_pred_1066
+rocreg dementia k_fold_dem_pred_1066
+
+matrix drop conf_matrix
+scalar drop TN FN FP TP Sensitivity Specificity Accuracy Prevalence
 *ascribed
 gen dem_pred_bin_1066a25 = (k_fold_dem_pred_1066 >= .25) if !missing(k_fold_dem_pred_1066)
 tab dem_pred_bin_1066a25
@@ -460,21 +482,8 @@ replace cogtot27_imp2002_categorical = 1 if cogtot27_imp2002 >= 7 & cogtot27_imp
 replace cogtot27_imp2002_categorical = 0 if cogtot27_imp2002 >= 12
 
 *binary tics
-
-logit dementia cogtot27_imp2002
-gen inregtics=e(sample)
-predict dem_pred_lw
-estat classification, cutoff(.15900329)
-cutpt dementia dem_pred_lw
-display "Predicted Prevalence from HRS TICS optimal cutoff: " (199/508) * 100
-
-
-rocreg dementia dem_pred_lw
-	gen dem_pred_bin_lw = (dem_pred_lw >= .15900329) if !missing(dem_pred_lw)
-tab dementia dem_pred_bin_lw
-
 gen dem_pred_lwa = 0
-	replace dem_pred_lwa = 1 if cogtot27_imp2002 >= 0 & cogtot27_imp2002 <= 6
+replace dem_pred_lwa = 1 if cogtot27_imp2002 >= 0 & cogtot27_imp2002 <= 6
 
 
 tab dem_pred_lwa
@@ -572,7 +581,7 @@ display "Predicted Prevalence for lasso ascribed: " Prevalence
 roctab dementia lasso_dem
 
 ** education gradients [for all cutpoints]
-foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_bin_lw expert_dem hurd_dem lasso_dem {
+foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_lwa expert_dem hurd_dem lasso_dem {
     forvalues r = 1/2 {
         display "****start: `dem_var' `r'****"
         qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat == `r'
@@ -584,13 +593,14 @@ foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pr
 *tabulating to see distribution
 tab AAGE_cat k_fold_dem_pred_1066_opt
 tab AAGE_cat dem_pred_bin_1066a25
-tab AAGE_cat dem_pred_bin_lw
+tab AAGE_cat dem_pred_lwa
 tab AAGE_cat expert_dem
 tab AAGE_cat hurd_dem
 tab AAGE_cat lasso_dem
-tab raracem expert_dem
-tab raracem hurd_dem
-tab raracem lasso_dem
+tab educat dem_pred_lwa
+tab educat hurd_dem
+tab educat lasso_dem
 
 log close
 exit, clear
+

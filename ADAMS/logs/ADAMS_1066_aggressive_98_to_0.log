@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  /hdir/0/chrissoria/1066/ADAMS_1066_aggressive_98_to_0.log
   log type:  text
- opened on:   8 May 2024, 16:04:20
+ opened on:   8 May 2024, 21:51:53
 
 . 
 . ** set sample inclusion
@@ -77,9 +77,13 @@
 . ** table 3 **
 . ** identify cutpoints to maximize sensitivity and specificity [optimal]
 . * http://www.haghish.com/statistics/stata-blog/stata-programming/download/cutpt.html
-. *  1066
 . 
-. set seed 12345
+. *****  1066 *****
+. 
+. *****************
+. 
+. * optimal
+. set seed 1234
 
 . gen fold = mod(_n, 10) + 1
 
@@ -90,14 +94,10 @@
 . forvalues i = 1/10 {
   2.     local train = "fold != `i'"
   3.     local test = "fold == `i'"
-  4.     
-.     logit dementia COGSCORE RELSCORE aRECALLcs if `train'
-  5.     
-.     predict p_`i' if `test', pr
-  6.     
-.     replace k_fold_dem_pred_1066 = p_`i' if `test'
-  7.     
-.     drop p_`i'
+  4.     logit dementia COGSCORE RELSCORE aRECALLcs if `train' 
+  5.     predict p_`i' if `test', pr
+  6.     replace k_fold_dem_pred_1066 = p_`i' if `test'
+  7.     drop p_`i'
   8. }
 
 Iteration 0:  Log likelihood = -197.54546  
@@ -340,34 +340,6 @@ Log likelihood = -72.512192                             Pseudo R2     = 0.6420
 (458 missing values generated)
 (50 real changes made)
 
-. estat classification, cutoff(.14220728)
-
-Logistic model for dementia
-
-              -------- True --------
-Classified |         D            ~D  |      Total
------------+--------------------------+-----------
-     +     |        70            42  |        112
-     -     |         4           342  |        346
------------+--------------------------+-----------
-   Total   |        74           384  |        458
-
-Classified + if predicted Pr(D) >= .1422073
-True D defined as dementia != 0
---------------------------------------------------
-Sensitivity                     Pr( +| D)   94.59%
-Specificity                     Pr( -|~D)   89.06%
-Positive predictive value       Pr( D| +)   62.50%
-Negative predictive value       Pr(~D| -)   98.84%
---------------------------------------------------
-False + rate for true ~D        Pr( +|~D)   10.94%
-False - rate for true D         Pr( -| D)    5.41%
-False + rate for classified +   Pr(~D| +)   37.50%
-False - rate for classified -   Pr( D| -)    1.16%
---------------------------------------------------
-Correctly classified                        89.96%
---------------------------------------------------
-
 . 
 . cutpt dementia k_fold_dem_pred_1066
 
@@ -379,6 +351,65 @@ Empirical optimal cutpoint:            .14220728
 Sensitivity at cutpoint:               0.94
 Specificity at cutpoint:               0.90
 Area under ROC curve at cutpoint:      0.92
+
+. 
+. gen k_fold_dem_pred_1066_opt = (k_fold_dem_pred_1066 >= .14220728) if !missing(k_fold_dem_pred_1066)
+
+. tab dementia k_fold_dem_pred_1066_opt, matcell(conf_matrix)
+
+           | k_fold_dem_pred_1066_
+           |          opt
+  dementia |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       383         42 |       425 
+         1 |         5         78 |        83 
+-----------+----------------------+----------
+     Total |       388        120 |       508 
+
+. matrix list conf_matrix
+
+conf_matrix[2,2]
+     c1   c2
+r1  383   42
+r2    5   78
+
+. 
+. scalar TN = conf_matrix[1,1]
+
+. scalar FN = conf_matrix[2,1]
+
+. scalar FP = conf_matrix[1,2]
+
+. scalar TP = conf_matrix[2,2]
+
+. 
+. scalar Sensitivity = TP / (TP + FN)
+
+. scalar Specificity = TN / (TN + FP)
+
+. scalar Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+. scalar Prevalence = ((TP+FP) / (TP + TN + FP + FN))*100
+
+. display TP+FP
+120
+
+. 
+. display "Sensitivity for 1066 .25: " Sensitivity
+Sensitivity for 1066 .25: .93975904
+
+. display "Specificity for 1066 .25: " Specificity
+Specificity for 1066 .25: .90117647
+
+. display "Accuracy for 1066 .25: " Accuracy
+Accuracy for 1066 .25: .90748031
+
+. display "Predicted Prevalence for 1066 optimal: " Prevalence
+Predicted Prevalence for 1066 optimal: 23.622047
+
+. 
+. display "Predicted Prevalence from 1066 optimal cutoff: " (120/508) * 100
+Predicted Prevalence from 1066 optimal cutoff: 23.622047
 
 . roctab dementia k_fold_dem_pred_1066
 
@@ -420,36 +451,16 @@ Area under the ROC curve
              |    Observed               Bootstrap
          AUC | coefficient       Bias    std. err.     [95% conf. interval]
 -------------+----------------------------------------------------------------
-             |    .9700921   .0000255    .0070365     .9563008   .9838835  (N)
-             |                                        .9550979   .9820126  (P)
-             |                                        .9539579   .9810739 (BC)
+             |    .9700921  -.0000253    .0069986     .9563751   .9838092  (N)
+             |                                        .9548286   .9824359  (P)
+             |                                         .953027   .9816983 (BC)
 ------------------------------------------------------------------------------
 
 . 
-. *below is where Jordan identified the ideal cutoff point that maximizes the product of sensitivity and
->  specificity
-. *however, we'll also want to try .5 (the traditional indicator) and .25 (Prince 2003) stated on page 9
-> 15 that, 
-. *"A predicted probability of more than 0·25 produced the best sensitivity and specificity
-. 
-. *Chris is updating this slightly to reflect slightly revised computation of relscore
-. gen k_fold_dem_pred_1066_opt = (k_fold_dem_pred_1066 >= .14220728) if !missing(k_fold_dem_pred_1066)
+. matrix drop conf_matrix
 
-. tab dementia k_fold_dem_pred_1066_opt, matcell(conf_matrix)
+. scalar drop TN FN FP TP Sensitivity Specificity Accuracy Prevalence
 
-           | k_fold_dem_pred_1066_
-           |          opt
-  dementia |         0          1 |     Total
------------+----------------------+----------
-         0 |       383         42 |       425 
-         1 |         5         78 |        83 
------------+----------------------+----------
-     Total |       388        120 |       508 
-
-. display "Predicted Prevalence from 1066 optimal cutoff: " (120/508) * 100
-Predicted Prevalence from 1066 optimal cutoff: 23.622047
-
-. 
 . *ascribed
 . gen dem_pred_bin_1066a25 = (k_fold_dem_pred_1066 >= .25) if !missing(k_fold_dem_pred_1066)
 
@@ -550,130 +561,9 @@ Predicted Prevalence for 1066 .25: 20.07874
 
 . 
 . *binary tics
-. 
-. logit dementia cogtot27_imp2002
-
-Iteration 0:  Log likelihood = -226.18291  
-Iteration 1:  Log likelihood = -185.14281  
-Iteration 2:  Log likelihood = -178.35767  
-Iteration 3:  Log likelihood = -178.29112  
-Iteration 4:  Log likelihood = -178.29112  
-
-Logistic regression                                     Number of obs =    508
-                                                        LR chi2(1)    =  95.78
-                                                        Prob > chi2   = 0.0000
-Log likelihood = -178.29112                             Pseudo R2     = 0.2117
-
-----------------------------------------------------------------------------------
-        dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
------------------+----------------------------------------------------------------
-cogtot27_imp2002 |  -.3061744   .0385548    -7.94   0.000    -.3817404   -.2306084
-           _cons |   1.235009   .3321542     3.72   0.000     .5839983    1.886019
-----------------------------------------------------------------------------------
-
-. gen inregtics=e(sample)
-
-. predict dem_pred_lw
-(option pr assumed; Pr(dementia))
-
-. estat classification, cutoff(.15900329)
-
-Logistic model for dementia
-
-              -------- True --------
-Classified |         D            ~D  |      Total
------------+--------------------------+-----------
-     +     |        68           131  |        199
-     -     |        15           294  |        309
------------+--------------------------+-----------
-   Total   |        83           425  |        508
-
-Classified + if predicted Pr(D) >= .1590033
-True D defined as dementia != 0
---------------------------------------------------
-Sensitivity                     Pr( +| D)   81.93%
-Specificity                     Pr( -|~D)   69.18%
-Positive predictive value       Pr( D| +)   34.17%
-Negative predictive value       Pr(~D| -)   95.15%
---------------------------------------------------
-False + rate for true ~D        Pr( +|~D)   30.82%
-False - rate for true D         Pr( -| D)   18.07%
-False + rate for classified +   Pr(~D| +)   65.83%
-False - rate for classified -   Pr( D| -)    4.85%
---------------------------------------------------
-Correctly classified                        71.26%
---------------------------------------------------
-
-. cutpt dementia dem_pred_lw
-
-Empirical cutpoint estimation
-Method:                                Liu
-Reference variable:                    dementia (0=neg, 1=pos)
-Classification variable:               dem_pred_lw
-Empirical optimal cutpoint:            .15900329
-Sensitivity at cutpoint:               0.82
-Specificity at cutpoint:               0.69
-Area under ROC curve at cutpoint:      0.76
-
-. display "Predicted Prevalence from HRS TICS optimal cutoff: " (199/508) * 100
-Predicted Prevalence from HRS TICS optimal cutoff: 39.173228
-
-. 
-. 
-. rocreg dementia dem_pred_lw
-(running rocregstat on estimation sample)
-
-Bootstrap replications (1,000): .........10.........20.........30.........40.........50.........60......
-> ...70.........80.........90.........100.........110.........120.........130.........140.........150...
-> ......160.........170.........180.........190.........200.........210.........220.........230.........
-> 240.........250.........260.........270.........280.........290.........300.........310.........320...
-> ......330.........340.........350.........360.........370.........380.........390.........400.........
-> 410.........420.........430.........440.........450.........460.........470.........480.........490...
-> ......500.........510.........520.........530.........540.........550.........560.........570.........
-> 580.........590.........600.........610.........620.........630.........640.........650.........660...
-> ......670.........680.........690.........700.........710.........720.........730.........740.........
-> 750.........760.........770.........780.........790.........800.........810.........820.........830...
-> ......840.........850.........860.........870.........880.........890.........900.........910.........
-> 920.........930.........940.........950.........960.........970.........980.........990.........1,000 
-> done
-
-Bootstrap results                                        Number of obs =   508
-                                                         Replications  = 1,000
-
-Nonparametric ROC estimation
-
-Control standardization: empirical
-ROC method             : empirical
-
-Area under the ROC curve
-
-   Status    : dementia
-   Classifier: dem_pred_lw
-------------------------------------------------------------------------------
-             |    Observed               Bootstrap
-         AUC | coefficient       Bias    std. err.     [95% conf. interval]
--------------+----------------------------------------------------------------
-             |    .7975337  -.0003063    .0231513     .7521579   .8429095  (N)
-             |                                        .7504884   .8415668  (P)
-             |                                        .7504472   .8415431 (BC)
-------------------------------------------------------------------------------
-
-.         gen dem_pred_bin_lw = (dem_pred_lw >= .15900329) if !missing(dem_pred_lw)
-
-. tab dementia dem_pred_bin_lw
-
-           |    dem_pred_bin_lw
-  dementia |         0          1 |     Total
------------+----------------------+----------
-         0 |       294        131 |       425 
-         1 |        15         68 |        83 
------------+----------------------+----------
-     Total |       309        199 |       508 
-
-. 
 . gen dem_pred_lwa = 0
 
-.         replace dem_pred_lwa = 1 if cogtot27_imp2002 >= 0 & cogtot27_imp2002 <= 6
+. replace dem_pred_lwa = 1 if cogtot27_imp2002 >= 0 & cogtot27_imp2002 <= 6
 (91 real changes made)
 
 . 
@@ -930,8 +820,8 @@ Predicted Prevalence for lasso ascribed: 29.724409
 
 . 
 . ** education gradients [for all cutpoints]
-. foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_bin_lw expert_dem h
-> urd_dem lasso_dem {
+. foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_lwa expert_dem hurd
+> _dem lasso_dem {
   2.     forvalues r = 1/2 {
   3.         display "****start: `dem_var' `r'****"
   4.         qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat == `r'
@@ -1035,37 +925,36 @@ Expression: Pr(dem_pred_bin_1066a25), predict()
           2  |    .299945   .0598431     5.01   0.000     .1826547    .4172353
           3  |   .1972077   .0445319     4.43   0.000     .1099269    .2844886
 ------------------------------------------------------------------------------
-****start: dem_pred_bin_lw 1****
+****start: dem_pred_lwa 1****
 
-Predictive margins                                         Number of obs = 258
+Predictive margins                                         Number of obs = 181
 Model VCE: OIM
 
-Expression: Pr(dem_pred_bin_lw), predict()
+Expression: Pr(dem_pred_lwa), predict()
 
 ------------------------------------------------------------------------------
              |            Delta-method
              |     Margin   std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       educat |
-          1  |   .5861145   .0467737    12.53   0.000     .4944396    .6777893
-          2  |   .2280028     .05012     4.55   0.000     .1297693    .3262363
-          3  |   .0908921   .0327547     2.77   0.006      .026694    .1550901
+          1  |   .2688526   .0415922     6.46   0.000     .1873333    .3503719
+          2  |   .0723179   .0310101     2.33   0.020     .0115392    .1330966
 ------------------------------------------------------------------------------
-****start: dem_pred_bin_lw 2****
+****start: dem_pred_lwa 2****
 
 Predictive margins                                         Number of obs = 250
 Model VCE: OIM
 
-Expression: Pr(dem_pred_bin_lw), predict()
+Expression: Pr(dem_pred_lwa), predict()
 
 ------------------------------------------------------------------------------
              |            Delta-method
              |     Margin   std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       educat |
-          1  |   .6130862   .0437348    14.02   0.000     .5273676    .6988049
-          2  |   .3911828   .0643992     6.07   0.000     .2649628    .5174029
-          3  |   .2208355   .0468471     4.71   0.000     .1290168    .3126542
+          1  |   .3362956    .042439     7.92   0.000     .2531166    .4194746
+          2  |   .1867546   .0524497     3.56   0.000      .083955    .2895541
+          3  |   .0690047   .0295266     2.34   0.019     .0111336    .1268758
 ------------------------------------------------------------------------------
 ****start: expert_dem 1****
 
@@ -1165,9 +1054,7 @@ Expression: Pr(lasso_dem), predict()
 ------------------------------------------------------------------------------
 
 . 
-. *in this data there are zero cases of dem_pred_experta if AAGE_CAT == 1
-. *same thing for dem_pred_hurda and dem_pred_lassoa
-. *I will remove it for now and ask Jordan about it
+. *tabulating to see distribution
 . tab AAGE_cat k_fold_dem_pred_1066_opt
 
            | k_fold_dem_pred_1066_
@@ -1190,82 +1077,41 @@ Expression: Pr(lasso_dem), predict()
      Total |       406        102 |       508 
 
 . tab AAGE_cat dem_pred_bin_lw
+variable dem_pred_bin_lw not found
+r(111);
 
-           |    dem_pred_bin_lw
+end of do-file
+
+r(111);
+
+. do "/scratch/chrissoria/STATATMP/SD866859.000000"
+
+. tab AAGE_cat dem_pred_lwa
+
+           |     dem_pred_lwa
   AAGE_cat |         0          1 |     Total
 -----------+----------------------+----------
-         1 |       170         88 |       258 
-         2 |       139        111 |       250 
+         1 |       223         35 |       258 
+         2 |       194         56 |       250 
 -----------+----------------------+----------
-     Total |       309        199 |       508 
-
-. tab AAGE_cat expert_dem
-
-           |      expert_dem
-  AAGE_cat |         0          1 |     Total
------------+----------------------+----------
-         1 |       232         26 |       258 
-         2 |       149        101 |       250 
------------+----------------------+----------
-     Total |       381        127 |       508 
-
-. tab AAGE_cat hurd_dem
-
-           |       hurd_dem
-  AAGE_cat |         0          1 |     Total
------------+----------------------+----------
-         1 |       231         27 |       258 
-         2 |       150        100 |       250 
------------+----------------------+----------
-     Total |       381        127 |       508 
-
-. tab AAGE_cat lasso_dem
-
-           |       lasso_dem
-  AAGE_cat |         0          1 |     Total
------------+----------------------+----------
-         1 |       217         41 |       258 
-         2 |       140        110 |       250 
------------+----------------------+----------
-     Total |       357        151 |       508 
-
-. tab raracem expert_dem
-
-           raracem: r |      expert_dem
-          race-masked |         0          1 |     Total
-----------------------+----------------------+----------
-    1.white/caucasian |       313         89 |       402 
-2.black/african ameri |        60         36 |        96 
-              3.other |         8          2 |        10 
-----------------------+----------------------+----------
-                Total |       381        127 |       508 
-
-. tab raracem hurd_dem
-
-           raracem: r |       hurd_dem
-          race-masked |         0          1 |     Total
-----------------------+----------------------+----------
-    1.white/caucasian |       310         92 |       402 
-2.black/african ameri |        64         32 |        96 
-              3.other |         7          3 |        10 
-----------------------+----------------------+----------
-                Total |       381        127 |       508 
-
-. tab raracem lasso_dem
-
-           raracem: r |       lasso_dem
-          race-masked |         0          1 |     Total
-----------------------+----------------------+----------
-    1.white/caucasian |       294        108 |       402 
-2.black/african ameri |        58         38 |        96 
-              3.other |         5          5 |        10 
-----------------------+----------------------+----------
-                Total |       357        151 |       508 
+     Total |       417         91 |       508 
 
 . 
-. log close
-      name:  <unnamed>
-       log:  /hdir/0/chrissoria/1066/ADAMS_1066_aggressive_98_to_0.log
-  log type:  text
- closed on:   8 May 2024, 16:04:38
---------------------------------------------------------------------------------------------------------
+end of do-file
+
+. do "/scratch/chrissoria/STATATMP/SD866859.000000"
+
+. tab educat dem_pred_lwa
+
+           |     dem_pred_lwa
+    educat |         0          1 |     Total
+-----------+----------------------+----------
+         1 |       159         71 |       230 
+         2 |       108         15 |       123 
+         3 |       150          5 |       155 
+-----------+----------------------+----------
+     Total |       417         91 |       508 
+
+. 
+end of do-file
+
