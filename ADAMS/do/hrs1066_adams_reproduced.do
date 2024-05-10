@@ -402,7 +402,13 @@ tab educat
 *****************
 
 * optimal
-set seed 1234
+/*
+set seed 54321
+gen ranum = uniform()
+sort ranum
+drop ranum
+*/
+
 gen fold = mod(_n, 10) + 1
 gen k_fold_dem_pred_1066 = .
 
@@ -598,6 +604,10 @@ tab AAGE_cat expert_dem
 tab AAGE_cat hurd_dem
 tab AAGE_cat lasso_dem
 tab educat dem_pred_lwa
+
+*there are no cases of dementia in the younger group for the langa-weir
+tabulate AAGE_cat educat if dem_pred_lwa == 1
+
 tab educat hurd_dem
 tab educat lasso_dem
 
