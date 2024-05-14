@@ -1,8 +1,8 @@
---------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
        log:  /hdir/0/chrissoria/1066/ADAMS_1066_aggressive_98_to_0.log
   log type:  text
- opened on:   8 May 2024, 21:51:53
+ opened on:  14 May 2024, 10:13:36
 
 . 
 . ** set sample inclusion
@@ -83,277 +83,264 @@
 . *****************
 . 
 . * optimal
-. set seed 1234
+. 
+. local num_repeats 10
 
-. gen fold = mod(_n, 10) + 1
-
-. gen k_fold_dem_pred_1066 = .
+. 
+. forvalues r = 1/`num_repeats' {
+  2.     set seed `r'010
+  3.     
+.     gen ranum = uniform()
+  4.     sort ranum
+  5.     drop ranum
+  6.     
+.     gen fold_`r' = mod(_n, 10) + 1
+  7.     
+.     gen k_fold_dem_pred_1066_`r' = .
+  8.     
+.     forvalues i = 1/10 {  
+  9.         local train = "fold_`r' != `i'" 
+ 10.         local test = "fold_`r' == `i'"  
+ 11.         
+.         quietly logit dementia COGSCORE RELSCORE aRECALLcs if `train'
+ 12.         predict p_`r'_`i' if `test', pr
+ 13.         
+.         replace k_fold_dem_pred_1066_`r' = p_`r'_`i' if `test'
+ 14.     }
+ 15. }
 (508 missing values generated)
-
-. 
-. forvalues i = 1/10 {
-  2.     local train = "fold != `i'"
-  3.     local test = "fold == `i'"
-  4.     logit dementia COGSCORE RELSCORE aRECALLcs if `train' 
-  5.     predict p_`i' if `test', pr
-  6.     replace k_fold_dem_pred_1066 = p_`i' if `test'
-  7.     drop p_`i'
-  8. }
-
-Iteration 0:  Log likelihood = -197.54546  
-Iteration 1:  Log likelihood = -94.733289  
-Iteration 2:  Log likelihood = -72.137739  
-Iteration 3:  Log likelihood =  -70.00585  
-Iteration 4:  Log likelihood = -69.980024  
-Iteration 5:  Log likelihood = -69.979988  
-Iteration 6:  Log likelihood = -69.979988  
-
-Logistic regression                                     Number of obs =    458
-                                                        LR chi2(3)    = 255.13
-                                                        Prob > chi2   = 0.0000
-Log likelihood = -69.979988                             Pseudo R2     = 0.6458
-
-------------------------------------------------------------------------------
-    dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-    COGSCORE |  -.6185584   .1273707    -4.86   0.000    -.8682003   -.3689165
-    RELSCORE |   .5370237   .1075363     4.99   0.000     .3262564     .747791
-   aRECALLcs |  -.6331234   .1423687    -4.45   0.000     -.912161   -.3540858
-       _cons |   6.871709   1.509121     4.55   0.000     3.913886    9.829532
-------------------------------------------------------------------------------
 (458 missing values generated)
 (50 real changes made)
-
-Iteration 0:  Log likelihood = -204.01803  
-Iteration 1:  Log likelihood = -91.985932  
-Iteration 2:  Log likelihood = -68.536103  
-Iteration 3:  Log likelihood = -66.899851  
-Iteration 4:  Log likelihood =  -66.88051  
-Iteration 5:  Log likelihood = -66.880487  
-Iteration 6:  Log likelihood = -66.880487  
-
-Logistic regression                                     Number of obs =    457
-                                                        LR chi2(3)    = 274.28
-                                                        Prob > chi2   = 0.0000
-Log likelihood = -66.880487                             Pseudo R2     = 0.6722
-
-------------------------------------------------------------------------------
-    dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-    COGSCORE |  -.6895312   .1387518    -4.97   0.000    -.9614797   -.4175827
-    RELSCORE |   .5885052   .1127843     5.22   0.000     .3674521    .8095584
-   aRECALLcs |  -.5743154   .1397266    -4.11   0.000    -.8481745   -.3004562
-       _cons |   7.587496   1.617172     4.69   0.000     4.417897     10.7571
-------------------------------------------------------------------------------
 (457 missing values generated)
 (51 real changes made)
-
-Iteration 0:  Log likelihood =  -208.8308  
-Iteration 1:  Log likelihood = -97.539423  
-Iteration 2:  Log likelihood = -75.133842  
-Iteration 3:  Log likelihood =   -71.9385  
-Iteration 4:  Log likelihood = -71.879036  
-Iteration 5:  Log likelihood = -71.878844  
-Iteration 6:  Log likelihood = -71.878844  
-
-Logistic regression                                     Number of obs =    457
-                                                        LR chi2(3)    = 273.90
-                                                        Prob > chi2   = 0.0000
-Log likelihood = -71.878844                             Pseudo R2     = 0.6558
-
-------------------------------------------------------------------------------
-    dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-    COGSCORE |  -.6480102   .1234074    -5.25   0.000    -.8898843   -.4061362
-    RELSCORE |   .5687889   .1077956     5.28   0.000     .3575135    .7800643
-   aRECALLcs |  -.6437224   .1412694    -4.56   0.000    -.9206053   -.3668396
-       _cons |   7.210376   1.469084     4.91   0.000     4.331024    10.08973
-------------------------------------------------------------------------------
 (457 missing values generated)
 (51 real changes made)
-
-Iteration 0:  Log likelihood = -202.38209  
-Iteration 1:  Log likelihood = -92.778776  
-Iteration 2:  Log likelihood = -69.079059  
-Iteration 3:  Log likelihood =  -66.91681  
-Iteration 4:  Log likelihood = -66.875203  
-Iteration 5:  Log likelihood = -66.875193  
-Iteration 6:  Log likelihood = -66.875193  
-
-Logistic regression                                     Number of obs =    457
-                                                        LR chi2(3)    = 271.01
-                                                        Prob > chi2   = 0.0000
-Log likelihood = -66.875193                             Pseudo R2     = 0.6696
-
-------------------------------------------------------------------------------
-    dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-    COGSCORE |  -.6366206   .1235223    -5.15   0.000    -.8787199   -.3945213
-    RELSCORE |   .5650689   .1126021     5.02   0.000     .3443728    .7857651
-   aRECALLcs |  -.6489306   .1497587    -4.33   0.000    -.9424522    -.355409
-       _cons |   7.016008   1.472153     4.77   0.000     4.130642    9.901375
-------------------------------------------------------------------------------
 (457 missing values generated)
 (51 real changes made)
-
-Iteration 0:  Log likelihood = -197.37681  
-Iteration 1:  Log likelihood = -93.457498  
-Iteration 2:  Log likelihood = -70.981595  
-Iteration 3:  Log likelihood = -68.462682  
-Iteration 4:  Log likelihood = -68.423334  
-Iteration 5:  Log likelihood = -68.423244  
-Iteration 6:  Log likelihood = -68.423244  
-
-Logistic regression                                     Number of obs =    457
-                                                        LR chi2(3)    = 257.91
-                                                        Prob > chi2   = 0.0000
-Log likelihood = -68.423244                             Pseudo R2     = 0.6533
-
-------------------------------------------------------------------------------
-    dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-    COGSCORE |  -.5902808   .1207265    -4.89   0.000    -.8269005   -.3536612
-    RELSCORE |   .6156478   .1142944     5.39   0.000      .391635    .8396607
-   aRECALLcs |  -.6236202   .1457681    -4.28   0.000    -.9093205     -.33792
-       _cons |   6.308952   1.421538     4.44   0.000     3.522789    9.095116
-------------------------------------------------------------------------------
 (457 missing values generated)
 (51 real changes made)
-
-Iteration 0:  Log likelihood = -205.63801  
-Iteration 1:  Log likelihood = -90.407059  
-Iteration 2:  Log likelihood =  -65.18151  
-Iteration 3:  Log likelihood = -60.520359  
-Iteration 4:  Log likelihood = -60.392691  
-Iteration 5:  Log likelihood = -60.392315  
-Iteration 6:  Log likelihood = -60.392315  
-
-Logistic regression                                     Number of obs =    457
-                                                        LR chi2(3)    = 290.49
-                                                        Prob > chi2   = 0.0000
-Log likelihood = -60.392315                             Pseudo R2     = 0.7063
-
-------------------------------------------------------------------------------
-    dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-    COGSCORE |  -.6084587   .1290197    -4.72   0.000    -.8613327   -.3555847
-    RELSCORE |    .763398   .1407827     5.42   0.000      .487469    1.039327
-   aRECALLcs |  -.8034193   .1688144    -4.76   0.000    -1.134289   -.4725492
-       _cons |   6.488894    1.50303     4.32   0.000     3.543009    9.434778
-------------------------------------------------------------------------------
 (457 missing values generated)
 (51 real changes made)
-
-Iteration 0:  Log likelihood = -202.38209  
-Iteration 1:  Log likelihood = -93.558167  
-Iteration 2:  Log likelihood = -69.299103  
-Iteration 3:  Log likelihood = -67.002412  
-Iteration 4:  Log likelihood = -66.957031  
-Iteration 5:  Log likelihood = -66.957019  
-Iteration 6:  Log likelihood = -66.957019  
-
-Logistic regression                                     Number of obs =    457
-                                                        LR chi2(3)    = 270.85
-                                                        Prob > chi2   = 0.0000
-Log likelihood = -66.957019                             Pseudo R2     = 0.6692
-
-------------------------------------------------------------------------------
-    dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-    COGSCORE |  -.7272577    .135222    -5.38   0.000     -.992288   -.4622274
-    RELSCORE |    .556487   .1105205     5.04   0.000     .3398709    .7731031
-   aRECALLcs |  -.6173483   .1432164    -4.31   0.000    -.8980473   -.3366493
-       _cons |   8.187466   1.610369     5.08   0.000       5.0312    11.34373
-------------------------------------------------------------------------------
 (457 missing values generated)
 (51 real changes made)
-
-Iteration 0:  Log likelihood = -207.24222  
-Iteration 1:  Log likelihood =   -96.3978  
-Iteration 2:  Log likelihood = -73.144487  
-Iteration 3:  Log likelihood =  -71.38028  
-Iteration 4:  Log likelihood =   -71.3533  
-Iteration 5:  Log likelihood = -71.353255  
-Iteration 6:  Log likelihood = -71.353255  
-
-Logistic regression                                     Number of obs =    457
-                                                        LR chi2(3)    = 271.78
-                                                        Prob > chi2   = 0.0000
-Log likelihood = -71.353255                             Pseudo R2     = 0.6557
-
-------------------------------------------------------------------------------
-    dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-    COGSCORE |  -.6026289   .1197586    -5.03   0.000    -.8373513   -.3679064
-    RELSCORE |   .5914736   .1101642     5.37   0.000     .3755556    .8073915
-   aRECALLcs |  -.6352036    .140484    -4.52   0.000    -.9105472   -.3598601
-       _cons |   6.532886   1.420369     4.60   0.000     3.749015    9.316758
-------------------------------------------------------------------------------
 (457 missing values generated)
 (51 real changes made)
-
-Iteration 0:  Log likelihood = -207.24222  
-Iteration 1:  Log likelihood = -96.855793  
-Iteration 2:  Log likelihood = -73.860376  
-Iteration 3:  Log likelihood = -72.194442  
-Iteration 4:  Log likelihood = -72.175856  
-Iteration 5:  Log likelihood = -72.175836  
-Iteration 6:  Log likelihood = -72.175836  
-
-Logistic regression                                     Number of obs =    457
-                                                        LR chi2(3)    = 270.13
-                                                        Prob > chi2   = 0.0000
-Log likelihood = -72.175836                             Pseudo R2     = 0.6517
-
-------------------------------------------------------------------------------
-    dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-    COGSCORE |  -.6270456   .1198575    -5.23   0.000     -.861962   -.3921291
-    RELSCORE |   .5827705   .1080002     5.40   0.000      .371094    .7944469
-   aRECALLcs |  -.6002637   .1373871    -4.37   0.000    -.8695375   -.3309899
-       _cons |   6.834554   1.418042     4.82   0.000     4.055242    9.613865
-------------------------------------------------------------------------------
 (457 missing values generated)
 (51 real changes made)
-
-Iteration 0:  Log likelihood = -202.55853  
-Iteration 1:  Log likelihood = -96.148971  
-Iteration 2:  Log likelihood = -74.378041  
-Iteration 3:  Log likelihood = -72.533352  
-Iteration 4:  Log likelihood = -72.512216  
-Iteration 5:  Log likelihood = -72.512192  
-Iteration 6:  Log likelihood = -72.512192  
-
-Logistic regression                                     Number of obs =    458
-                                                        LR chi2(3)    = 260.09
-                                                        Prob > chi2   = 0.0000
-Log likelihood = -72.512192                             Pseudo R2     = 0.6420
-
-------------------------------------------------------------------------------
-    dementia | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-    COGSCORE |  -.6157612   .1183827    -5.20   0.000     -.847787   -.3837355
-    RELSCORE |   .5412108   .1070227     5.06   0.000     .3314501    .7509714
-   aRECALLcs |  -.5946141    .140514    -4.23   0.000    -.8700164   -.3192118
-       _cons |    6.75663   1.390355     4.86   0.000     4.031584    9.481677
-------------------------------------------------------------------------------
+(458 missing values generated)
+(50 real changes made)
+(508 missing values generated)
+(458 missing values generated)
+(50 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(458 missing values generated)
+(50 real changes made)
+(508 missing values generated)
+(458 missing values generated)
+(50 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(458 missing values generated)
+(50 real changes made)
+(508 missing values generated)
+(458 missing values generated)
+(50 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(458 missing values generated)
+(50 real changes made)
+(508 missing values generated)
+(458 missing values generated)
+(50 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(458 missing values generated)
+(50 real changes made)
+(508 missing values generated)
+(458 missing values generated)
+(50 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(458 missing values generated)
+(50 real changes made)
+(508 missing values generated)
+(458 missing values generated)
+(50 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(458 missing values generated)
+(50 real changes made)
+(508 missing values generated)
+(458 missing values generated)
+(50 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(458 missing values generated)
+(50 real changes made)
+(508 missing values generated)
+(458 missing values generated)
+(50 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(458 missing values generated)
+(50 real changes made)
+(508 missing values generated)
+(458 missing values generated)
+(50 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
+(457 missing values generated)
+(51 real changes made)
 (458 missing values generated)
 (50 real changes made)
 
 . 
-. cutpt dementia k_fold_dem_pred_1066
+. gen total_pred = k_fold_dem_pred_1066_1 + k_fold_dem_pred_1066_2 + k_fold_dem_pred_1066_3 + k_fold_dem_pred_1066_4
+>  + k_fold_dem_pred_1066_5 + k_fold_dem_pred_1066_6 + k_fold_dem_pred_1066_7 + k_fold_dem_pred_1066_8 + k_fold_dem_
+> pred_1066_9 + k_fold_dem_pred_1066_10
+
+. 
+. gen k_fold_dem_pred_1066_av = total_pred/10
+
+. 
+. cutpt dementia k_fold_dem_pred_1066_av
 
 Empirical cutpoint estimation
 Method:                                Liu
 Reference variable:                    dementia (0=neg, 1=pos)
-Classification variable:               k_fold_dem_pred_1066
-Empirical optimal cutpoint:            .14220728
+Classification variable:               k_fold_dem_pred_1066_av
+Empirical optimal cutpoint:            .1277115
 Sensitivity at cutpoint:               0.94
-Specificity at cutpoint:               0.90
-Area under ROC curve at cutpoint:      0.92
+Specificity at cutpoint:               0.89
+Area under ROC curve at cutpoint:      0.91
 
 . 
-. gen k_fold_dem_pred_1066_opt = (k_fold_dem_pred_1066 >= .14220728) if !missing(k_fold_dem_pred_1066)
+. gen k_fold_dem_pred_1066_opt = (k_fold_dem_pred_1066_av >= .1277115) if !missing(k_fold_dem_pred_1066_av)
 
 . tab dementia k_fold_dem_pred_1066_opt, matcell(conf_matrix)
 
@@ -361,16 +348,16 @@ Area under ROC curve at cutpoint:      0.92
            |          opt
   dementia |         0          1 |     Total
 -----------+----------------------+----------
-         0 |       383         42 |       425 
+         0 |       378         47 |       425 
          1 |         5         78 |        83 
 -----------+----------------------+----------
-     Total |       388        120 |       508 
+     Total |       383        125 |       508 
 
 . matrix list conf_matrix
 
 conf_matrix[2,2]
      c1   c2
-r1  383   42
+r1  378   47
 r2    5   78
 
 . 
@@ -392,48 +379,43 @@ r2    5   78
 . scalar Prevalence = ((TP+FP) / (TP + TN + FP + FN))*100
 
 . display TP+FP
-120
+125
 
 . 
 . display "Sensitivity for 1066 .25: " Sensitivity
 Sensitivity for 1066 .25: .93975904
 
 . display "Specificity for 1066 .25: " Specificity
-Specificity for 1066 .25: .90117647
+Specificity for 1066 .25: .88941176
 
 . display "Accuracy for 1066 .25: " Accuracy
-Accuracy for 1066 .25: .90748031
+Accuracy for 1066 .25: .8976378
 
 . display "Predicted Prevalence for 1066 optimal: " Prevalence
-Predicted Prevalence for 1066 optimal: 23.622047
+Predicted Prevalence for 1066 optimal: 24.606299
 
 . 
-. display "Predicted Prevalence from 1066 optimal cutoff: " (120/508) * 100
-Predicted Prevalence from 1066 optimal cutoff: 23.622047
-
-. roctab dementia k_fold_dem_pred_1066
+. roctab dementia k_fold_dem_pred_1066_av
 
                       ROC                     Asymptotic normal  
            Obs       area     Std. err.      [95% conf. interval]
      ------------------------------------------------------------
-           508     0.9701       0.0070        0.95636     0.98382
+           508     0.9701       0.0067        0.95691     0.98328
 
-. rocreg dementia k_fold_dem_pred_1066
+. rocreg dementia k_fold_dem_pred_1066_av
 (running rocregstat on estimation sample)
 
-Bootstrap replications (1,000): .........10.........20.........30.........40.........50.........60......
-> ...70.........80.........90.........100.........110.........120.........130.........140.........150...
-> ......160.........170.........180.........190.........200.........210.........220.........230.........
-> 240.........250.........260.........270.........280.........290.........300.........310.........320...
-> ......330.........340.........350.........360.........370.........380.........390.........400.........
-> 410.........420.........430.........440.........450.........460.........470.........480.........490...
-> ......500.........510.........520.........530.........540.........550.........560.........570.........
-> 580.........590.........600.........610.........620.........630.........640.........650.........660...
-> ......670.........680.........690.........700.........710.........720.........730.........740.........
-> 750.........760.........770.........780.........790.........800.........810.........820.........830...
-> ......840.........850.........860.........870.........880.........890.........900.........910.........
-> 920.........930.........940.........950.........960.........970.........980.........990.........1,000 
-> done
+Bootstrap replications (1,000): .........10.........20.........30.........40.........50.........60.........70.......
+> ..80.........90.........100.........110.........120.........130.........140.........150.........160.........170...
+> ......180.........190.........200.........210.........220.........230.........240.........250.........260.........
+> 270.........280.........290.........300.........310.........320.........330.........340.........350.........360...
+> ......370.........380.........390.........400.........410.........420.........430.........440.........450.........
+> 460.........470.........480.........490.........500.........510.........520.........530.........540.........550...
+> ......560.........570.........580.........590.........600.........610.........620.........630.........640.........
+> 650.........660.........670.........680.........690.........700.........710.........720.........730.........740...
+> ......750.........760.........770.........780.........790.........800.........810.........820.........830.........
+> 840.........850.........860.........870.........880.........890.........900.........910.........920.........930...
+> ......940.........950.........960.........970.........980.........990.........1,000 done
 
 Bootstrap results                                        Number of obs =   508
                                                          Replications  = 1,000
@@ -446,14 +428,14 @@ ROC method             : empirical
 Area under the ROC curve
 
    Status    : dementia
-   Classifier: k_fold_dem_pred_1066
+   Classifier: k_fold_dem_pred_1066_av
 ------------------------------------------------------------------------------
              |    Observed               Bootstrap
          AUC | coefficient       Bias    std. err.     [95% conf. interval]
 -------------+----------------------------------------------------------------
-             |    .9700921  -.0000253    .0069986     .9563751   .9838092  (N)
-             |                                        .9548286   .9824359  (P)
-             |                                         .953027   .9816983 (BC)
+             |    .9700921   .0000359    .0067668     .9568294   .9833548  (N)
+             |                                        .9557163   .9825009  (P)
+             |                                        .9549522   .9816764 (BC)
 ------------------------------------------------------------------------------
 
 . 
@@ -462,15 +444,15 @@ Area under the ROC curve
 . scalar drop TN FN FP TP Sensitivity Specificity Accuracy Prevalence
 
 . *ascribed
-. gen dem_pred_bin_1066a25 = (k_fold_dem_pred_1066 >= .25) if !missing(k_fold_dem_pred_1066)
+. gen dem_pred_bin_1066a25 = (k_fold_dem_pred_1066_av >= .25) if !missing(k_fold_dem_pred_1066_av)
 
 . tab dem_pred_bin_1066a25
 
 dem_pred_bi |
   n_1066a25 |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-          0 |        406       79.92       79.92
-          1 |        102       20.08      100.00
+          0 |        409       80.51       80.51
+          1 |         99       19.49      100.00
 ------------+-----------------------------------
       Total |        508      100.00
 
@@ -479,18 +461,18 @@ dem_pred_bi |
            | dem_pred_bin_1066a25
   dementia |         0          1 |     Total
 -----------+----------------------+----------
-         0 |       394         31 |       425 
-         1 |        12         71 |        83 
+         0 |       395         30 |       425 
+         1 |        14         69 |        83 
 -----------+----------------------+----------
-     Total |       406        102 |       508 
+     Total |       409         99 |       508 
 
 . 
 . matrix list conf_matrix
 
 conf_matrix[2,2]
      c1   c2
-r1  394   31
-r2   12   71
+r1  395   30
+r2   14   69
 
 . 
 . scalar TN = conf_matrix[1,1]
@@ -511,20 +493,20 @@ r2   12   71
 . scalar Prevalence = ((TP+FP) / (TP + TN + FP + FN))*100
 
 . display TP+FP
-102
+99
 
 . 
 . display "Sensitivity for 1066 .25: " Sensitivity
-Sensitivity for 1066 .25: .85542169
+Sensitivity for 1066 .25: .8313253
 
 . display "Specificity for 1066 .25: " Specificity
-Specificity for 1066 .25: .92705882
+Specificity for 1066 .25: .92941176
 
 . display "Accuracy for 1066 .25: " Accuracy
-Accuracy for 1066 .25: .91535433
+Accuracy for 1066 .25: .91338583
 
 . display "Predicted Prevalence for 1066 .25: " Prevalence
-Predicted Prevalence for 1066 .25: 20.07874
+Predicted Prevalence for 1066 .25: 19.488189
 
 . 
 . roctab dementia dem_pred_bin_1066a25
@@ -532,7 +514,7 @@ Predicted Prevalence for 1066 .25: 20.07874
                       ROC                     Asymptotic normal  
            Obs       area     Std. err.      [95% conf. interval]
      ------------------------------------------------------------
-           508     0.8912       0.0204        0.85122     0.93126
+           508     0.8804       0.0216        0.83805     0.92269
 
 . matrix drop conf_matrix
 
@@ -820,8 +802,8 @@ Predicted Prevalence for lasso ascribed: 29.724409
 
 . 
 . ** education gradients [for all cutpoints]
-. foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_lwa expert_dem hurd
-> _dem lasso_dem {
+. foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_lwa expert_dem hurd_dem lasso_d
+> em {
   2.     forvalues r = 1/2 {
   3.         display "****start: `dem_var' `r'****"
   4.         qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat == `r'
@@ -873,9 +855,9 @@ Expression: Pr(k_fold_dem_pred_1066_opt), predict()
              |     Margin   std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       educat |
-          1  |   .2407775   .0400959     6.01   0.000     .1621909    .3193641
-          2  |   .0721809   .0309566     2.33   0.020     .0115071    .1328548
-          3  |   .0393462   .0222109     1.77   0.076    -.0041864    .0828788
+          1  |   .2495063   .0406129     6.14   0.000     .1699066    .3291061
+          2  |   .0722997   .0310184     2.33   0.020     .0115047    .1330946
+          3  |   .0524633    .025459     2.06   0.039     .0025645     .102362
 ------------------------------------------------------------------------------
 ****start: k_fold_dem_pred_1066_opt 2****
 
@@ -889,9 +871,9 @@ Expression: Pr(k_fold_dem_pred_1066_opt), predict()
              |     Margin   std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       educat |
-          1  |   .3996389   .0430975     9.27   0.000     .3151694    .4841085
-          2  |   .3908176   .0636793     6.14   0.000     .2660086    .5156267
-          3  |   .2096072   .0457146     4.59   0.000     .1200082    .2992063
+          1  |   .4072666   .0430009     9.47   0.000     .3229863    .4915469
+          2  |   .4277376    .064196     6.66   0.000     .3019158    .5535595
+          3  |   .2109197   .0455877     4.63   0.000     .1215694      .30027
 ------------------------------------------------------------------------------
 ****start: dem_pred_bin_1066a25 1****
 
@@ -921,9 +903,9 @@ Expression: Pr(dem_pred_bin_1066a25), predict()
              |     Margin   std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       educat |
-          1  |   .3481036   .0418204     8.32   0.000     .2661371    .4300702
-          2  |    .299945   .0598431     5.01   0.000     .1826547    .4172353
-          3  |   .1972077   .0445319     4.43   0.000     .1099269    .2844886
+          1  |   .3407618   .0417138     8.17   0.000     .2590042    .4225193
+          2  |   .2803043   .0588784     4.76   0.000     .1649048    .3957039
+          3  |    .182471    .043646     4.18   0.000     .0969265    .2680156
 ------------------------------------------------------------------------------
 ****start: dem_pred_lwa 1****
 
@@ -1061,10 +1043,10 @@ Expression: Pr(lasso_dem), predict()
            |          opt
   AAGE_cat |         0          1 |     Total
 -----------+----------------------+----------
-         1 |       223         35 |       258 
-         2 |       165         85 |       250 
+         1 |       221         37 |       258 
+         2 |       162         88 |       250 
 -----------+----------------------+----------
-     Total |       388        120 |       508 
+     Total |       383        125 |       508 
 
 . tab AAGE_cat dem_pred_bin_1066a25
 
@@ -1072,19 +1054,9 @@ Expression: Pr(lasso_dem), predict()
   AAGE_cat |         0          1 |     Total
 -----------+----------------------+----------
          1 |       229         29 |       258 
-         2 |       177         73 |       250 
+         2 |       180         70 |       250 
 -----------+----------------------+----------
-     Total |       406        102 |       508 
-
-. tab AAGE_cat dem_pred_bin_lw
-variable dem_pred_bin_lw not found
-r(111);
-
-end of do-file
-
-r(111);
-
-. do "/scratch/chrissoria/STATATMP/SD866859.000000"
+     Total |       409         99 |       508 
 
 . tab AAGE_cat dem_pred_lwa
 
@@ -1096,10 +1068,35 @@ r(111);
 -----------+----------------------+----------
      Total |       417         91 |       508 
 
-. 
-end of do-file
+. tab AAGE_cat expert_dem
 
-. do "/scratch/chrissoria/STATATMP/SD866859.000000"
+           |      expert_dem
+  AAGE_cat |         0          1 |     Total
+-----------+----------------------+----------
+         1 |       232         26 |       258 
+         2 |       149        101 |       250 
+-----------+----------------------+----------
+     Total |       381        127 |       508 
+
+. tab AAGE_cat hurd_dem
+
+           |       hurd_dem
+  AAGE_cat |         0          1 |     Total
+-----------+----------------------+----------
+         1 |       231         27 |       258 
+         2 |       150        100 |       250 
+-----------+----------------------+----------
+     Total |       381        127 |       508 
+
+. tab AAGE_cat lasso_dem
+
+           |       lasso_dem
+  AAGE_cat |         0          1 |     Total
+-----------+----------------------+----------
+         1 |       217         41 |       258 
+         2 |       140        110 |       250 
+-----------+----------------------+----------
+     Total |       357        151 |       508 
 
 . tab educat dem_pred_lwa
 
@@ -1113,5 +1110,44 @@ end of do-file
      Total |       417         91 |       508 
 
 . 
-end of do-file
+. *there are no cases of dementia in the younger group for the langa-weir
+. tabulate AAGE_cat educat if dem_pred_lwa == 1
 
+           |              educat
+  AAGE_cat |         1          2          3 |     Total
+-----------+---------------------------------+----------
+         1 |        30          5          0 |        35 
+         2 |        41         10          5 |        56 
+-----------+---------------------------------+----------
+     Total |        71         15          5 |        91 
+
+. 
+. tab educat hurd_dem
+
+           |       hurd_dem
+    educat |         0          1 |     Total
+-----------+----------------------+----------
+         1 |       158         72 |       230 
+         2 |        92         31 |       123 
+         3 |       131         24 |       155 
+-----------+----------------------+----------
+     Total |       381        127 |       508 
+
+. tab educat lasso_dem
+
+           |       lasso_dem
+    educat |         0          1 |     Total
+-----------+----------------------+----------
+         1 |       140         90 |       230 
+         2 |        88         35 |       123 
+         3 |       129         26 |       155 
+-----------+----------------------+----------
+     Total |       357        151 |       508 
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /hdir/0/chrissoria/1066/ADAMS_1066_aggressive_98_to_0.log
+  log type:  text
+ closed on:  14 May 2024, 10:13:52
+--------------------------------------------------------------------------------------------------------------------

@@ -402,28 +402,38 @@ tab educat
 *****************
 
 * optimal
-/*
-set seed 54321
-gen ranum = uniform()
-sort ranum
-drop ranum
-*/
 
-gen fold = mod(_n, 10) + 1
-gen k_fold_dem_pred_1066 = .
+local num_repeats 10
 
-forvalues i = 1/10 {
-    local train = "fold != `i'"
-    local test = "fold == `i'"
-    logit dementia COGSCORE RELSCORE aRECALLcs if `train' 
-    predict p_`i' if `test', pr
-    replace k_fold_dem_pred_1066 = p_`i' if `test'
-    drop p_`i'
+forvalues r = 1/`num_repeats' {
+    set seed `r'010
+    
+    gen ranum = uniform()
+    sort ranum
+    drop ranum
+    
+    gen fold_`r' = mod(_n, 10) + 1
+    
+    gen k_fold_dem_pred_1066_`r' = .
+    
+    forvalues i = 1/10 {  
+        local train = "fold_`r' != `i'" 
+        local test = "fold_`r' == `i'"  
+        
+        quietly logit dementia COGSCORE RELSCORE aRECALLcs if `train'
+        predict p_`r'_`i' if `test', pr
+        
+        replace k_fold_dem_pred_1066_`r' = p_`r'_`i' if `test'
+    }
 }
 
-cutpt dementia k_fold_dem_pred_1066
+gen total_pred = k_fold_dem_pred_1066_1 + k_fold_dem_pred_1066_2 + k_fold_dem_pred_1066_3 + k_fold_dem_pred_1066_4 + k_fold_dem_pred_1066_5 + k_fold_dem_pred_1066_6 + k_fold_dem_pred_1066_7 + k_fold_dem_pred_1066_8 + k_fold_dem_pred_1066_9 + k_fold_dem_pred_1066_10
 
-gen k_fold_dem_pred_1066_opt = (k_fold_dem_pred_1066 >= .14220728) if !missing(k_fold_dem_pred_1066)
+gen k_fold_dem_pred_1066_av = total_pred/10
+
+cutpt dementia k_fold_dem_pred_1066_av
+
+gen k_fold_dem_pred_1066_opt = (k_fold_dem_pred_1066_av >= .1277115) if !missing(k_fold_dem_pred_1066_av)
 tab dementia k_fold_dem_pred_1066_opt, matcell(conf_matrix)
 matrix list conf_matrix
 
@@ -443,14 +453,13 @@ display "Specificity for 1066 .25: " Specificity
 display "Accuracy for 1066 .25: " Accuracy
 display "Predicted Prevalence for 1066 optimal: " Prevalence
 
-display "Predicted Prevalence from 1066 optimal cutoff: " (120/508) * 100
-roctab dementia k_fold_dem_pred_1066
-rocreg dementia k_fold_dem_pred_1066
+roctab dementia k_fold_dem_pred_1066_av
+rocreg dementia k_fold_dem_pred_1066_av
 
 matrix drop conf_matrix
 scalar drop TN FN FP TP Sensitivity Specificity Accuracy Prevalence
 *ascribed
-gen dem_pred_bin_1066a25 = (k_fold_dem_pred_1066 >= .25) if !missing(k_fold_dem_pred_1066)
+gen dem_pred_bin_1066a25 = (k_fold_dem_pred_1066_av >= .25) if !missing(k_fold_dem_pred_1066_av)
 tab dem_pred_bin_1066a25
 tab dementia dem_pred_bin_1066a25, matcell(conf_matrix)
 
