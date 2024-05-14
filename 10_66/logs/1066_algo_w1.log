@@ -1,0 +1,296 @@
+--------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /hdir/0/chrissoria/1066/1066_algo_w1.log
+  log type:  text
+ opened on:  14 May 2024, 10:53:39
+. }
+
+. else if `wave' == 2 {
+.     log using 1066_algo_w2.log, text replace
+. }
+
+. 
+. *************COGSCORE******************
+. 
+. 
+. **************************************
+. 
+. /*
+> 
+> 12/26 variables in the 1066 cannot be included in the ADAMS algo
+> they are: chair shoes knuckle elbow should bridge hammer pray chemist store longmem nod point circle
+> all 0 / 1
+> 
+> */
+. 
+. egen count = rowtotal(pencil watch repeat town chief street address month day year season pentag)
+
+. 
+. foreach var in pencil watch repeat town chief street address month day year season pentag animals wordimm worddel 
+> paper story{
+  2.     replace `var' = 0 if `var' == .
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. foreach var in animals wordimm worddel paper story {
+  2.     replace `var' = 0 if `var' == 99
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. foreach var in wordimm worddel paper story {
+  2.     replace `var' = 0 if `var' == 9
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. *other variables that we won't be able to use are learn1 learn2 learn3 recall immed nrecall
+. 
+. foreach var in pencil watch repeat town chief street address month day year season pentag {
+  2.     replace `var' = . if `var' >= 2 & `var' <= 9
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. local vars "animals wordimm worddel paper story"
+
+. local nums "45 3 3 3 6"
+
+. 
+. local n : word count `vars'
+
+. 
+. forval i = 1/`n' {
+  2.     local var : word `i' of `vars'
+  3.     local num : word `i' of `nums'
+  4.     replace `var' = . if `var' > `num'
+  5. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. gen animtot=animals/23
+
+. 
+. gen wordtot1=wordimm/3
+
+. 
+. gen wordtot2=worddel/3
+
+. 
+. gen papertot=paper/3
+
+. 
+. gen storytot=story/6
+
+. 
+. *if we are to weight count for the variables it doesn't have
+. gen cogscore_adams1 = 1.03125*(count + animtot + wordtot1 + wordtot2 + papertot + storytot)
+
+. 
+. 
+. gen cogscore_adams2 = 1.03125*(count*(1+(26-12)/12) + animtot + wordtot1 + wordtot2 + papertot + storytot)
+
+. 
+. summarize cogscore cogscore_adams1 cogscore_adams2
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+    cogscore |      6,833     28.8248    5.454179          0   33.76223
+cogscore_a~1 |      6,833    14.48299    3.211103          0   18.29348
+cogscore_a~2 |      6,833    27.09634    6.014588          0   32.73098
+
+. 
+. ******************
+. * RELSCORE
+. ******************
+. 
+. 
+. sum memory put frdname famname wordfind wordwrg lastday orient lostout lostin chores money reason feed dress toile
+> t hobby
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+      memory |      6,796    .1748087    .3798314          0          1
+         put |      6,790    .5974963    .6151422          0          2
+     frdname |      6,792    .2111307    .4925058          0          2
+     famname |      6,791    .1182447    .4006713          0          2
+    wordfind |      6,794     .117015    .3965056          0          2
+-------------+---------------------------------------------------------
+     wordwrg |      6,795    .0933039    .3596611          0          2
+     lastday |      6,794    .1385046     .432499          0          2
+      orient |      6,795     .066961    .3201902          0          2
+     lostout |      6,782    .0639929    .3082284          0          2
+      lostin |      6,791    .0457959    .2638665          0          2
+-------------+---------------------------------------------------------
+      chores |      6,794    .0809538    .3439185          0          2
+       money |      6,795    .1461369    .4670299          0          2
+      reason |      6,797    .1346182    .3413404          0          1
+        feed |      6,795    .0366446    .2976395          0          3
+       dress |      6,796     .060771    .3836047          0          3
+-------------+---------------------------------------------------------
+      toilet |      6,794    .0459229    .3374797          0          3
+       hobby |      6,798    .1191527    .3239919          0          1
+
+. 
+. *adding kept because I was able to find it in the codebook
+. egen MISS1 = rowmiss(memory frdname famname wordfind wordwrg lastday orient lostout lostin chores money reason hob
+> by)
+
+. 
+. replace MISS1 = MISS1 + 1 if inlist(pid, 2108501, 20122802, 20164200)
+(3 real changes made)
+
+. 
+. egen MISS3 = rowmiss(feed dress toilet)
+
+. 
+. gen MISSTOT = (MISS3*3) + MISS1
+
+. 
+. if "`drop_missing_from_relscore'" == "yes" {
+.     drop if missing(memory) | missing(put) | missing(frdname) | missing(famname) | missing(wordfind) | missing(wor
+> dwrg) | missing(lastday) | missing(orient) | missing(lostout) | missing(lostin) | missing(chores) | missing(money)
+>  | missing(reason) | missing(feed) | missing(dress) | missing(toilet)
+. }
+
+. 
+. *conservative version with only the variables we first incorporated
+. if `wave' == 1 {
+. 
+. foreach var in frdname famname wordfind wordwrg lastday orient lostout lostin chores money{
+  2.     replace `var'= `var'/2
+  3. }
+(1,176 real changes made)
+(612 real changes made)
+(612 real changes made)
+(482 real changes made)
+(711 real changes made)
+(319 real changes made)
+(315 real changes made)
+(223 real changes made)
+(401 real changes made)
+(676 real changes made)
+. 
+. }
+
+. 
+. else if `wave' == 2 {
+. foreach var in frdname famname wordfind wordwrg lastday orient lostout lostin chores_original money{
+  2.     replace `var'= `var'/2
+  3.     
+. replace chores = chores_original
+  4. }
+. 
+. }
+
+. 
+. * Backup original 'dress' variable and recode if 'dressdis' is 1
+. replace dress = 0 if dressdis == 1
+(0 real changes made)
+
+. 
+. * Backup original 'chores' variable and recode if 'choredis' is 1 (I cannot find this)
+. replace chores = 0 if choredis == 1
+(0 real changes made)
+
+. 
+. * Backup original 'feed' variable and recode if 'feeddis' is 1
+. replace feed = 0 if feeddis == 1
+(0 real changes made)
+
+. 
+. * Backup original 'toilet' variable and recode if 'toildis' is 1
+. replace toilet = 0 if toildis == 1
+(0 real changes made)
+
+.                     
+. gen S = (cond(missing(memory), 0, memory) + ///
+>                     cond(missing(frdname), 0, frdname) + ///
+>                     cond(missing(famname), 0, famname) + ///
+>                     cond(missing(wordfind), 0, wordfind) + ///
+>                     cond(missing(wordwrg), 0, wordwrg) + ///
+>                     cond(missing(lastday), 0, lastday) + ///
+>                     cond(missing(orient), 0, orient) + ///
+>                     cond(missing(lostout), 0, lostout) + ///
+>                     cond(missing(lostin), 0, lostin) + ///
+>                     cond(missing(chores), 0, chores) + ///
+>                     cond(missing(money), 0, money) + ///
+>                     cond(missing(reason), 0, reason) + ///
+>                     cond(missing(feed), 0, feed) + ///
+>                     cond(missing(dress), 0, dress) + ///
+>                     cond(missing(toilet), 0, toilet) + ///
+>                     cond(missing(hobby), 0, hobby))
+
+. 
+. 
+. summarize S
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+           S |      6,833    1.106688    2.753995          0         22
+
+. 
+. gen relscore_adams1 = 23/(23-MISSTOT)*S
+
+. 
+. summarize relscore relscore_adams1
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+    relscore |      6,802    2.270669     4.12887  -9.310345         30
+relscore_a~1 |      6,833    1.110367    2.769461          0         22
+
+. 
+. ******MAIN COMPUTATION*****
+. 
+. ****************************
+. 
+. /*for now we're ignoring these
+> gen dem1066prob = exp(-0.261*cogscore_adams1 + 0.516*relscore_adams1 - 0.713*recall + 4.826) / (1+exp(-0.261*cogsc
+> ore_adams1 + 0.516*relscore_adams1 - 0.713*recall + 4.826))
+> */
+. log close
+      name:  <unnamed>
+       log:  /hdir/0/chrissoria/1066/1066_algo_w1.log
+  log type:  text
+ closed on:  14 May 2024, 10:53:40
+--------------------------------------------------------------------------------------------------------------------

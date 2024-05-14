@@ -1,0 +1,226 @@
+--------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /hdir/0/chrissoria/1066/ADAMS_1066_comparison.log
+  log type:  text
+ opened on:  14 May 2024, 10:53:40
+
+. 
+. local num_repeats 10
+
+. 
+. forvalues r = 1/`num_repeats' {
+  2.     set seed `r'010
+  3.     
+.     gen ranum = uniform()
+  4.     sort ranum
+  5.     drop ranum
+  6.     
+.     gen fold_`r' = mod(_n, 10) + 1
+  7.     
+.     gen k_fold_dem_pred_1066_`r' = .
+  8.     
+.     forvalues i = 1/10 {  
+  9.         local train = "fold_`r' != `i'" 
+ 10.         local test = "fold_`r' == `i'"  
+ 11.         
+.         quietly logit cdem1066 cogscore_adams1 relscore_adams1 recall if `train'
+ 12.         quietly predict p_`r'_`i' if `test', pr
+ 13.         
+.         replace k_fold_dem_pred_1066_`r' = p_`r'_`i' if `test'
+ 14.     }
+ 15. }
+(6,833 missing values generated)
+(683 real changes made)
+(684 real changes made)
+(684 real changes made)
+(684 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(6,833 missing values generated)
+(683 real changes made)
+(684 real changes made)
+(684 real changes made)
+(684 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(6,833 missing values generated)
+(683 real changes made)
+(684 real changes made)
+(684 real changes made)
+(684 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(6,833 missing values generated)
+(683 real changes made)
+(684 real changes made)
+(684 real changes made)
+(684 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(6,833 missing values generated)
+(683 real changes made)
+(684 real changes made)
+(684 real changes made)
+(684 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(6,833 missing values generated)
+(683 real changes made)
+(684 real changes made)
+(684 real changes made)
+(684 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(6,833 missing values generated)
+(683 real changes made)
+(684 real changes made)
+(684 real changes made)
+(684 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(6,833 missing values generated)
+(683 real changes made)
+(684 real changes made)
+(684 real changes made)
+(684 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(6,833 missing values generated)
+(683 real changes made)
+(684 real changes made)
+(684 real changes made)
+(684 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(6,833 missing values generated)
+(683 real changes made)
+(684 real changes made)
+(684 real changes made)
+(684 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+(683 real changes made)
+
+. 
+. gen total_pred = k_fold_dem_pred_1066_1 + k_fold_dem_pred_1066_2 + k_fold_dem_pred_1066_3 + k_fold_dem_pred_1066_4
+>  + k_fold_dem_pred_1066_5 + k_fold_dem_pred_1066_6 + k_fold_dem_pred_1066_7 + k_fold_dem_pred_1066_8 + k_fold_dem_
+> pred_1066_9 + k_fold_dem_pred_1066_10
+
+. 
+. gen k_fold_dem_pred_1066_av = total_pred/10
+
+. 
+. gen dem1066pred50 = (k_fold_dem_pred_1066_av >= .5) if !missing(k_fold_dem_pred_1066_av)
+
+. tab dem1066pred50
+
+dem1066pred |
+         50 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      6,144       89.92       89.92
+          1 |        689       10.08      100.00
+------------+-----------------------------------
+      Total |      6,833      100.00
+
+. tab cdem1066 dem1066pred50, matcell(conf_matrix)
+
+ Education |
+  adjusted |
+      1066 |
+    Lancet |
+  dementia |     dem1066pred50
+ diagnosis |         0          1 |     Total
+-----------+----------------------+----------
+  non-case |     5,980         69 |     6,049 
+      case |       145        615 |       760 
+-----------+----------------------+----------
+     Total |     6,125        684 |     6,809 
+
+. 
+. matrix list conf_matrix
+
+conf_matrix[2,2]
+      c1    c2
+r1  5980    69
+r2   145   615
+
+. 
+. scalar TN = conf_matrix[1,1]
+
+. scalar FN = conf_matrix[2,1]
+
+. scalar FP = conf_matrix[1,2]
+
+. scalar TP = conf_matrix[2,2]
+
+. 
+. scalar Sensitivity = TP / (TP + FN)
+
+. scalar Specificity = TN / (TN + FP)
+
+. scalar Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+. scalar Prevalence = ((TP+FP) / (TP + TN + FP + FN))*100
+
+. 
+. display "Sensitivity for 1066 .50: " Sensitivity
+Sensitivity for 1066 .50: .80921053
+
+. display "Specificity for 1066 .50: " Specificity
+Specificity for 1066 .50: .98859316
+
+. display "Accuracy for 1066 .50: " Accuracy
+Accuracy for 1066 .50: .96857101
+
+. display "Predicted Prevalence for 1066 .50: " Prevalence
+Predicted Prevalence for 1066 .50: 10.045528
+
+. display "Predicted Prevalence for 1066 .25: " ((TP+FN) / (TP + TN + FP + FN))*100
+Predicted Prevalence for 1066 .25: 11.161698
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /hdir/0/chrissoria/1066/ADAMS_1066_comparison.log
+  log type:  text
+ closed on:  14 May 2024, 10:53:44
+--------------------------------------------------------------------------------------------------------------------
