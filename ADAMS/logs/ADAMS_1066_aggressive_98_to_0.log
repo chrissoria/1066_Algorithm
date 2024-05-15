@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  /hdir/0/chrissoria/1066/ADAMS_1066_aggressive_98_to_0.log
   log type:  text
- opened on:  14 May 2024, 10:13:36
+ opened on:  14 May 2024, 20:29:39
 
 . 
 . ** set sample inclusion
@@ -103,221 +103,21 @@
  10.         local test = "fold_`r' == `i'"  
  11.         
 .         quietly logit dementia COGSCORE RELSCORE aRECALLcs if `train'
- 12.         predict p_`r'_`i' if `test', pr
+ 12.         quietly predict p_`r'_`i' if `test', pr
  13.         
-.         replace k_fold_dem_pred_1066_`r' = p_`r'_`i' if `test'
+.         quietly replace k_fold_dem_pred_1066_`r' = p_`r'_`i' if `test'
  14.     }
  15. }
 (508 missing values generated)
-(458 missing values generated)
-(50 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(458 missing values generated)
-(50 real changes made)
 (508 missing values generated)
-(458 missing values generated)
-(50 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(458 missing values generated)
-(50 real changes made)
 (508 missing values generated)
-(458 missing values generated)
-(50 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(458 missing values generated)
-(50 real changes made)
 (508 missing values generated)
-(458 missing values generated)
-(50 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(458 missing values generated)
-(50 real changes made)
 (508 missing values generated)
-(458 missing values generated)
-(50 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(458 missing values generated)
-(50 real changes made)
 (508 missing values generated)
-(458 missing values generated)
-(50 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(458 missing values generated)
-(50 real changes made)
 (508 missing values generated)
-(458 missing values generated)
-(50 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(458 missing values generated)
-(50 real changes made)
 (508 missing values generated)
-(458 missing values generated)
-(50 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(458 missing values generated)
-(50 real changes made)
 (508 missing values generated)
-(458 missing values generated)
-(50 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(458 missing values generated)
-(50 real changes made)
 (508 missing values generated)
-(458 missing values generated)
-(50 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(457 missing values generated)
-(51 real changes made)
-(458 missing values generated)
-(50 real changes made)
 
 . 
 . gen total_pred = k_fold_dem_pred_1066_1 + k_fold_dem_pred_1066_2 + k_fold_dem_pred_1066_3 + k_fold_dem_pred_1066_4
@@ -804,16 +604,12 @@ Predicted Prevalence for lasso ascribed: 29.724409
 . ** education gradients [for all cutpoints]
 . foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_lwa expert_dem hurd_dem lasso_d
 > em {
-  2.     forvalues r = 1/2 {
-  3.         display "****start: `dem_var' `r'****"
-  4.         qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat == `r'
-  5.         margins educat, post  // Only use 'post' if necessary
-  6.         eststo `dem_var'_`r'
-  7.     }
-  8. }
-****start: dementia 1****
+  2.         qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat
+  3.         margins educat, post  // Only use 'post' if necessary
+  4.         eststo `dem_var'
+  5. }
 
-Predictive margins                                         Number of obs = 258
+Predictive margins                                         Number of obs = 508
 Model VCE: OIM
 
 Expression: Pr(dementia), predict()
@@ -823,29 +619,12 @@ Expression: Pr(dementia), predict()
              |     Margin   std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       educat |
-          1  |   .1334245   .0319917     4.17   0.000      .070722     .196127
-          2  |   .0434133   .0244684     1.77   0.076    -.0045438    .0913704
-          3  |   .0262196   .0182728     1.43   0.151    -.0095944    .0620336
+          1  |   .1794954   .0234318     7.66   0.000     .1335699    .2254209
+          2  |   .1823686   .0334809     5.45   0.000     .1167474    .2479899
+          3  |   .1233707    .025516     4.84   0.000     .0733602    .1733812
 ------------------------------------------------------------------------------
-****start: dementia 2****
 
-Predictive margins                                         Number of obs = 250
-Model VCE: OIM
-
-Expression: Pr(dementia), predict()
-
-------------------------------------------------------------------------------
-             |            Delta-method
-             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-      educat |
-          1  |   .2332591   .0368038     6.34   0.000     .1611249    .3053932
-          2  |   .3324418   .0606255     5.48   0.000      .213618    .4512656
-          3  |   .2236924    .046566     4.80   0.000     .1324247    .3149601
-------------------------------------------------------------------------------
-****start: k_fold_dem_pred_1066_opt 1****
-
-Predictive margins                                         Number of obs = 258
+Predictive margins                                         Number of obs = 508
 Model VCE: OIM
 
 Expression: Pr(k_fold_dem_pred_1066_opt), predict()
@@ -855,29 +634,12 @@ Expression: Pr(k_fold_dem_pred_1066_opt), predict()
              |     Margin   std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       educat |
-          1  |   .2495063   .0406129     6.14   0.000     .1699066    .3291061
-          2  |   .0722997   .0310184     2.33   0.020     .0115047    .1330946
-          3  |   .0524633    .025459     2.06   0.039     .0025645     .102362
+          1  |   .3249233   .0288563    11.26   0.000     .2683661    .3814806
+          2  |   .2403496   .0366567     6.56   0.000     .1685037    .3121954
+          3  |   .1308053   .0260655     5.02   0.000     .0797178    .1818927
 ------------------------------------------------------------------------------
-****start: k_fold_dem_pred_1066_opt 2****
 
-Predictive margins                                         Number of obs = 250
-Model VCE: OIM
-
-Expression: Pr(k_fold_dem_pred_1066_opt), predict()
-
-------------------------------------------------------------------------------
-             |            Delta-method
-             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-      educat |
-          1  |   .4072666   .0430009     9.47   0.000     .3229863    .4915469
-          2  |   .4277376    .064196     6.66   0.000     .3019158    .5535595
-          3  |   .2109197   .0455877     4.63   0.000     .1215694      .30027
-------------------------------------------------------------------------------
-****start: dem_pred_bin_1066a25 1****
-
-Predictive margins                                         Number of obs = 258
+Predictive margins                                         Number of obs = 508
 Model VCE: OIM
 
 Expression: Pr(dem_pred_bin_1066a25), predict()
@@ -887,29 +649,12 @@ Expression: Pr(dem_pred_bin_1066a25), predict()
              |     Margin   std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       educat |
-          1  |   .1950895   .0370789     5.26   0.000     .1224162    .2677628
-          2  |   .0582191    .028131     2.07   0.038     .0030833    .1133548
-          3  |   .0394047   .0222326     1.77   0.076    -.0041704    .0829798
+          1  |   .2656087   .0273639     9.71   0.000     .2119765    .3192409
+          2  |   .1640297   .0325411     5.04   0.000     .1002504     .227809
+          3  |   .1095038   .0245928     4.45   0.000     .0613028    .1577048
 ------------------------------------------------------------------------------
-****start: dem_pred_bin_1066a25 2****
 
-Predictive margins                                         Number of obs = 250
-Model VCE: OIM
-
-Expression: Pr(dem_pred_bin_1066a25), predict()
-
-------------------------------------------------------------------------------
-             |            Delta-method
-             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-      educat |
-          1  |   .3407618   .0417138     8.17   0.000     .2590042    .4225193
-          2  |   .2803043   .0588784     4.76   0.000     .1649048    .3957039
-          3  |    .182471    .043646     4.18   0.000     .0969265    .2680156
-------------------------------------------------------------------------------
-****start: dem_pred_lwa 1****
-
-Predictive margins                                         Number of obs = 181
+Predictive margins                                         Number of obs = 508
 Model VCE: OIM
 
 Expression: Pr(dem_pred_lwa), predict()
@@ -919,28 +664,12 @@ Expression: Pr(dem_pred_lwa), predict()
              |     Margin   std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       educat |
-          1  |   .2688526   .0415922     6.46   0.000     .1873333    .3503719
-          2  |   .0723179   .0310101     2.33   0.020     .0115392    .1330966
+          1  |   .3003222   .0295536    10.16   0.000     .2423981    .3582462
+          2  |   .1264482   .0299699     4.22   0.000     .0677083    .1851882
+          3  |   .0338317   .0147733     2.29   0.022     .0048765    .0627868
 ------------------------------------------------------------------------------
-****start: dem_pred_lwa 2****
 
-Predictive margins                                         Number of obs = 250
-Model VCE: OIM
-
-Expression: Pr(dem_pred_lwa), predict()
-
-------------------------------------------------------------------------------
-             |            Delta-method
-             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-      educat |
-          1  |   .3362956    .042439     7.92   0.000     .2531166    .4194746
-          2  |   .1867546   .0524497     3.56   0.000      .083955    .2895541
-          3  |   .0690047   .0295266     2.34   0.019     .0111336    .1268758
-------------------------------------------------------------------------------
-****start: expert_dem 1****
-
-Predictive margins                                         Number of obs = 258
+Predictive margins                                         Number of obs = 508
 Model VCE: OIM
 
 Expression: Pr(expert_dem), predict()
@@ -950,29 +679,12 @@ Expression: Pr(expert_dem), predict()
              |     Margin   std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       educat |
-          1  |   .1570962   .0331513     4.74   0.000     .0921209    .2220715
-          2  |   .0890163   .0339875     2.62   0.009      .022402    .1556305
-          3  |   .0264758   .0183513     1.44   0.149     -.009492    .0624436
+          1  |    .300489   .0264521    11.36   0.000     .2486439    .3523341
+          2  |   .2888494   .0371461     7.78   0.000     .2160444    .3616545
+          3  |   .1430562   .0263761     5.42   0.000     .0913601    .1947524
 ------------------------------------------------------------------------------
-****start: expert_dem 2****
 
-Predictive margins                                         Number of obs = 250
-Model VCE: OIM
-
-Expression: Pr(expert_dem), predict()
-
-------------------------------------------------------------------------------
-             |            Delta-method
-             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-      educat |
-          1  |   .4514162   .0432703    10.43   0.000     .3666081    .5362244
-          2  |   .4970792   .0643813     7.72   0.000     .3708941    .6232642
-          3  |   .2630504   .0488946     5.38   0.000     .1672187     .358882
-------------------------------------------------------------------------------
-****start: hurd_dem 1****
-
-Predictive margins                                         Number of obs = 258
+Predictive margins                                         Number of obs = 508
 Model VCE: OIM
 
 Expression: Pr(hurd_dem), predict()
@@ -982,29 +694,12 @@ Expression: Pr(hurd_dem), predict()
              |     Margin   std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       educat |
-          1  |   .1668961   .0344024     4.85   0.000     .0994687    .2343235
-          2  |   .0883469   .0339862     2.60   0.009     .0217351    .1549586
-          3  |   .0263801   .0183278     1.44   0.150    -.0095416    .0623019
+          1  |   .2962691    .026624    11.13   0.000     .2440869    .3484512
+          2  |   .2708016   .0367277     7.37   0.000     .1988166    .3427865
+          3  |   .1636357   .0275453     5.94   0.000     .1096479    .2176235
 ------------------------------------------------------------------------------
-****start: hurd_dem 2****
 
-Predictive margins                                         Number of obs = 250
-Model VCE: OIM
-
-Expression: Pr(hurd_dem), predict()
-
-------------------------------------------------------------------------------
-             |            Delta-method
-             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-      educat |
-          1  |   .4334503   .0429986    10.08   0.000     .3491746    .5177259
-          2  |   .4611066   .0639527     7.21   0.000     .3357616    .5864517
-          3  |    .304401   .0504198     6.04   0.000     .2055801    .4032219
-------------------------------------------------------------------------------
-****start: lasso_dem 1****
-
-Predictive margins                                         Number of obs = 258
+Predictive margins                                         Number of obs = 508
 Model VCE: OIM
 
 Expression: Pr(lasso_dem), predict()
@@ -1014,25 +709,9 @@ Expression: Pr(lasso_dem), predict()
              |     Margin   std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       educat |
-          1  |   .2454019   .0389573     6.30   0.000     .1690469    .3217568
-          2  |   .1182618   .0381553     3.10   0.002     .0434788    .1930449
-          3  |   .0662672   .0281411     2.35   0.019     .0111117    .1214227
-------------------------------------------------------------------------------
-****start: lasso_dem 2****
-
-Predictive margins                                         Number of obs = 250
-Model VCE: OIM
-
-Expression: Pr(lasso_dem), predict()
-
-------------------------------------------------------------------------------
-             |            Delta-method
-             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
--------------+----------------------------------------------------------------
-      educat |
-          1  |   .5087951   .0433165    11.75   0.000     .4238963    .5936939
-          2  |   .4984019   .0638628     7.80   0.000     .3732331    .6235707
-          3  |   .2928006   .0496152     5.90   0.000     .1955565    .3900447
+          1  |   .3743458   .0286406    13.07   0.000     .3182112    .4304805
+          2  |   .3034379   .0381187     7.96   0.000     .2287267    .3781491
+          3  |   .1769396   .0284318     6.22   0.000     .1212143    .2326649
 ------------------------------------------------------------------------------
 
 . 
@@ -1149,5 +828,5 @@ Expression: Pr(lasso_dem), predict()
       name:  <unnamed>
        log:  /hdir/0/chrissoria/1066/ADAMS_1066_aggressive_98_to_0.log
   log type:  text
- closed on:  14 May 2024, 10:13:52
+ closed on:  14 May 2024, 20:29:51
 --------------------------------------------------------------------------------------------------------------------

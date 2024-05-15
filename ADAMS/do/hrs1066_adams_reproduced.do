@@ -421,9 +421,9 @@ forvalues r = 1/`num_repeats' {
         local test = "fold_`r' == `i'"  
         
         quietly logit dementia COGSCORE RELSCORE aRECALLcs if `train'
-        predict p_`r'_`i' if `test', pr
+        quietly predict p_`r'_`i' if `test', pr
         
-        replace k_fold_dem_pred_1066_`r' = p_`r'_`i' if `test'
+        quietly replace k_fold_dem_pred_1066_`r' = p_`r'_`i' if `test'
     }
 }
 
@@ -597,12 +597,9 @@ roctab dementia lasso_dem
 
 ** education gradients [for all cutpoints]
 foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_lwa expert_dem hurd_dem lasso_dem {
-    forvalues r = 1/2 {
-        display "****start: `dem_var' `r'****"
-        qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat == `r'
+        qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat
         margins educat, post  // Only use 'post' if necessary
-        eststo `dem_var'_`r'
-    }
+        eststo `dem_var'
 }
 
 *tabulating to see distribution

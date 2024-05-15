@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  /hdir/0/chrissoria/1066/ADAMS_1066_comparison.log
   log type:  text
- opened on:  14 May 2024, 10:53:40
+ opened on:  14 May 2024, 20:57:20
 
 . 
 . local num_repeats 10
@@ -26,119 +26,19 @@
 .         quietly logit cdem1066 cogscore_adams1 relscore_adams1 recall if `train'
  12.         quietly predict p_`r'_`i' if `test', pr
  13.         
-.         replace k_fold_dem_pred_1066_`r' = p_`r'_`i' if `test'
+.         quietly replace k_fold_dem_pred_1066_`r' = p_`r'_`i' if `test'
  14.     }
  15. }
 (6,833 missing values generated)
-(683 real changes made)
-(684 real changes made)
-(684 real changes made)
-(684 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
 (6,833 missing values generated)
-(683 real changes made)
-(684 real changes made)
-(684 real changes made)
-(684 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
 (6,833 missing values generated)
-(683 real changes made)
-(684 real changes made)
-(684 real changes made)
-(684 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
 (6,833 missing values generated)
-(683 real changes made)
-(684 real changes made)
-(684 real changes made)
-(684 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
 (6,833 missing values generated)
-(683 real changes made)
-(684 real changes made)
-(684 real changes made)
-(684 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
 (6,833 missing values generated)
-(683 real changes made)
-(684 real changes made)
-(684 real changes made)
-(684 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
 (6,833 missing values generated)
-(683 real changes made)
-(684 real changes made)
-(684 real changes made)
-(684 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
 (6,833 missing values generated)
-(683 real changes made)
-(684 real changes made)
-(684 real changes made)
-(684 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
 (6,833 missing values generated)
-(683 real changes made)
-(684 real changes made)
-(684 real changes made)
-(684 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
 (6,833 missing values generated)
-(683 real changes made)
-(684 real changes made)
-(684 real changes made)
-(684 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
-(683 real changes made)
 
 . 
 . gen total_pred = k_fold_dem_pred_1066_1 + k_fold_dem_pred_1066_2 + k_fold_dem_pred_1066_3 + k_fold_dem_pred_1066_4
@@ -211,16 +111,24 @@ Specificity for 1066 .50: .98859316
 . display "Accuracy for 1066 .50: " Accuracy
 Accuracy for 1066 .50: .96857101
 
-. display "Predicted Prevalence for 1066 .50: " Prevalence
-Predicted Prevalence for 1066 .50: 10.045528
+. display "Predicted Prevalence for 1066 ADAMS modified: " Prevalence
+Predicted Prevalence for 1066 ADAMS modified: 10.045528
 
-. display "Predicted Prevalence for 1066 .25: " ((TP+FN) / (TP + TN + FP + FN))*100
-Predicted Prevalence for 1066 .25: 11.161698
+. display "Predicted Prevalence for 1066 original: " ((TP+FN) / (TP + TN + FP + FN))*100
+Predicted Prevalence for 1066 original: 11.161698
+
+. 
+. roctab dem1066 dem1066pred50
+
+                      ROC                     Asymptotic normal  
+           Obs       area     Std. err.      [95% conf. interval]
+     ------------------------------------------------------------
+         6,833     1.0000       0.0000        1.00000     1.00000
 
 . 
 . log close
       name:  <unnamed>
        log:  /hdir/0/chrissoria/1066/ADAMS_1066_comparison.log
   log type:  text
- closed on:  14 May 2024, 10:53:44
+ closed on:  14 May 2024, 20:57:24
 --------------------------------------------------------------------------------------------------------------------

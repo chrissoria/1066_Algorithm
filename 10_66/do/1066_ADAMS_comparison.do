@@ -41,7 +41,7 @@ cd "`path'"\
 local wave 1\
 \
 local drop_missing_from_relscore "no"\
-local drop_missing_from_cogscore "no"\
+local drop_missing_from_cogscore "yes"\
 \
 \
 ***** SCRIPT STARTS HERE *********\
@@ -229,6 +229,8 @@ summarize relscore relscore_adams1\
 /*for now we're ignoring these\
 gen dem1066prob = exp(-0.261*cogscore_adams1 + 0.516*relscore_adams1 - 0.713*recall + 4.826) / (1+exp(-0.261*cogscore_adams1 + 0.516*relscore_adams1 - 0.713*recall + 4.826))\
 */\
+log close\
+log using "/hdir/0/chrissoria/1066/ADAMS_1066_comparison.log", text replace\
 \
 local num_repeats 10\
 \
@@ -250,7 +252,7 @@ forvalues r = 1/`num_repeats' \{\
         quietly logit cdem1066 cogscore_adams1 relscore_adams1 recall if `train'\
         quietly predict p_`r'_`i' if `test', pr\
         \
-        replace k_fold_dem_pred_1066_`r' = p_`r'_`i' if `test'\
+        quietly replace k_fold_dem_pred_1066_`r' = p_`r'_`i' if `test'\
     \}\
 \}\
 \
@@ -277,6 +279,11 @@ scalar Prevalence = ((TP+FP) / (TP + TN + FP + FN))*100\
 display "Sensitivity for 1066 .50: " Sensitivity\
 display "Specificity for 1066 .50: " Specificity\
 display "Accuracy for 1066 .50: " Accuracy\
-display "Predicted Prevalence for 1066 .50: " Prevalence\
-display "Predicted Prevalence for 1066 .25: " ((TP+FN) / (TP + TN + FP + FN))*100\
+display "Predicted Prevalence for 1066 ADAMS modified: " Prevalence\
+display "Predicted Prevalence for 1066 original: " ((TP+FN) / (TP + TN + FP + FN))*100\
+\
+roctab dem1066 dem1066pred50\
+\
+log close\
+exit, clear\
 }

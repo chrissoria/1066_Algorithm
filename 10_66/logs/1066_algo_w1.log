@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  /hdir/0/chrissoria/1066/1066_algo_w1.log
   log type:  text
- opened on:  14 May 2024, 10:53:39
+ opened on:  14 May 2024, 20:57:20
 . }
 
 . else if `wave' == 2 {
@@ -292,5 +292,5 @@ relscore_a~1 |      6,833    1.110367    2.769461          0         22
       name:  <unnamed>
        log:  /hdir/0/chrissoria/1066/1066_algo_w1.log
   log type:  text
- closed on:  14 May 2024, 10:53:40
+ closed on:  14 May 2024, 20:57:20
 --------------------------------------------------------------------------------------------------------------------
