@@ -127,9 +127,9 @@ tab `i'DFDX1 if cognormal==1 //307 normal
 *chris adding this
 rename ANAFTOT aANIMALS
 rename ANWM1TOT aSTORY
-rename ANMSE17 aWATCH
+rename ANMSE17 aPENCIL
 rename ANMSE7 aREPEAT
-rename ANMSE16 aPENCIL
+rename ANMSE16 aWATCH
 rename ANMSE8 aTOWN
 rename ANPRES aCHIEF
 rename ANMSE10 aSTREET
@@ -154,6 +154,10 @@ foreach var in aANIMALS aSTORY{
 	tab `var', miss
 } 
 
+*recoding to make the same as 10/66
+recode aWATCH 2 = 1
+recode aPENCIL 2 = 1
+
 *below is what already was (haven't added two variables i found
 
 sum aPENCIL aWATCH aREPEAT aTOWN aCHIEF aSTREET aADDRESS aMONTH aDAY aYEAR aSEASON aPENTAG
@@ -165,10 +169,16 @@ sum aANIMALS
 gen animtot=aANIMALS/33
 tab animtot, miss
 
-*****chris adding this*****
 rename ANMSE11S aWORDIMM
-*there's three of these, I'm choosing the first delayed recall
-rename ANMSE13 aWORDDEL
+
+foreach var in ANMSE13 ANMSE14 ANMSE15 {
+	recode `var' (97 = .)
+	tab `var', miss
+}
+
+gen aWORDDEL = ANMSE13 + ANMSE14 + ANMSE15
+tab aWORDDEL
+
 foreach var in ANMSE20F ANMSE20L ANMSE20R {
 	recode `var' (97 = .)
 	tab `var', miss
@@ -453,7 +463,7 @@ display "Specificity for 1066 .25: " Specificity
 display "Accuracy for 1066 .25: " Accuracy
 display "Predicted Prevalence for 1066 optimal: " Prevalence
 
-roctab dementia k_fold_dem_pred_1066_av
+roctab dementia k_fold_dem_pred_1066_opt
 rocreg dementia k_fold_dem_pred_1066_av
 
 matrix drop conf_matrix

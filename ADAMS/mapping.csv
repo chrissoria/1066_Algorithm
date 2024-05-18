@@ -1,0 +1,247 @@
+﻿,,,ADAMS,,,
+,Variable,Data Output,Question/Data Label,Variable,Data Output,Mapping 10/66#toADAMS#
+,RECALL,"[0,10]",,ANDELCOR,"[0,10]",# = #
+Object Naming,PENCIL,"Incorrect/Correct [0,1]",MMSE ITEM 17 (pencil),ANMSE17,"0.  Error
+1.  Correct
+2.  Correct, Tactile stimuli
+97.  Not assessed/Not asked","0=0 ; 1=1,2"
+,WATCH,"Incorrect/Correct [0,1]",MMSE ITEM 16 (watch),ANMSE16,"0.  Error
+1.  Correct
+2.  Correct, Tactile stimuli
+97.  Not assessed/Not asked","0=0 ; 1=1,2"
+Repeat,REPEAT,"Incorrect/Correct [0,1]",MMSE ITEM 7,ANMSE7,"0.  Error 
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+Animals,ANIMALS,"[0,43]",ANIMAL FLUENCY TOTAL SCORE,ANAFTOT,"[0,33]",# = #
+3 Word Recall,WORDIMM,"[0,3]",MMSE ITEM 11 SCORE,ANMSE11S,"[0,3]",# = #
+Location,TOWN,"Incorrect/Correct [0,1]",MMSE ITEM 8,ANMSE8,"0.  Error
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+Political Leader,CHIEF,"Incorrect/Correct [0,1]",NAME OF PRESIDENT,ANPRES,"0.  Incorrect
+1.  Correct
+97.  Not assessed/Not asked
+98.  DK (Don't Know)
+99.  RF (Refused)","0,98 = 0 ; 1=1"
+Location continued,STREET,"Incorrect/Correct [0,1]",MMSE ITEM 10,ANMSE10,"0.  Error
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+Store,STORE,"Incorrect/Correct [0,1]",N/A,,,
+Address,ADDRESS,"Incorrect/Correct [0,1]",MMSE ITEM 6,ANMSE6,"0.  Error
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+3 Word Recall Delay,,,MMSE 13,ANMSE13,"0.  Error
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+,,,MMSE  14,ANMSE14,"0.  Error
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+,WORDDEL,"[0,3]",MMSE 15,ANMSE15,"0.  Error
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+Long Term Memory,LONGMEM,"Incorrect/Correct [0,1]",N/A,,,
+Month,MONTH,"Incorrect/Correct [0,1]",MMSE ITEM 3,ANMSE3,"0.  Error
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+Day,DAY,"Incorrect/Correct [0,1]",MMSE ITEM 5,ANMSE5,"0.  Error
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+Year,YEAR,"Incorrect/Correct [0,1]",MMSE ITEM 1,ANMSE1,"0.  Error
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+Season,SEASON,"Incorrect/Correct [0,1]",MMSE ITEM 2,ANMSE2,"0.  Error
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+Nod Head,NOD,"Incorrect/Correct [0,1]",N/A,,,
+Point,POINT,"Incorrect/Correct [0,1]",N/A,,,
+Fold Paper,,,MMSE ITEM 20F,ANMSE20F,"0.  Error
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+,,,MMSE ITEM 20L, ANMSE20L,"0.  Error
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+,PAPER,"Incorrect/Correct [0,3]",MMSE ITEM 20R,ANMSE20R,"0.  Error
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+drawing,PENTAG,"Incorrect/Correct [0,1]",MMSE ITEM 22,ANMSE22,"0.  Error
+1.  Correct
+97.  Not assessed/Not asked",0=0 ; 1=1
+Story Recall,STORY,"[0,6]","WECHSLER LOGICAL MEM I TOTAL FOR STORIES. After each of two brief stories were read to the subject, he or she was asked to
+         recall as much of the story as possible.  The delayed recall task was
+         administered later in the evaluation.  The code for the immediate trial is
+         ANWM1TOT, and the code for the delayed trial is ANWM2TOT.",ANWM1TOT,"[0,37]",#=#
+,,,,,,
+Memory,MEMORY,"No/Yes [0,1]",,,,
+,,,DSRS MEMORY SCORE,ADDRS1,"1.  Normal
+2.  Occasional forgetfulness of no real significance
+3.  Frequent noticeable forgetfulness, but still has partial  recollection of events
+4.  Moderate memory loss, more marked for recent events, and  severe enough to interfere with everyday activities
+5.  Severe memory loss; only well-learned material retained,
+  with newly-learned material rapidly lost
+6.  Usually unable to remember simple facts such as the day of  the week, month and/or year, when last meal eaten or name of next meal
+7.  Unable to evaluate memory because of speech or language difficulty and/or inability to follow instructions
+8.  Questions about memory not meaningful; makes no attempt to communicate and is no longer aware of surroundings
+97.  Not assessed/Not asked
+98.  DK (Don't Know)","0=1,2      1=2,3,4,5,6,7"
+Forgetting ,PUT,"Never/Sometimes/Often [0,2]","20. Compared with two years ago, how is your friend or relative at remembering where to find things that have been put in a different place
+than usual?",AGQ20,"1 - much better
+2 - a bit better
+3 - not much change
+4 - a bit worse
+5 - much worse","0 = 1,23 ; .5 = 4 ; 1 = 5"
+Forgetting ,KEPT,"Never/Sometimes/Often [0,2]","19. Compared with two years ago, how is your friend or relative at remembering  where things are usually kept?",AGQ19,"1 - much better
+2 - a bit better
+3 - not much change
+4 - a bit worse
+5 - much worse","0 = 1,23 ; .5 = 4 ; 1 = 5"
+Forgetting ,FRDNAME,"Never/Sometimes/Often [0,2]","DSRS RECOGNITION OF OTHERS SCORE
+(Please circle one item in each category that best describes how your (RELATIONSHIP OF SUBJECT TO INFORMANT) is doing at the present time. ",ADDRS8,"1.  Normal
+2.  Occasionally fails to recognize distant acquaintances or casual friends
+3.  Always recognizes family and close friends but frequently fails to recognize others
+4.  Occasionally fails to recognize family members and/or close friends
+5.  Only occasionally recognizes spouse or caregiver
+6.  No recognition or awareness of the presence of others
+97.  Not assessed/Not asked
+98.  DK (Don't Know)","0=1,2,3  .5=4.  1=5,6"
+,,,,,,
+Forgetting ,FAMNAME,"Never/Sometimes/Often [0,2]","DEMENTIA SEVERITY RATING SCALE
+(Please circle one item in each category that best describes how your
+(RELATIONSHIP OF SUBJECT TO INFORMANT) is doing at the present time.  Please feel free to ask questions if any items are unclear.)",ADDRS8,"1.  Normal
+2.  Occasionally fails to recognize distant acquaintances or casual friends
+3.  Always recognizes family and close friends but frequently fails to recognize others
+4.  Occasionally fails to recognize family members and/or closefriends
+5.  Only occasionally recognizes spouse or caregiver
+6.  No recognition or awareness of the presence of others
+97.  Not assessed/Not asked
+ 98.  DK (Don't Know)","0=1,2,3  .5=4.  1=5,6"
+Finding Words,WORDFIND,"Never/Sometimes/Often [0,2]","Measure: DEMENTIA SEVERITY RATING SCALE
+(Please circle one item in each category that best describes how your
+(RELATIONSHIP OF SUBJECT TO INFORMANT) is doing at the present time.  Please feel free to ask questions if any items are unclear.)",ADDRS7,"1.  Normal
+2.  Occasional trouble finding words or other speech errors, but able to carry on conversations
+3.  Frequently unable to think of words, may make inappropriate word substitutions or use nonsense expressions.  Has difficulty following complex conversations
+ 4.  No longer able to hold extended conversations because of difficulties comprehending others or expressing self.  Can usually answer questions using simple sentences
+5.  Answers questions, but the responses are often unintelligible or nonsensical. Able to follow only simple instructions
+6.  Speech usually unintelligible or irrelevant.  Unable tounderstand or answer questions or to follow verbal instructions
+7.  No response, no longer attempts to communicate
+97.  Not assessed/Not asked
+98.  DK (Don't Know)","0=1     .5=2   1=3,4,5,6"
+Wrong Words,WORDWRG,"Never/Sometimes/Often [0,2]","Measure: DEMENTIA SEVERITY RATING SCALE
+(Please circle one item in each category that best describes how your
+(RELATIONSHIP OF SUBJECT TO INFORMANT) is doing at the present time.  Please feel free to ask questions if any items are unclear.)",ADDRS7,"1.  Normal
+2.  Occasional trouble finding words or other speech errors, but able to carry on conversations
+3.  Frequently unable to think of words, may make inappropriate word substitutions or use nonsense expressions.  Has difficulty following complex conversations
+ 4.  No longer able to hold extended conversations because of difficulties comprehending others or expressing self.  Can usually answer questions using simple sentences
+5.  Answers questions, but the responses are often unintelligible or nonsensical. Able to follow only simple instructions
+6.  Speech usually unintelligible or irrelevant.  Unable tounderstand or answer questions or to follow verbal instructions
+7.  No response, no longer attempts to communicate
+97.  Not assessed/Not asked
+98.  DK (Don't Know)","0=1     .5=2   1=3,4,5,6"
+Forgetting ,LASTDAY,"Never/Sometimes/Often [0,2]","Measure: BLESSED DEMENTIA SCALE
+Memory and performance of everyday activities: rate subject's LOSS of ability to do the tasks listed below.",ADBL1G,"0.  None
+0.5.  Some
+1.  Severe
+97.  Not assessed/Not asked","0=0 , 1=0.5 , 1=2"
+Orienting,ORIENT,"Never/Sometimes/Often [0,2]","DSRS ORIENTATION SCORE
+Measure: DEMENTIA SEVERITY RATING SCALE (Please circle one item in each category that best describes how your (RELATIONSHIP OF SUBJECT TO INFORMANT) is doing at the present time.  Please feel free to ask questions if any items are unclear.)",ADDRS2,"1.  Normal
+2.  Some difficulty keeping track of dates and times, but not  severe enough to interfere with everyday activities
+3.  Frequently disoriented in time and sometimes disoriented to new place
+4.  Almost always disoriented in time and usually disoriented to place
+5.  Unable to understand or answer questions about time of day or name of present location
+6.  Is unaware of questions and makes no attempt to respond
+97.  Not assessed/Not asked
+98.  DK (Don't Know)","0=1,2 , .5=3,4 , 1=5,6"
+Lost,LOSTOUT,"Never/Sometimes/Often [0,2]","Measure: BLESSED DEMENTIA SCALE
+Memory and performance of everyday activities: rate subject's LOSS of ability to do the tasks listed below.
+Find way around familiar streets",ADBL1E,"0.  None
+0.5.  Some
+1.  Severe
+97.  Not assessed/Not asked",0=0 ; 1=0.5 ; 2=1
+Lost,LOSTIN,"Never/Sometimes/Often [0,2]","Measure: BLESSED DEMENTIA SCALE
+Memory and performance of everyday activities: rate subject's LOSS of ability to do the tasks listed below.
+Find way about indoors (home or other familiar locations)",ADBL1D,"0.  None
+0.5.  Some
+1.  Severe
+97.  Not assessed/Not asked","0=0 , 1=0.5 , 2=1"
+Chores,CHORES,"Never/Sometimes/Often [0,2]","Measure: BLESSED DEMENTIA SCALE
+Memory and performance of everyday activities: rate subject's LOSS of ability to do the tasks listed below.
+Perform household tasks",ADBL1A,"0.  None
+0.5.  Some
+1.  Severe
+97.  Not assessed/Not asked","0=0 , 1=0.5 ,  2=1"
+Chores Disability,CHOREDIS,"No/Yes [0,1]",Measure: BLESSED DEMENTIA SCALE,ADBL1AR,"0.  Physical
+1.  Mental
+2.  Both physical and mental
+96.  Skipped (Not applicable)
+97.  Not assessed/Not asked","0=1,2 ; 1=0,96"
+Hobby,HOBBY,"No/Yes [0,1]","81. Now I have a few questions about her/his hobbies.  Does (s/he) have more difficulty than in the past performing her/his hobbies?
+Hobbies may include things like sewing, painting, handicrafts, reading,
+entertaining, photography, gardening, going to theater or symphony, woodworking,
+participating in sports.",AC99,"1 - little
+2 - some
+3 - much
+4 - no
+7 - refused
+8 - don’t know","0=4 ; 1 = 1,2,3"
+Money,MONEY,"No difficulty/some difficulty/cannot handle money [0,2]","Measure: BLESSED DEMENTIA SCALE
+Memory and performance of everyday activities: rate subject's LOSS of ability to do the tasks listed below.
+Cope with small sums of money",ADBL1B,"0.  None
+0.5.  Some
+1.  Severe
+97.  Not assessed/Not asked",0-0   1-0.5  2-1
+,REASON,"No change/yes, some change [0,1]","Measure: DEMENTIA SEVERITY RATING SCALE
+(Please circle one item in each category that best describes how your
+(RELATIONSHIP OF SUBJECT TO INFORMANT) is doing at the present time.  Please feel free to ask questions if any items are unclear.)",ADDRS3,"1.  Normal
+2.  Only questionable impairment in problem solving ability
+3.  Moderate difficulty in handling complex problems, but social judgment is usually maintained
+4.  Severe impairment in handling problems, social judgment impaired
+5.  Unable to exercise judgment in either problem solving or social situations
+97.  Not assessed/Not asked
+98.  DK (Don't Know)","0=1,2   1=3,4,5"
+Feed,FEED,"Eats cleanly with proper utensils/ eats messily with spoon only/simple solids such as biscuits/has to be fed [0,3]","For three items assessing activities of daily living (i.e., eating, dressing, toileting), the informant reported the level of assistance the subject needed on a three-point scale. For all items, the informant also noted whether the loss of ability or the need for assistance in each area was due to Mental (i.e. cognitive) and/or Physical reasons.  The score is weighted based on the severity of the loss.  The only items counted in the score are losses for which the cause is 'Mental' or 'Both' (Mental and Physical).",ADBL2EA,"0.  Feeds self without assistance
+1.  Feeds self with minor assistance
+2.  Feeds self with much assistance
+3.  Has to be fed
+97.  Not assessed/Not asked",0=0 ; 1=1 ;  2=2 ; 3=3
+Feeding Disability,FEEDDIS,"No/Yes [0,1]",REASON FOR BLESSED SCORE - ADBL2EA,ADBL2EAR,"0.  Physical
+1.  Mental
+2.  Both physical and mental
+96.  Skipped (Not applicable)
+97.  Not assessed/Not asked","0=1,2 ;  1=0,96"
+Dressing,DRESS,"Dresses self/occasionally misplaces buttons etc/wrong sequences, commonly forgets items/cannot dress [0,3]","For three items assessing activities of daily living (i.e., eating, dressing, toileting), the informant reported the level of assistance the subject needed on a three-point scale. For all items, the informant also noted whether the loss of ability or the need for assistance in each area was due to Mental (i.e. cognitive) and/or Physical reasons.  The score is weighted based on the severity of the loss.  The only items counted in the score are losses for which the cause is 'Mental' or 'Both' (Mental and Physical).",ADBL2DRE,"0.  Unaided
+1.  Occasionally misplaces buttons, etc., requires minor help
+2.  Wrong sequences, forgets items, requires much assistance
+3.  Unable to dress
+97.  Not assessed/Not asked",0= 0 ; 1=1 ; 2=2 ; 3=3
+Dressing Disability,DRESSDIS,"No/Yes [0,1]",REASON FOR BLESSED SCORE - ADBL2DRE,ADBL2DRR,"0.  Physical
+1.  Mental
+2.  Both physical and mental
+96.  Skipped (Not applicable)
+97.  Not assessed/Not asked","0=1,2 ;  1=0,96."
+Toilet,TOILET,"No problems/occasionally wets the bed/frequently wets bed/double incontenence [0,3]","For three items assessing activities of daily living (i.e., eating, dressing, toileting), the informant reported the level of assistance the subject needed on a three-point scale. For all items, the informant also noted whether the loss of ability or the need for assistance in each area was due to Mental (i.e. cognitive) and/or Physical reasons.  The score is weighted based on the severity of the loss.  The only items counted in the score are losses for which the cause is 'Mental' or 'Both' (Mental and Physical).",ADBL2TO ,"0.  Clean, cares for self at toilet
+1.  Occasional incontinence, or needs to be reminded
+2.  Frequent incontinence, or needs much assistance
+3.  Little or no control
+97.  Not assessed/Not asked",0= 0 ; 1=1 ; 2=2 ; 3=3
+Toilet Disability,TOILDIS,"No/Yes [0,1]",REASON FOR BLESSED SCORE - ADBL2TO,ADBL2TOR,"0.  Physical
+1.  Mental
+2.  Both physical and mental
+96.  Skipped (Not applicable)
+97.  Not assessed/Not asked","0=1,2 ; 1=0,96"
+Mistake,MISTAKE,"No/Yes [0,1]","Measure: DEMENTIA SEVERITY RATING SCALE
+(Please circle one item in each category that best describes how your
+(RELATIONSHIP OF SUBJECT TO INFORMANT) is doing at the present time.  Please feel free to ask questions if any items are unclear.)",ADDRS8,"1.  Normal
+2.  Occasionally fails to recognize distant acquaintances or casual friends
+3.  Always recognizes family and close friends but frequently fails to recognize others
+4.  Occasionally fails to recognize family members and/or close friends
+5.  Only occasionally recognizes spouse or caregiver
+6.  No recognition or awareness of the presence of others
+97.  Not assessed/Not asked
+98.  DK (Don't Know)","0=1,2  ; 1=3,4,5,6"
+Decisions,DECIDE,"No/Yes [0,1]","Measure: DEMENTIA SEVERITY RATING SCALE
+(Please circle one item in each category that best describes how your
+(RELATIONSHIP OF SUBJECT TO INFORMANT) is doing at the present time.  Please feel free to ask questions if any items are unclear.)",ADDRS3,"1.  Normal
+2.  Only questionable impairment in problem solving ability
+3.  Moderate difficulty in handling complex problems, but social judgment is usually maintained
+4.  Severe impairment in handling problems, social judgment impaired
+5.  Unable to exercise judgment in either problem solving or social situations
+97.  Not assessed/Not asked
+98.  DK (Don't Know)","0=1,2 ; 1=3,4,5"
