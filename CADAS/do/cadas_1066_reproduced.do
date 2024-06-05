@@ -1,11 +1,13 @@
 {\rtf1\ansi\ansicpg1252\cocoartf2761
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\margl1440\margr1440\vieww11220\viewh8100\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 ArialMT;}
+{\colortbl;\red255\green255\blue255;\red24\green25\blue27;\red255\green255\blue255;}
+{\*\expandedcolortbl;;\cssrgb\c12549\c12941\c14118;\cssrgb\c100000\c100000\c100000;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
 
-\f0\fs24 \cf0 clear all \
+\f0\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
+clear all \
 set more off\
 capture log close\
 cls\
@@ -15,7 +17,8 @@ cls\
 ***********************************\
 local user "Chris"  // Change this to "Will" to switch paths\
 \
-local Chris "/hdir/0/chrissoria/1066/"\
+*for now just using Cuba\
+local Chris "/hdir/0/chrissoria/Stata_CADAS/Data/DR_out"\
 local Will "PATH"\
 \
 local path = cond("`user'" == "Chris", "`Chris'", "`Will'")\
@@ -31,131 +34,133 @@ local drop_missing_from_relscore "no" // change to yes or no\
 \
 **********************************\
 \
-if `wave' == 1 \{\
-    use "`path'/data/1066_Baseline_data.dta"\
+use "`path'/Cog.dta"\
+*until we clean all the data, we'll have to indiscriminantly drop duplicates\
+duplicates report pid\
+sort pid\
+by pid: gen dup = _n == 1\
+drop if dup == 0\
+drop dup\
+\
+merge 1:m pid using Infor, force\
+duplicates report pid\
+sort pid\
+by pid: gen dup = _n == 1\
+drop if dup == 0\
+drop dup\
+\
+rename _merge merge1\
+\
+merge 1:m pid using Cog_Scoring, force\
+duplicates report pid\
+sort pid\
+by pid: gen dup = _n == 1\
+drop if dup == 0\
+drop dup\
+\
+duplicates report pid\
+\
+rename c_24 pencil\
+rename c_25 watch\
+rename c_48 chair\
+rename c_49 shoes\
+rename c_50 knuckle\
+rename c_51 elbow\
+rename c_52 should\
+rename c_53 bridge\
+rename c_54 hammer\
+rename c_55 pray\
+rename c_56 chemist\
+rename c_26 repeat\
+rename c_8 town\
+gen chief = cond(missing(c_70_d_c),0,c_70_d_c) + cond(missing(c_70_p),0,c_70_p)\
+rename i_a2 street\
+rename i_a3 store\
+rename i_a4 address\
+gen longmem = cond(missing(c_69_c),0,c_69_c) + cond(missing(c_69_d),0,c_69_d) + cond(missing(c_69_p),0,c_69_p)\
+rename c_3 month\
+rename c_5 day\
+rename c_1 year\
+gen season = cond(missing(c_2_p_c),0,c_2_p_c) + cond(missing(c_2_d),0,c_2_d)\
+rename c_61 nod\
+rename c_62 point\
+rename cs_72_1 circle\
+rename c_72_1 circle_diss\
+rename cs_32 pentag\
+rename c_32 pentag_diss\
+rename cs_40 animals\
+rename c_40 animals_diss\
+gen wordimm = c_11 + c_12 + c_13\
+gen worddel = c_21 + c_22 + c_23\
+\
+foreach var in c_27 c_28 c_29 \{\
+	replace `var' = . if `var' == 6 | `var' == 7\
 \}\
-else if `wave' == 2 \{\
-    use "`path'/data/1066_full_follow_up_Caribbean.dta"\
+gen paper = cond(missing(c_27),0,c_27) + cond(missing(c_28),0,c_28) + cond(missing(c_29),0,c_29)\
+\
+foreach var in c_66a c_66b c_66c c_66d c_66e c_66f \{\
+	tab `var'\
+	replace `var' = 1 if `var' == 0 | `var' == 1\
+	replace `var' = 0 if `var' == 2\
+	summarize `var'\
+\}\
+gen story = c_66a + c_66b + c_66c + c_66d + c_66e + c_66f\
+\
+rename c_66_a story_refuse\
+gen learn1 = c_33_1 + c_33_2 + c_33_3 + c_33_4 + c_33_5 + c_33_6 + c_33_7 + c_33_8 + c_33_9 + c_33_10\
+rename c_33_a learn1_refuse\
+gen learn2 = c_34_1 + c_34_2 + c_34_3 + c_34_4 + c_34_5 + c_34_6 + c_34_7 + c_34_8 + c_34_9 + c_34_10\
+rename c_34_a learn2_refuse\
+gen learn3 = c_35_1 + c_35_2 + c_35_3 + c_35_4 + c_35_5 + c_35_6 + c_35_7 + c_35_8 + c_35_9 + c_35_10\
+rename c_35_a learn3_refuse\
+gen recall = c_63_1 + c_63_2 + c_63_3 + c_63_4 + c_63_5 + c_63_6 + c_63_7 + c_63_8 + c_63_9 + c_63_10\
+rename c_63_a recall_refuse\
+rename c_0 name\
+rename c_65 nrecall\
+\
+foreach var in story learn1 learn2 learn3 recall \{\
+	replace `var' = . if `var'_refuse == 7\
 \}\
 \
-if `wave' == 2 \{\
-    foreach var of varlist _all \{\
-        local lowvar = lower("`var'")\
-        rename `var' `lowvar'\
-        local newname = substr("`lowvar'", 3, .)\
-        rename `lowvar' `newname'\
-    \}\
-gen pid = (ntreid*1000000) + (useid*100) + rticid\
-*I'm dropping these because they look to have been dropped in the data possible incomplete\
-drop if inlist(pid, 20028102,20041200,20076700,20129300,20131602)\
-*I'm dropping this case but I cannot see a reason why it would've been dropped (no missing in relscore)\
-*I'm assuming it was dropped for a specific resons (singled out)\
-drop if inlist(pid, 20125302)\
-*the cogscores below have been dropped for a reason that's not identifiable\
-*the dem1066 algo ends up dropping them somewhere in its computation\
-drop if inlist(pid, 1109201, 1300101, 1300901, 1312101, 1316301, 1316302, 1620901, 2026501, 2040901, 2046001, 2046002, 2066101, 2070001, 2070302, 2583601)\
+*for now, we will recode physical disability into missing (but later we could keep as 1)\
+foreach var in pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat street store address nod point \{\
+	replace `var' = . if `var' == 6 | `var' == 7 | `var' == 8 | `var' == 9\
 \}\
-else if `wave' == 1 \{\
-    foreach var of varlist _all \{\
-    rename `var' `=lower("`var'")'\
+replace circle = . if circle_diss == 6 | circle_diss == 7\
+replace circle = 0 if circle == 1\
+replace circle = 1 if circle == 2\
+replace circle = 1 if circle == 3\
+\
+replace pentag = . if pentag_diss == 6 | pentag_diss == 7\
+replace pentag = 1 if pentag == 2\
+\
+replace animals = . if animals == 777\
+*for now, until we decide acceptable cutpoint\
+replace animals = . if animals > 45\
+\
+gen nametot = 0\
+replace nametot = 1 if name > 0 & !missing(name)\
+replace nametot = 1 if nrecall > 0 & !missing(nrecall)\
+\
+foreach var in animals wordimm worddel paper story learn1 learn2 learn3 recall pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point circle pentag nametot nrecall \{\
+    replace `var' = . if `var' == .v | `var' == .i\
 \}\
-gen pid = (countryid*1000000) + (region*100000) + (houseid*100) + particid\
-\}\
-\
-if `wave' == 1 \{\
-    log using 1066_algo_w1.log, text replace\
-\}\
-else if `wave' == 2 \{\
-    log using 1066_algo_w2.log, text replace\
-\}\
-\
-recode pdas2 (1 2 =1) (3 4 =2), gen(pdas2a)\
-recode pdas4 (1 2 =1) (3 4 =2), gen(pdas4a)\
-recode pdas8 (1 2 =1) (3 4 =2), gen(pdas8a)\
-recode pdas10 (1 2 =1) (3 4 =2), gen(pdas10a)\
-recode pdas11 (1 2 =1) (3 4 =2), gen(pdas11a)\
-recode pdas12 (1 2 =1) (3 4 =2), gen(pdas12a)\
-\
-* sum, re-scaled from 36 to 100\
-gen whodas12_duplicate=(pdas1+pdas2a+pdas3+pdas4a+pdas5+pdas6+pdas7+pdas8a+pdas9+pdas10a+pdas11a+pdas12a)*(100/36)\
-summarize whodas12 whodas12_duplicate\
-\
-replace whodas12 = whodas12_duplicate\
-drop whodas12_duplicate\
-\
-gen nametot_duplicate = 0\
-\
-replace nametot_duplicate = 1 if name > 0 & !missing(name)\
-replace nametot_duplicate = 1 if nrecall > 0 & !missing(nrecall)\
-\
-* Counting the number of 1s in specific columns (all binary)\
 \
 egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point circle pentag)\
 \
-* Recoding values from na to 0 so that we can perform the arithmetic\
+*max should be 27\
+summarize count\
 \
-foreach var in animals wordimm worddel paper story learn1 learn2 learn3 recall pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point circle pentag nametot nrecall \{\
-    replace `var' = 0 if `var' == .\
-\}\
-\
-* recoding 9's and 99's to 0\
-\
-* Replace 99 with 0 for specific columns\
-foreach var in animals wordimm worddel paper story \{\
-    replace `var' = 0 if `var' == 99\
-\}\
-\
-* Replace 9 with 0 for specific columns\
-foreach var in wordimm worddel paper story \{\
-    replace `var' = 0 if `var' == 9\
-\}\
-\
-* cleaning the learn variables and recoding, from what I can tell this is to fix possible errors\
-* I assume this on the basis that the learn1-3 max words possible is 10\
-* replacing the values 11, 20, 21, 30, 31, 40, 41, 50, 51, 60, 61, 70, 71, 80, 81, and 90 \
-* with the values 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, and 9, respectively.\
-* this may or may not be a good idea, given that we are assuming 11 was meant to be typed in as 11 and not 10\
-\
-foreach var in learn1 learn2 learn3 recall \{\
-    replace `var' = 1 if `var' == 11\
-    replace `var' = 2 if inlist(`var', 20, 21)\
-    replace `var' = 3 if inlist(`var', 30, 31)\
-    replace `var' = 4 if inlist(`var', 40, 41)\
-    replace `var' = 5 if inlist(`var', 50, 51)\
-    replace `var' = 6 if inlist(`var', 60, 61)\
-    replace `var' = 7 if inlist(`var', 70, 71)\
-    replace `var' = 8 if inlist(`var', 80, 81)\
-    replace `var' = 9 if inlist(`var', 90, 91)\
-    * Map 99 to sysmis (in Stata, missing values are represented by .)\
-    replace `var' = . if `var' == 99\
-\}\
-\
-* below should all be binary 0 1 variables, we will recode any values greater than 2 but less than 9 as na\
-* this is an odd recoding, why less than 9? We will have to be careful with this in CADAS\
-\
-foreach var in name pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point circle pentag \{\
-    replace `var' = . if `var' >= 2 & `var' <= 9\
-\}\
-\
+*this is only if we want to impute recall (which I don't think we want to)\
 gen immed = cond(missing(learn1),0,learn1) + cond(missing(learn2),0,learn2) + cond(missing(learn3),0,learn3)\
-\
-* more cleaning, recoding any values higher than a certain amount as "na"\
-\
-local vars "animals wordimm worddel paper story recall immed nrecall"\
-local nums "45 3 3 3 6 10 29 1"\
-\
-local n : word count `vars'\
-\
-forval i = 1/`n' \{\
-    local var : word `i' of `vars'\
-    local num : word `i' of `nums'\
-    replace `var' = . if `var' > `num'\
-\}\
+tab recall, miss\
+*we could potentially recover 59 cases here\
+tab immed, miss\
 \
 *dividing by total amount of possible correct answers to get a "total"\
 \
 local divide_var "animals wordimm worddel paper story"\
-local divisor "23 3 3 3 6"\
+local divisor "45 3 3 3 6"\
 local new_column "animtot wordtot1 wordtot2 papertot storytot"\
 \
 local n : word count `divide_var'\
@@ -170,37 +175,50 @@ forval i = 1/`n' \{\
     if _rc capture replace `new' = `col'/`num'\
 \}\
 \
-* then put it all together below\
-* nametot = ability to say the interviewer's name and remember it\
-* count = ability to identify common objects, repeat simple words, orient themselves in space and time, and motor skills\
-* animtot = quickly list the names of animals \
-* wordtot1 = immediate recall of words\
-* wordtot2 = delayed recall of words\
-* papertot = ability to fold paper and follow instructions\
-* storytot = ability to recall the elements of a story\
+*all of these should max out to 1\
+summarize animtot\
+summarize wordtot1\
+summarize wordtot2\
+summarize papertot\
+summarize storytot\
 \
-* Calculate the cognitive score\
-* Try to generate the new variable\
-capture gen cogscore_duplicate = 1.03125 * (nametot + count + animtot + wordtot1 + wordtot2 + papertot + storytot)\
 \
-if `wave' == 1 \{\
-format cogscore_duplicate %21.8f\
-\}\
+* generate the cogscore. anyone who does not have all components will be dropped.\
+gen cogscore = nametot + count + animtot + wordtot1 + wordtot2 + papertot + storytot\
 \
-else if `wave' == 2 \{\
-format cogscore_duplicate %9.4f\
-\}\
+summarize cogscore\
 \
-if "`wave'" == "1" \{\
-    replace cogscore = cogscore_duplicate\
-    drop cogscore_duplicate\
-\}\
-else if "`wave'" == "2" \{\
-    replace cogscore_duplicate = round(cogscore_duplicate, 0.0001)\
-    replace cogscore = round(cogscore, 0.0001)\
-\}\
+***** relscore ********\
 \
-summarize cogscore cogscore_duplicate\
+***********************\
+\
+rename i_f_csid_1 activ\
+rename i_f_csid_2 mental\
+rename i_f_csid_3 memory\
+rename i_f_csid_4 put\
+rename i_f_csid_5 kept\
+rename i_f_csid_6 frdname\
+rename i_f_csid_7 famname\
+rename i_f_csid_8 convers\
+rename i_f_csid_9 wordfind\
+rename i_f_csid_10 wordwrg\
+rename i_f_csid_11 past\
+rename i_f_csid_12 lastsee\
+rename i_f_csid_13 lastday\
+rename i_f_csid_14 orient\
+rename i_f_csid_15 lostout\
+rename i_f_csid_16 lostin\
+rename i_f_csid_17 chores\
+rename i_f_csid_18 hobby\
+rename i_f_csid_19 money\
+rename i_f_csid_20 change\
+rename i_f_csid_21 reason\
+rename i_f_csid_22_1 feed\
+rename i_f_csid_22_2 feeddiss\
+rename i_f_csid_23_1 dress\
+rename i_f_csid_23_2 dressdiss\
+rename i_f_csid_24_1 toilet\
+rename i_f_csid_24_2 toiletdiss\
 \
 * Creating binary missing indicators without changing the original missing values\
 local miss1_variables "mental activ memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason"\
@@ -211,38 +229,22 @@ foreach var of local miss1_variables \{\
 \}\
 \
 * Generating the miss1 variable by summing up the binary missing indicators\
-egen miss1_duplicate = rowtotal(missing_mental missing_activ missing_memory /* \
+egen miss1 = rowtotal(missing_mental missing_activ missing_memory /* \
     */ missing_put missing_kept missing_frdname missing_famname /* \
     */ missing_convers missing_wordfind missing_wordwrg missing_past /* \
     */ missing_lastsee missing_lastday missing_orient missing_lostout /* \
     */ missing_lostin missing_chores missing_hobby missing_money /* \
     */ missing_change missing_reason)\
 \
-*replace miss1_duplicate = 0 if miss1_duplicate == 21\
-if `wave' == 1 \{\
-replace miss1_duplicate = 0 if miss1_duplicate == .\
-\}\
-\
-/*these are the three variables that i believe are changed in wave 1\
-*/\
-\
-if `wave' == 1 & "`drop_missing_from_relscore'" != "yes" \{\
-replace miss1_duplicate = miss1_duplicate + 1 if inlist(pid, 2108501, 20122802, 20164200)\
-\}\
 \
 * counting up the remaining missing values to generate miss 3 variable\
 local miss3_variables "feed dress toilet"\
 \
-gen miss3_duplicate = 0\
+gen miss3 = 0\
 \
 foreach var of local miss3_variables \{\
     * Sum up the variables that are missing\
-    replace miss3_duplicate = miss3_duplicate + missing(`var')\
-\}\
-\
-if `wave' == 1 \{\
-*the logic below makes these match, which also implies an inconcisistent conversion of miss3 to missing versus 0\
-replace miss3_duplicate = . if miss3_duplicate + miss1_duplicate == 24 & miss3 == . \
+    replace miss3 = miss3 + missing(`var')\
 \}\
 \
 local all_miss "feed dress toilet"\
@@ -259,9 +261,9 @@ egen all_miss = rowtotal(missing_mental missing_activ missing_memory /* \
     */ missing_lostin missing_chores missing_hobby missing_money /* \
     */ missing_change missing_reason missing_feed missing_dress missing_toilet)\
     \
-replace miss1_duplicate = . if (all_miss ==24 & miss3 == .)\
+replace miss1 = . if (all_miss ==24 & miss3 == .)\
 \
-gen misstot_duplicate = (miss3_duplicate * 3) + miss1_duplicate\
+gen misstot = (miss3 * 3) + miss1\
 \
 /* below should be the correct logic\
 replace misstot = . if misstot == 30\
