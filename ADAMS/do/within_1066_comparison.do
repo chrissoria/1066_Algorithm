@@ -282,7 +282,7 @@ display "Accuracy for 1066 .50: " Accuracy\
 display "Predicted Prevalence for 1066 ADAMS modified: " Prevalence\
 display "Predicted Prevalence for 1066 original: " ((TP+FN) / (TP + TN + FP + FN))*100\
 \
-roctab dem1066 dem1066pred50\
+roctab cdem1066 dem1066pred50\
 \
 log close\
 exit, clear\

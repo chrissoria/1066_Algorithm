@@ -1,0 +1,74 @@
+cogscore,,,,,,
+,10/66 variable,10/66 question,cadas variable,cadas question,cadas responses,mapped
+,pencil,,c_24,,"0, 1, 6, 7","0 = 1 ; 1 = 1 ; 6,7 = na"
+,watch,,c_25,,"0, 1, 6, 7","0 = 1 ; 1 = 1 ; 6,7 = na"
+,chair,,c_48,,"0, 1, 6, 7","0 = 1 ; 1 = 1 ; 6,7 = na"
+,shoes,,c_49,,"0, 1, 6, 7","0 = 1 ; 1 = 1 ; 6,7 = na"
+,knuckle,,c_50,,"0, 1, 6, 7","0 = 1 ; 1 = 1 ; 6,7 = na"
+,elbow,,c_51,,"0, 1, 6, 7","0 = 1 ; 1 = 1 ; 6,7 = na"
+,should,,c_52,,"0, 1, 6, 7","0 = 1 ; 1 = 1 ; 6,7 = na"
+,bridge,,c_53,,"0, 1, 7",0 = 0 ; 1 = 1 ; 7 = na
+,hammer,,c_54,,"0, 1, 7",0 = 0 ; 1 = 1 ; 7 = na
+,pray,,c_55,,"0, 1, 7",0 = 0 ; 1 = 1 ; 7 = na
+,chemist,,c_56,,"0, 1, 7",0 = 0 ; 1 = 1 ; 7 = na
+,repeat,,c_26,,"0, 1, 7",0 = 0 ; 1 = 1 ; 7 = na
+,town,,c_8,,"0, 1",0 = 0 ; 1 = 1
+,chief,,c_70 (CU/DR)/c_71(PR),,"0, 1",0 = 0 ; 1 = 1
+,street,,i_a2,,"1, 2, 8, 9","1 = 1 ; 2  = 0 ; 8,9  = na"
+,store,,i_a3,,"1, 2, 8, 9","2 = 1 ; 2  = 0 ; 8,9  = na"
+,address,,i_a4,,"1, 2, 8, 9","3 = 1 ; 2  = 0 ; 8,9  = na"
+,longmem,,c_69,,"0, 1",0 = 0 ; 1 = 1
+,month,,c_3,,"0, 1",0 = 0 ; 1 = 1
+,day,,c_5,,"0, 1",0 = 0 ; 1 = 1
+,year,,c_1,,"0, 1",0 = 0 ; 1 = 1
+,season,,c_2,,"0, 1",0 = 0 ; 1 = 1
+,nod,,c_61,,"0, 1, 6, 7","0 = 1 ; 1 = 1 ; 6,7 = na"
+,point,,"c_62,",,"0, 1, 6, 7","0 = 1 ; 1 = 1 ; 6,7 = na"
+,circle,,cs_72_1,,"0, 1, 2","0, 1 = 0 ; 2 = 1"
+,circle_diss,NA,c_72_1,,"1, 6, 7","circle = na if 6,7"
+,pentag,,cs_32,,"0, 1",0 = 0 ; 1 = 1
+,pentag_diss,NA,c_32,,"1, 6, 7","pentag = na if 6,7"
+,animals,,cs_40 (in some cases cs_40 - cs_41),¿Intentó esta prueba de fluidez verbal?,"0 , 1, 777",animals = na if 777
+,animals_diss,NA,c_40,"Muy bien, quiero que nombre cosas pertenecientes a otras categori_as: “animales”. ",#,#
+,wordimm,,sum of c_11-13,"barco, casa, pescado","0, 1",0 = 0 ; 1 = 1
+,worddel,,sum of c_21-23,"barco, casa, pescado","0, 1",0 = 0 ; 1 = 1
+,paper,,sum of c_27-29,"Tomó el papel con la mano derecha
+Dobló el papel a la mitad
+Colocó el papel sobre sus piernas","0, 1, 6, 7","0 = 1 ; 1 = 1 ; 6,7 = na"
+,story,,sum of c_66,“Ahora quiero que me cuente la historia con la mayor cantidad de detalles como sea posible.” ,"0, 1, 2","0, 1 = 1 ; 2 = 0"
+,story_refuse,,c_66a,Se rehúsa a contestar ,"0, 1",story = na if 1
+,learn1,,"c_33,",,,
+,learn2,,c_34,,,
+,learn3,,c_35,,,
+,recall,,c_63,,,
+,name,,c_0,,,
+,nrecall,,c_65,,,
+relscore,,,,,,
+,activ,,F.CSID.1,¿Ha visto algún cambio en sus actividades diarias? Por favor describa,,
+,mental,,F.CSID.2 ,¿Ha habido una disminución general en su funcionamiento mental? Por favor describa.,,
+,memory,,F.CSID.3 ,"Todos tenemos cierta dificultad en recordar cosas a medida que envejecemos, pero esto ¿Ha sido un problema particularmente importante para su (pariente)?",,
+,put,,F.CSID.4 ,¿Se olvida donde ha puesto las cosas? Si afirmativo - Que tan a menudo?,,
+,kept,,F.CSID.5,¿Se olvida donde normalmente se guardan las cosas? Si afirmativo - Que tan a menudo?,,
+,frdname,,F.CSID.6,¿Olvida el nombre de amigos?  Si afirmativo - Que tan a menudo?,,
+,famname,,F.CSID.7,¿Olvida nombres de miembros de la familia? Si afirmativo - Que tan a menudo?,,
+,convers,,F.CSID.8,¿Olvida lo que quería decir en el medio de una conversación? Si afirmativo - Que tan a menudo?,,
+,wordfind,,F.CSID.9,¿Cuando habla tiene dificultad diciendo las palabras correctas?,,
+,wordwrg,,F.CSID.10,¿Usa palabras incorrectas? Si afirmativo - Que tan a menudo?,,
+,past,,F.CSID.11,"¿Tiende a hablar de cosas que pasaron hace mucho tiempo en vez de cosas presentes?
+   Si afirmativo - Que tan a menudo?",,
+,lastsee,,F.CSID.12,¿Se olvida cuando fue la última vez que la/lo vio? Si afirmativo - Que tan a menudo?,,
+,lastday,,F.CSID.13,¿Olvida lo que pasó ayer?  Si afirmativo - Que tan a menudo?,,
+,orient,,F.CSID.14,¿Se olvida donde ella/é) está? Si afirmativo -Que tan a menudo?,,
+,lostout,,F.CSID.15,¿Se pierde en la comunidad?  Si afirmativo -Que tan a menudo?,,
+,lostin,,F.CSID.16,"¿Se pierde en su propia casa, ejemplo: buscando el baño? Si afirmativo - Que tan a menudo?",,
+,chores,,F.CSID.17,¿Tiene dificultad realizando las tareas de la casa que ella/el acostumbraba a hacer?,,
+,hobby,,F.CSID.18,¿Ha habido pérdida de alguna habilidad especial de un pasatiempo que antes podía hacer?,,
+,money,,F.CSID.19,¿Ha habido un cambio en su capacidad de manejar dinero?,,
+,change,,F.CSID.20,¿Tiene dificultad para ajustarse a cambios en su rutina diaria?  Si afirmativo- Que tan a menudo?,,
+,reason,,F.CSID.21,¿Ha notado cambios en su habilidad para pensar y razonar?,,
+,feed,,F.CSID.22.1,¿Tiene dificultad para alimentarse por sí misma?,,
+,feeddiss,,F.CSID.22.2,¿El entrevistador piensa que estos problemas son primariamente debidos a discapacidad física?,,
+,dress,,F.CSID.23.1,¿Tiene dificultad para vestirse?,,
+,dressdiss,,F.CSID.23.2,¿El entrevistador piensa que estos problemas son primariamente debidos a discapacidad física?,,
+,toilet,,F.CSID.24.1,¿Tiene dificultad usando el sanitario? ¿Se orina o defeca?,,
+,toiletdiss,,F.CSID.24.2,¿El entrevistador piensa que estos problemas son primariamente debidos a discapacidad física?,,

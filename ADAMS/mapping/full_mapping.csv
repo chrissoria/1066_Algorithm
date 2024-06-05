@@ -1,0 +1,52 @@
+﻿Domain ,Indicators,10/66 Source,ADAMS Source,Inclusion
+Informant interview: Reliance Score measures,,,,
+Memory,Inability to recall recent events,CSI-D,BDS,Yes
+,Forgetfulness or memory loss,CSI-D,DSRS*,Yes
+,Forget the names of friends,CSI-D,DSRS*,Yes
+,Forget the names of family members,CSI-D,DSRS*,Yes
+,Forgets where puts things,CSI-D,,No
+,Forgets where things are kept,CSI-D,,No
+,Forgets in the middle of a sentence,CSI-D,,No
+,Forgets when last saw you,CSI-D,,No
+Orientation,Inability to generally orient,CSI-D,DSRS,Yes
+,Inability to find way about familiar streets,CSI-D,BDS,Yes
+,Inability to find way about indoors,CSI-D,BDS,Yes
+,Excessive focus on the past,CSI-D,,No
+Language,Word finding difficulties,CSI-D,DSRS*,Yes
+,Use the wrong words in conversations,CSI-D,DSRS*,Yes
+Judgment and Problem solving,Change in ability to think and reason,CSI-D,DSRS*,Yes
+,Ability to handle money,CSI-D,BDS,Yes
+,General decline in cognitive functioning,JORGE,,No
+Daily living activities,Difficulty performing household chores,CSI-D,BDS,Yes
+,Difficulty performing hobbies,CSI-D,Clinical History,Yes
+,Difficulty Dressing,CSI-D,BDS,Yes
+,Difficulty Eating,CSI-D,BDS,Yes
+,Difficulty with Sphincter control,CSI-D,BDS,Yes
+,Change in daily activities,CSI-D,,No
+,Difficulty adjusting to change in routine,CSI-D,,No
+Cognitive Interview: Cognitive Score Measures,,,,
+Memory,Logical memory immediate recall,EBMT**,WMS**,Yes
+,Long term memroy,JORGE,,No
+Language,Name watch,CSI-D,MMSE,Yes
+,Name Pencil,CSI-D,MMSE,Yes
+,Name Chair,JORGE,,No
+,Name shoes,JORGE,,No
+,Name knuckles,JORGE,,No
+,Name elbow,JORGE,,No
+,Name shoulders,JORGE,,No
+,Define bridge,JORGE,,No
+,Identify hammer,JORGE,,No
+,Identify church,JORGE,,No
+,Identify pharmacy,JORGE,,No
+,Sentence repeat,JORGE,,Yes
+,Interviewer name repeat,CSI-D,,No
+Orientation,Time: Month/day/year/season,CSI-D,MMSE,Yes
+,Place: City/Town/Room,CSI-D,MMSE,Yes
+,Name of political leader,CERAD,TICS,Yes
+Executive function,Animal fluency,CERAD,CERAD,Yes
+,Constructional praxis Copying (Pentagon),CERAD,CERAD,Yes
+,Constructional praxis Copying (Circle),CERAD,,No
+,Head nod,JORGE,,No
+,Finger point,JORGE,,No
+Cognitive Interview: Word list recall,,,,
+Memory,Word List delayed recall,CERAD,CERAD,Yes
