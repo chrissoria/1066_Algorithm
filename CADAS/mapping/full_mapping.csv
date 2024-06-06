@@ -24,8 +24,8 @@ cogscore,,,,,,,
 ,season,,c_2,En qué estación estamos?,"0, 1",0 = 0 ; 1 = 1,"gen season = cond(missing(c_2_p_c),0,c_2_p_c) + cond(missing(c_2_d),0,c_2_d)"
 ,nod,,c_61,"Por favor mueva su cabeza, como si dijera sí","0, 1, 6, 7","0 = 1 ; 1 = 1 ; 6,7 = na",rename c_61 nod
 ,point,,c_62,"Por favor, apunte primero a la ventana y luego a la puerta","0, 1, 6, 7","0 = 1 ; 1 = 1 ; 6,7 = na",rename c_62 point
-,circle,,cs_72_1,El Circulo (0-2),"0, 1, 2","0, 1 = 0 ; 2 = 1",rename cs_72_1 circle
-,circle_diss,NA,c_72_1,Intentó dibujar el círculo?,"1, 6, 7","circle = na if 6,7",rename c_72_1 circle_diss
+,circle,,cs_72_1,not in CADAS,,,
+,circle_diss,NA,c_72_1,not in CADAS,,,
 ,pentag,,cs_32,Dibujo de pentagonos (0-1),"0, 1",0 = 0 ; 1 = 1,rename cs_32 pentag
 ,pentag_diss,NA,c_32,¿Intentó dibujar esta figura?,"1, 6, 7","pentag = na if 6,7",rename c_32 pentag_diss
 ,animals,,cs_40 (in some cases cs_40 - cs_41),¿Intentó esta prueba de fluidez verbal?,"0 , 1, 777",animals = na if 777,rename cs_40 animals
