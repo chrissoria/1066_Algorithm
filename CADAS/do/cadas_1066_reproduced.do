@@ -16,9 +16,18 @@ cls\
 \
 ***********************************\
 local user "Chris"  // Change this to "Will" to switch paths\
+local country "CU"\
 \
 *for now just using Cuba\
+if "`country'" == "CU" \{\
+local Chris "/hdir/0/chrissoria/Stata_CADAS/Data/CUBA_out"\
+\}\
+\
+else if "`country'" == "DR" \{\
 local Chris "/hdir/0/chrissoria/Stata_CADAS/Data/DR_out"\
+\}\
+\
+\
 local Will "PATH"\
 \
 local path = cond("`user'" == "Chris", "`Chris'", "`Will'")\
@@ -129,7 +138,7 @@ foreach var in story learn1 learn2 learn3 recall \{\
 \
 if "`drop_physical_disability'" == "yes" \{\
 foreach var in pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat street store address nod point \{\
-	replace `var' = 0 if `var' == 6 | `var' == 7 | `var' == 8 | `var' == 9\
+	replace `var' = . if `var' == 6 | `var' == 7 | `var' == 8 | `var' == 9\
 \}\
 \
 \}\
@@ -204,6 +213,10 @@ summarize storytot\
 gen cogscore = nametot + count + animtot + wordtot1 + wordtot2 + papertot + storytot\
 \
 summarize cogscore\
+\
+/* in CU the averae cogscore is 28.70772 \
+in DR the average cogscore is 27.34616\
+*/\
 \
 ***** relscore ********\
 \
@@ -354,7 +367,8 @@ replace U = cond(missing(misstot), 0, U)\
 gen relscore_cadas = U*S\
 \
 summarize relscore_cadas\
-/* our relscore is bigger than 10/66 by over a whole point.  \
+/* our relscore in DR is bigger than 10/66 by over a whole point.  \
+in Cuba it's smaller by a half a point.\
 \
 score in 10/66:\
 \
@@ -364,6 +378,10 @@ relscore_d~e |      6,825    2.267357    4.131984          0         30\
 relscore_o~l |      6,799    2.271145    4.129672  -9.310345         30\
 */\
 \
+summarize recall\
+/* in CU the average recall is 3.402985\
+in DR the average recall is 2.318493\
+*/\
 \
 if "`impute_recall'" == "yes" \{\
 	gen recall_original = recall\
@@ -373,7 +391,7 @@ if "`impute_recall'" == "yes" \{\
 	replace recall = pred_recall if recall == 0\
 \}\
 \
-gen demp1066_score = exp(8.261208 - 0.4207415 * cogscore + 0.5038636 * relscore - 0.6954333 * recall) / (1 + exp(8.261208 - 0.4207415 * cogscore + 0.5038636 * relscore - 0.6954333 * recall))\
+gen demp1066_score = exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall) / (1 + exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall))\
 \
 gen dem1066 = .\
 replace dem1066 = 0 if demp1066_score <= 0.25591\

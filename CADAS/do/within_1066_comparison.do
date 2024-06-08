@@ -93,7 +93,7 @@ else if `wave' == 2 \{\
 /*\
 \
 12/26 variables in the 1066 cannot be included in the ADAMS algo\
-they are: chair shoes knuckle elbow should bridge hammer pray chemist store longmem nod point circle\
+they are: chair shoes knuckle elbow should bridge hammer pray chemist store longmem nod point \
 all 0 / 1\
 \
 */\
@@ -102,11 +102,11 @@ gen nametot_duplicate = 0\
 replace nametot_duplicate = 1 if name > 0 & !missing(name)\
 replace nametot_duplicate = 1 if nrecall > 0 & !missing(nrecall)\
 \
-egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point circle pentag)\
+egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point  pentag)\
 \
 * Recoding values from na to 0 so that we can perform the arithmetic\
 \
-foreach var in animals wordimm worddel paper story learn1 learn2 learn3 recall pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point circle pentag nametot nrecall \{\
+foreach var in animals wordimm worddel paper story learn1 learn2 learn3 recall pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point pentag nametot nrecall \{\
     replace `var' = 0 if `var' == .\
 \}\
 \
@@ -121,7 +121,7 @@ foreach var in wordimm worddel paper story \{\
 \}\
 *other variables that we won't be able to use are learn1 learn2 learn3 recall immed nrecall\
 \
-foreach var in name pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point circle pentag \{\
+foreach var in name pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point pentag \{\
     replace `var' = . if `var' >= 2 & `var' <= 9\
 \}\
 \
@@ -332,11 +332,11 @@ roctab cdem1066 dem1066pred50\
 *for this do file, I want to extract a set of coefficients that I can use to predict in the CADAS dataset\
 logit cdem1066 cogscore_cadas relscore_cadas recall\
 /* the formula using logit:\
-log(P/(1-P)) = 8.261208 -.4207415(cogscore) + .5038636(relscore) -.6954333(recall)\
+log(P/(1-P)) = 8.571528 -.4453795(cogscore) + .5031411(relscore) -.6978724(recall)\
 or\
-P/(1-P) = exp(8.261208 -.4207415(cogscore) + .5038636(relscore) -.6954333(recall))\
+P/(1-P) = exp(8.571528 -.4453795(cogscore) + ..5031411(relscore) -.6978724(recall))\
 or\
-P = exp(8.261208 - 0.4207415 * cogscore + 0.5038636 * relscore - 0.6954333 * recall) / (1 + exp(8.261208 - 0.4207415 * cogscore + 0.5038636 * relscore - 0.6954333 * recall))\
+P = exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall) / (1 + exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall))\
 */\
 \
 regress cdem1066 cogscore_cadas relscore_cadas recall\
