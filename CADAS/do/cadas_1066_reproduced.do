@@ -28,6 +28,10 @@ cd "`path'"\
 local wave 1\
 \
 local drop_missing_from_relscore "no" // change to yes or no\
+local drop_physical_disability "no"\
+local impute_recall "yes" //imputes the 10-word delayed recall from the immediate recall questions\
+\
+*create a dummy for people that we recoded because of that disability\
 \
 \
 ***** SCRIPT STARTS HERE *********\
@@ -84,8 +88,6 @@ rename c_1 year\
 gen season = cond(missing(c_2_p_c),0,c_2_p_c) + cond(missing(c_2_d),0,c_2_d)\
 rename c_61 nod\
 rename c_62 point\
-rename cs_72_1 circle\
-rename c_72_1 circle_diss\
 rename cs_32 pentag\
 rename c_32 pentag_diss\
 rename cs_40 animals\
@@ -93,8 +95,9 @@ rename c_40 animals_diss\
 gen wordimm = c_11 + c_12 + c_13\
 gen worddel = c_21 + c_22 + c_23\
 \
+*for now coding to 0\
 foreach var in c_27 c_28 c_29 \{\
-	replace `var' = . if `var' == 6 | `var' == 7\
+	replace `var' = 0 if `var' == 6 | `var' == 7\
 \}\
 gen paper = cond(missing(c_27),0,c_27) + cond(missing(c_28),0,c_28) + cond(missing(c_29),0,c_29)\
 \
@@ -105,6 +108,8 @@ foreach var in c_66a c_66b c_66c c_66d c_66e c_66f \{\
 	summarize `var'\
 \}\
 gen story = c_66a + c_66b + c_66c + c_66d + c_66e + c_66f\
+\
+summarize story\
 \
 rename c_66_a story_refuse\
 gen learn1 = c_33_1 + c_33_2 + c_33_3 + c_33_4 + c_33_5 + c_33_6 + c_33_7 + c_33_8 + c_33_9 + c_33_10\
@@ -122,31 +127,44 @@ foreach var in story learn1 learn2 learn3 recall \{\
 	replace `var' = . if `var'_refuse == 7\
 \}\
 \
-*for now, we will recode physical disability into missing (but later we could keep as 1)\
+if "`drop_physical_disability'" == "yes" \{\
 foreach var in pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat street store address nod point \{\
-	replace `var' = . if `var' == 6 | `var' == 7 | `var' == 8 | `var' == 9\
+	replace `var' = 0 if `var' == 6 | `var' == 7 | `var' == 8 | `var' == 9\
 \}\
-replace circle = . if circle_diss == 6 | circle_diss == 7\
-replace circle = 0 if circle == 1\
-replace circle = 1 if circle == 2\
-replace circle = 1 if circle == 3\
 \
+\}\
+\
+if "`drop_physical_disability'" == "no" \{\
+foreach var in pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat street store address nod point \{\
+	replace `var' = 0 if `var' == 6 | `var' == 7 | `var' == 8 | `var' == 9\
+\}\
+\
+\}\
+\
+if "`drop_physical_disability'" == "yes" \{\
 replace pentag = . if pentag_diss == 6 | pentag_diss == 7\
+\}\
+\
+else if "`drop_physical_disability'" == "no" \{\
+replace pentag = 0 if pentag_diss == 6 | pentag_diss == 7\
+\}\
+\
 replace pentag = 1 if pentag == 2\
 \
 replace animals = . if animals == 777\
-*for now, until we decide acceptable cutpoint\
+* copying from original algo\
 replace animals = . if animals > 45\
 \
 gen nametot = 0\
 replace nametot = 1 if name > 0 & !missing(name)\
 replace nametot = 1 if nrecall > 0 & !missing(nrecall)\
 \
-foreach var in animals wordimm worddel paper story learn1 learn2 learn3 recall pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point circle pentag nametot nrecall \{\
+*both types of skips (valid and invalid) will be removed\
+foreach var in animals wordimm worddel paper story learn1 learn2 learn3 recall pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point  pentag nametot nrecall \{\
     replace `var' = . if `var' == .v | `var' == .i\
 \}\
 \
-egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point circle pentag)\
+egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point  pentag)\
 \
 *max should be 27\
 summarize count\
@@ -154,13 +172,12 @@ summarize count\
 *this is only if we want to impute recall (which I don't think we want to)\
 gen immed = cond(missing(learn1),0,learn1) + cond(missing(learn2),0,learn2) + cond(missing(learn3),0,learn3)\
 tab recall, miss\
-*we could potentially recover 59 cases here\
 tab immed, miss\
 \
 *dividing by total amount of possible correct answers to get a "total"\
 \
 local divide_var "animals wordimm worddel paper story"\
-local divisor "45 3 3 3 6"\
+local divisor "23 3 3 3 6"\
 local new_column "animtot wordtot1 wordtot2 papertot storytot"\
 \
 local n : word count `divide_var'\
@@ -209,6 +226,7 @@ rename i_f_csid_14 orient\
 rename i_f_csid_15 lostout\
 rename i_f_csid_16 lostin\
 rename i_f_csid_17 chores\
+rename i_f_csid_17a choredis\
 rename i_f_csid_18 hobby\
 rename i_f_csid_19 money\
 rename i_f_csid_20 change\
@@ -218,7 +236,7 @@ rename i_f_csid_22_2 feeddiss\
 rename i_f_csid_23_1 dress\
 rename i_f_csid_23_2 dressdiss\
 rename i_f_csid_24_1 toilet\
-rename i_f_csid_24_2 toiletdiss\
+rename i_f_csid_24_2 toildiss\
 \
 * Creating binary missing indicators without changing the original missing values\
 local miss1_variables "mental activ memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason"\
@@ -274,9 +292,9 @@ replace misstot_duplicate = 0 if misstot_duplicate == .\
 \
 */\
 \
-summarize misstot misstot_duplicate\
-summarize miss1 miss1_duplicate\
-summarize miss3 miss3_duplicate\
+summarize misstot\
+summarize miss1\
+summarize miss3\
 \
 foreach var in put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores change money \{\
     replace `var'= `var'/2\
@@ -302,7 +320,7 @@ replace toilet = 0 if toildis == 1\
 *replace misstot_duplicate = 0 if misstot_duplicate == .\
 \
 if "`drop_missing_from_relscore'" == "yes" \{\
-    drop if misstot_duplicate > 0\
+    drop if misstot > 0\
 \}\
 \
 gen S = cond(missing(activ), 0, activ) +  ///\
@@ -329,163 +347,38 @@ gen S = cond(missing(activ), 0, activ) +  ///\
             cond(missing(feed), 0, feed) + ///\
             cond(missing(dress), 0, dress) + ///\
             cond(missing(toilet), 0, toilet)\
- \
-gen T = cond(missing(miss1_duplicate), 0, miss1_duplicate) + ///\
-        cond(missing(miss3_duplicate), 0, miss3_duplicate)\
 \
 gen U = 30 / (30 - misstot)\
 replace U = cond(missing(misstot), 0, U)\
 \
-gen S_2 = activ + mental + memory + put + kept + ///\
- frdname + famname + convers + wordfind + wordwrg + past + lastsee + lastday + ///\
- orient + lostout + lostin + chores + hobby + money + change + reason + feed + ///\
- dress + toilet\
- \
-gen T_2 = miss1_duplicate + miss3_duplicate\
- \
-gen U_2 = 30 / (30 - misstot_duplicate)\
+gen relscore_cadas = U*S\
 \
-gen relscore_duplicate = (U) * S - ((T) * 9)\
-gen relscore_duplicate2 = (U_2) * S_2 - ((T_2) * 9)\
+summarize relscore_cadas\
+/* our relscore is bigger than 10/66 by over a whole point.  \
 \
-summarize relscore_duplicate relscore_duplicate2 relscore_original\
+score in 10/66:\
 \
-gen pred_relscore = 0.004 + (0.072 * whodas12) + (0.338 * npisev)\
-\
-\
-/*RECODE\
-  pred_relscore  (Lowest thru 0=0)  (30 thru Highest=10)  .\
-EXECUTE .\
+     Variable |        Obs        Mean    Std. dev.       Min        Max\
+-------------+---------------------------------------------------------\
+relscore_d~e |      6,825    2.267357    4.131984          0         30\
+relscore_o~l |      6,799    2.271145    4.129672  -9.310345         30\
 */\
 \
-*I believe the above code is supposed to say 30 thru highest=30\
 \
-replace pred_relscore = 0 if pred_relscore <= 0\
-replace pred_relscore = 30 if pred_relscore >= 30 & !missing(pred_relscore)\
+if "`impute_recall'" == "yes" \{\
+	gen recall_original = recall\
 \
-/*RECODE\
-  relscore  (MISSING=999).\
-EXECUTE .\
+	gen pred_recall = (0.344 * immed) - 0.339\
+    \
+	replace recall = pred_recall if recall == 0\
+\}\
 \
-IF (relscore=999) relscore = pred_relscore .\
-EXECUTE .*/\
+gen demp1066_score = exp(8.261208 - 0.4207415 * cogscore + 0.5038636 * relscore - 0.6954333 * recall) / (1 + exp(8.261208 - 0.4207415 * cogscore + 0.5038636 * relscore - 0.6954333 * recall))\
 \
+gen dem1066 = .\
+replace dem1066 = 0 if demp1066_score <= 0.25591\
+replace dem1066 = 1 if demp1066_score > 0.25591 & demp1066_score != .\
 \
-* Replace missing values in relscore_duplicate with non-missing values from pred_relscore\
-replace relscore_duplicate = pred_relscore if relscore_duplicate == . & pred_relscore != .\
-\
-*exactly the same\
-summarize relscore_duplicate relscore\
-\
-generate dfscore_duplicate = 0.452322 - (0.01669918 * cogscore_duplicate) + (0.03033851 * relscore_duplicate)\
-\
-\
-*exact\
-summarize dfscore dfscore_duplicate\
-\
-*again, have to be careful to exclude missing here\
-gen dfcase_duplicate = .\
-replace dfcase_duplicate = 1 if dfscore_duplicate <= 0.119999999\
-replace dfcase_duplicate = 2 if dfscore_duplicate >= 0.12 & dfscore_duplicate < 0.184\
-replace dfcase_duplicate = 3 if dfscore_duplicate >= 0.184 & dfscore_duplicate < .\
-\
-*exact\
-summarize dfcase_duplicate dfcase\
-\
-gen cogcase_duplicate = .\
-replace cogcase_duplicate = 3 if cogscore <= 28.5\
-replace cogcase_duplicate = 2 if cogscore > 28.5 & cogscore <= 29.5\
-replace cogcase_duplicate = 1 if cogscore > 29.5 & cogscore != .\
-\
-*exact\
-summarize cogcase_duplicate cogcase\
-\
-gen ncogscor_duplicate = .\
-replace ncogscor_duplicate = 1 if cogscore <= 23.699\
-replace ncogscor_duplicate = 2 if cogscore > 23.699 & cogscore <= 28.619\
-replace ncogscor_duplicate = 3 if cogscore > 28.619 & cogscore <= 30.619\
-replace ncogscor_duplicate = 4 if cogscore > 30.619 & cogscore <= 31.839\
-replace ncogscor_duplicate = 5 if cogscore > 31.839 & cogscore != .\
-\
-gen nrelscor_duplicate = .\
-replace nrelscor_duplicate = 1 if relscore_duplicate == 0\
-replace nrelscor_duplicate = 2 if relscore_duplicate > 0 & relscore_duplicate <= 1.99\
-replace nrelscor_duplicate = 3 if relscore_duplicate > 1.99 & relscore_duplicate <= 5.0\
-replace nrelscor_duplicate = 4 if relscore_duplicate > 5.0 & relscore_duplicate <= 12.0\
-replace nrelscor_duplicate = 5 if relscore_duplicate > 12.0 & relscore_duplicate != .\
-\
-gen ndelay_duplicate = .\
-replace ndelay_duplicate = 1 if recall == 0\
-replace ndelay_duplicate = 2 if recall >= 1 & recall <= 3\
-replace ndelay_duplicate = 3 if recall == 4\
-replace ndelay_duplicate = 4 if recall >= 5 & recall <= 6\
-replace ndelay_duplicate = 5 if recall >= 7 & recall != .\
-\
-gen brelscor_duplicate = .\
-replace brelscor_duplicate = 0     if nrelscor_duplicate == 1\
-replace brelscor_duplicate = 1.908 if nrelscor_duplicate == 2\
-replace brelscor_duplicate = 2.311 if nrelscor_duplicate == 3\
-replace brelscor_duplicate = 4.171 if nrelscor_duplicate == 4\
-replace brelscor_duplicate = 5.680 if nrelscor_duplicate == 5 & nrelscor_duplicate != .\
-\
-gen bcogscor_duplicate = .\
-replace bcogscor_duplicate = 2.801  if ncogscor_duplicate == 1\
-replace bcogscor_duplicate = 1.377  if ncogscor_duplicate == 2\
-replace bcogscor_duplicate = 0.866  if ncogscor_duplicate == 3\
-replace bcogscor_duplicate = -0.231 if ncogscor_duplicate == 4\
-replace bcogscor_duplicate = 0      if ncogscor_duplicate == 5 & ncogscor_duplicate != .\
-\
-gen bdelay_duplicate = .\
-replace bdelay_duplicate = 3.822 if ndelay_duplicate == 1\
-replace bdelay_duplicate = 3.349 if ndelay_duplicate == 2\
-replace bdelay_duplicate = 2.575 if ndelay_duplicate == 3\
-replace bdelay_duplicate = 2.176 if ndelay_duplicate == 4\
-replace bdelay_duplicate = 0     if ndelay_duplicate == 5 & ndelay_duplicate != .\
-\
-gen bgmsdiag_duplicate = .\
-replace bgmsdiag_duplicate = 0      if gmsdiag == 6\
-replace bgmsdiag_duplicate = 1.566  if gmsdiag == 1\
-replace bgmsdiag_duplicate = 1.545  if gmsdiag == 2\
-replace bgmsdiag_duplicate = -0.635 if gmsdiag == 3\
-replace bgmsdiag_duplicate = -0.674 if gmsdiag == 4\
-replace bgmsdiag_duplicate = 0.34   if gmsdiag == 5 & gmsdiag != .\
-\
-gen Q = brelscor_duplicate + bcogscor_duplicate + bdelay_duplicate + bgmsdiag_duplicate\
-gen logodds_duplicate = -9.53 + Q\
-\
-gen odds_duplicate = exp(logodds_duplicate)\
-\
-gen prob_duplicate = odds_duplicate / (1 + odds_duplicate)\
-\
-gen dem1066_duplicate = .\
-replace dem1066_duplicate = 0 if prob_duplicate <= 0.25591\
-replace dem1066_duplicate = 1 if prob_duplicate > 0.25591 & prob_duplicate != .\
-\
-summarize dem1066_duplicate dem1066\
-\
-tab dem1066_duplicate dem1066, miss\
-\
-count if dem1066_duplicate == 1\
-count if cdem1066 == 1\
-\
-/*\
-gen is_diff = 0\
-replace is_diff = 1 if dem1066 != dem1066_duplicate\
-drop if is_diff == 0\
-*/\
-\
-gen is_diff = 0\
-replace is_diff = 1 if (abs(relscore - relscore_duplicate) > 0.0001) & (relscore != .) & (relscore_duplicate != .)\
-replace is_diff = 1 if (relscore == . & relscore_duplicate != .) | (relscore != . & relscore_duplicate == .)\
-drop if is_diff == 0\
-\
-* Keep only the relscore and relscore_duplicate variables\
-keep pid S dem1066_duplicate dem1066 misstot_duplicate relscore relscore_original relscore_duplicate is_diff ///\
- put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores chores_original change money\
-\
-* Export the modified data to an Excel file\
-export excel using "/hdir/0/chrissoria/1066/differences.xlsx", firstrow(variables) replace\
-\
-log close\
-\
+summarize dem1066\
+*dem1066_du~e |      6,783    .1167625    .3211607          0          1\
 }

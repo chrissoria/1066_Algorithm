@@ -137,7 +137,8 @@ foreach var in name pencil watch chair shoes knuckle elbow should bridge hammer 
     replace `var' = . if `var' >= 2 & `var' <= 9\
 \}\
 \
-gen immed = cond(missing(learn1),0,learn1) + cond(missing(learn2),0,learn2) + cond(missing(learn3),0,learn3)\
+gen immed_duplicate = cond(missing(learn1),0,learn1) + cond(missing(learn2),0,learn2) + cond(missing(learn3),0,learn3)\
+summarize immed immed_duplicate\
 \
 * more cleaning, recoding any values higher than a certain amount as "na"\
 \
@@ -191,10 +192,13 @@ else if `wave' == 2 \{\
 format cogscore_duplicate %9.4f\
 \}\
 \
+/*\
 if "`wave'" == "1" \{\
     replace cogscore = cogscore_duplicate\
     drop cogscore_duplicate\
 \}\
+*/\
+\
 else if "`wave'" == "2" \{\
     replace cogscore_duplicate = round(cogscore_duplicate, 0.0001)\
     replace cogscore = round(cogscore, 0.0001)\
@@ -334,19 +338,10 @@ gen T = cond(missing(miss1_duplicate), 0, miss1_duplicate) + ///\
 gen U = 30 / (30 - misstot)\
 replace U = cond(missing(misstot), 0, U)\
 \
-gen S_2 = activ + mental + memory + put + kept + ///\
- frdname + famname + convers + wordfind + wordwrg + past + lastsee + lastday + ///\
- orient + lostout + lostin + chores + hobby + money + change + reason + feed + ///\
- dress + toilet\
- \
-gen T_2 = miss1_duplicate + miss3_duplicate\
- \
-gen U_2 = 30 / (30 - misstot_duplicate)\
 \
-gen relscore_duplicate = (U) * S - ((T) * 9)\
-gen relscore_duplicate2 = (U_2) * S_2 - ((T_2) * 9)\
+gen relscore_duplicate = U * S\
 \
-summarize relscore_duplicate relscore_duplicate2 relscore_original\
+summarize relscore_duplicate relscore_original\
 \
 gen pred_relscore = 0.004 + (0.072 * whodas12) + (0.338 * npisev)\
 \
@@ -479,7 +474,7 @@ drop if is_diff == 0\
 \
 * Keep only the relscore and relscore_duplicate variables\
 keep pid S dem1066_duplicate dem1066 misstot_duplicate relscore relscore_original relscore_duplicate is_diff ///\
- put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores chores_original change money\
+ put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores change money\
 \
 * Export the modified data to an Excel file\
 export excel using "/hdir/0/chrissoria/1066/differences.xlsx", firstrow(variables) replace\

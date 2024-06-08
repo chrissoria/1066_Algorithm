@@ -17,7 +17,7 @@ cogscore,,,,,,,
 ,street,,i_a2,A la pregunta “Cuáles son los nombres de las dos calles más importantes cerca de su casa?” xxx respondió _________ [lea la respuesta que usted anoto en papel en el cognitivo]. Es correcto? p,"1, 2, 8, 9","1 = 1 ; 2  = 0 ; 8,9  = na",rename i_a2 street
 ,store,,i_a3,"A la pregunta “Donde está la tienda,,bodega, o colmado más cercana?” xxx respondió _________ [lea la respuesta que usted anoto en el cognitivo]. Es correcto? ","1, 2, 8, 9","2 = 1 ; 2  = 0 ; 8,9  = na",rename i_a3 store
 ,address,,i_a4,A la pregunta “Cuál es su dirección?” xxx respondió _________ [lea la respuesta que usted anoto en el cognitivo]. Es correcto? e,"1, 2, 8, 9","3 = 1 ; 2  = 0 ; 8,9  = na",rename i_a4 address
-,longmem,,c_69,¿Puede decirme el nombre del Apóstol de Cuba que murió en Dos Ríos en 1895? \ Puede decirme el nombre de los padres de la patria que proclamaron la indepe \Puede decirme quién descubrio Puerto Rico para los europeos?er,"0, 1",0 = 0 ; 1 = 1,"gen longmem = cond(missing(c_69_c),0,c_69_c) + cond(missing(c_69_d),0,c_69_d) + cond(missing(c_69_p),0,c_69_p)"
+,longmem,,c_69,¿Puede decirme el nombre del Apóstol de Cuba que murió en Dos Ríos en 1895? \ Puede decirme el nombre de los padres de la patria que proclamaron la indepe \Puede decirme quién descubrio Puerto Rico para los europeos?,"0, 1",0 = 0 ; 1 = 1,"gen longmem = cond(missing(c_69_c),0,c_69_c) + cond(missing(c_69_d),0,c_69_d) + cond(missing(c_69_p),0,c_69_p)"
 ,month,,c_3,En qué mes del año estamos?,"0, 1",0 = 0 ; 1 = 1,rename c_3 month
 ,day,,c_5,Qué día de la semana es hoy?,"0, 1",0 = 0 ; 1 = 1,rename c_5 day
 ,year,,c_1,En qué año estamos?,"0, 1",0 = 0 ; 1 = 1,rename c_1 year
@@ -25,7 +25,6 @@ cogscore,,,,,,,
 ,nod,,c_61,"Por favor mueva su cabeza, como si dijera sí","0, 1, 6, 7","0 = 1 ; 1 = 1 ; 6,7 = na",rename c_61 nod
 ,point,,c_62,"Por favor, apunte primero a la ventana y luego a la puerta","0, 1, 6, 7","0 = 1 ; 1 = 1 ; 6,7 = na",rename c_62 point
 ,circle,,cs_72_1,not in CADAS,,,
-,circle_diss,NA,c_72_1,not in CADAS,,,
 ,pentag,,cs_32,Dibujo de pentagonos (0-1),"0, 1",0 = 0 ; 1 = 1,rename cs_32 pentag
 ,pentag_diss,NA,c_32,¿Intentó dibujar esta figura?,"1, 6, 7","pentag = na if 6,7",rename c_32 pentag_diss
 ,animals,,cs_40 (in some cases cs_40 - cs_41),¿Intentó esta prueba de fluidez verbal?,"0 , 1, 777",animals = na if 777,rename cs_40 animals
@@ -57,31 +56,32 @@ gen story = c_66a + c_66b + c_66c + c_66d + c_66e + c_66f"
 ,name,,c_0,Quiero que usted recuerde mi nombre. Mi nombre es xxxxxxx. ¿Puede usted repetirlo por favor?,"0, 1",0 = 0 ; 1 = 1,rename c_0 name
 ,nrecall,,c_65,"Se acuerda usted de mi nombre?, Cuál es?","0, 2",1 = 0 ; 1 = 1,rename c_65 nrecall
 relscore,,,,,,,
-,activ,,i_f_csid_1,¿Ha visto algún cambio en sus actividades diarias? Por favor describa,,,rename i_f_csid_1 activ
-,mental,,i_f_csid_2,¿Ha habido una disminución general en su funcionamiento mental? Por favor describa.,,,rename i_f_csid_2 mental
-,memory,,i_f_csid_3,"Todos tenemos cierta dificultad en recordar cosas a medida que envejecemos, pero esto ¿Ha sido un problema particularmente importante para su (pariente)?",,,rename i_f_csid_3 memory
-,put,,i_f_csid_4,¿Se olvida donde ha puesto las cosas? Si afirmativo - Que tan a menudo?,,,rename i_f_csid_4 put
-,kept,,i_f_csid_5,¿Se olvida donde normalmente se guardan las cosas? Si afirmativo - Que tan a menudo?,,,rename i_f_csid_5 kept
-,frdname,,i_f_csid_6,¿Olvida el nombre de amigos?  Si afirmativo - Que tan a menudo?,,,rename i_f_csid_6 frdname
-,famname,,i_f_csid_7,¿Olvida nombres de miembros de la familia? Si afirmativo - Que tan a menudo?,,,rename i_f_csid_7 famname
-,convers,,i_f_csid_8,¿Olvida lo que quería decir en el medio de una conversación? Si afirmativo - Que tan a menudo?,,,rename i_f_csid_8 convers
-,wordfind,,i_f_csid_9,¿Cuando habla tiene dificultad diciendo las palabras correctas?,,,rename i_f_csid_9 wordfind
-,wordwrg,,i_f_csid_10,¿Usa palabras incorrectas? Si afirmativo - Que tan a menudo?,,,rename i_f_csid_10 wordwrg
+,activ,,i_f_csid_1,¿Ha visto algún cambio en sus actividades diarias? Por favor describa,"0,1",1 = 0 ; 1 = 1,rename i_f_csid_1 activ
+,mental,,i_f_csid_2,¿Ha habido una disminución general en su funcionamiento mental? Por favor describa.,"0,1",1 = 0 ; 1 = 1,rename i_f_csid_2 mental
+,memory,,i_f_csid_3,"Todos tenemos cierta dificultad en recordar cosas a medida que envejecemos, pero esto ¿Ha sido un problema particularmente importante para su (pariente)?","0,1",1 = 0 ; 1 = 1,rename i_f_csid_3 memory
+,put,,i_f_csid_4,¿Se olvida donde ha puesto las cosas? Si afirmativo - Que tan a menudo?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_4 put
+,kept,,i_f_csid_5,¿Se olvida donde normalmente se guardan las cosas? Si afirmativo - Que tan a menudo?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_5 kept
+,frdname,,i_f_csid_6,¿Olvida el nombre de amigos?  Si afirmativo - Que tan a menudo?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_6 frdname
+,famname,,i_f_csid_7,¿Olvida nombres de miembros de la familia? Si afirmativo - Que tan a menudo?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_7 famname
+,convers,,i_f_csid_8,¿Olvida lo que quería decir en el medio de una conversación? Si afirmativo - Que tan a menudo?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_8 convers
+,wordfind,,i_f_csid_9,¿Cuando habla tiene dificultad diciendo las palabras correctas?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_9 wordfind
+,wordwrg,,i_f_csid_10,¿Usa palabras incorrectas? Si afirmativo - Que tan a menudo?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_10 wordwrg
 ,past,,i_f_csid_11,"¿Tiende a hablar de cosas que pasaron hace mucho tiempo en vez de cosas presentes?
-   Si afirmativo - Que tan a menudo?",,,rename i_f_csid_11 past
-,lastsee,,i_f_csid_12,¿Se olvida cuando fue la última vez que la/lo vio? Si afirmativo - Que tan a menudo?,,,rename i_f_csid_12 lastsee
-,lastday,,i_f_csid_13,¿Olvida lo que pasó ayer?  Si afirmativo - Que tan a menudo?,,,rename i_f_csid_13 lastday
-,orient,,i_f_csid_14,¿Se olvida donde ella/é) está? Si afirmativo -Que tan a menudo?,,,rename i_f_csid_14 orient
-,lostout,,i_f_csid_15,¿Se pierde en la comunidad?  Si afirmativo -Que tan a menudo?,,,rename i_f_csid_15 lostout
-,lostin,,i_f_csid_16,"¿Se pierde en su propia casa, ejemplo: buscando el baño? Si afirmativo - Que tan a menudo?",,,rename i_f_csid_16 lostin
-,chores,,i_f_csid_17,¿Tiene dificultad realizando las tareas de la casa que ella/el acostumbraba a hacer?,,,rename i_f_csid_17 chores
-,hobby,,i_f_csid_18,¿Ha habido pérdida de alguna habilidad especial de un pasatiempo que antes podía hacer?,,,rename i_f_csid_18 hobby
-,money,,i_f_csid_19,¿Ha habido un cambio en su capacidad de manejar dinero?,,,rename i_f_csid_19 money
-,change,,i_f_csid_20,¿Tiene dificultad para ajustarse a cambios en su rutina diaria?  Si afirmativo- Que tan a menudo?,,,rename i_f_csid_20 change
-,reason,,i_f_csid_21,¿Ha notado cambios en su habilidad para pensar y razonar?,,,rename i_f_csid_21 reason
-,feed,,i_f_csid_22_1,¿Tiene dificultad para alimentarse por sí misma?,,,rename i_f_csid_22_1 feed
-,feeddiss,,i_f_csid_22_2,¿El entrevistador piensa que estos problemas son primariamente debidos a discapacidad física?,,,rename i_f_csid_22_2 feeddiss
-,dress,,i_f_csid_23_1,¿Tiene dificultad para vestirse?,,,rename i_f_csid_23_1 dress
-,dressdiss,,i_f_csid_23_2,¿El entrevistador piensa que estos problemas son primariamente debidos a discapacidad física?,,,rename i_f_csid_23_2 dressdiss
-,toilet,,i_f_csid_24_1,¿Tiene dificultad usando el sanitario? ¿Se orina o defeca?,,,rename i_f_csid_24_1 toilet
-,toiletdiss,,i_f_csid_24_2,¿El entrevistador piensa que estos problemas son primariamente debidos a discapacidad física?,,,rename i_f_csid_24_2 toiletdiss
+   Si afirmativo - Que tan a menudo?","0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_11 past
+,lastsee,,i_f_csid_12,¿Se olvida cuando fue la última vez que la/lo vio? Si afirmativo - Que tan a menudo?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_12 lastsee
+,lastday,,i_f_csid_13,¿Olvida lo que pasó ayer?  Si afirmativo - Que tan a menudo?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_13 lastday
+,orient,,i_f_csid_14,¿Se olvida donde ella/é) está? Si afirmativo -Que tan a menudo?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_14 orient
+,lostout,,i_f_csid_15,¿Se pierde en la comunidad?  Si afirmativo -Que tan a menudo?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_15 lostout
+,lostin,,i_f_csid_16,"¿Se pierde en su propia casa, ejemplo: buscando el baño? Si afirmativo - Que tan a menudo?","0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_16 lostin
+,chores,,i_f_csid_17,¿Tiene dificultad realizando las tareas de la casa que ella/el acostumbraba a hacer?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_17 chores
+,choredis,,i_f_csid_17a,¿El entrevistador piensa que el problema es primariamente debido a deficiencias físicas?,"0, 1",1 = 0 ; 1 = 1,rename i_f_csid_17a choredis
+,hobby,,i_f_csid_18,¿Ha habido pérdida de alguna habilidad especial de un pasatiempo que antes podía hacer?,"0,1",1 = 0 ; 1 = 1,rename i_f_csid_18 hobby
+,money,,i_f_csid_19,¿Ha habido un cambio en su capacidad de manejar dinero?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_19 money
+,change,,i_f_csid_20,¿Tiene dificultad para ajustarse a cambios en su rutina diaria?  Si afirmativo- Que tan a menudo?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_20 change
+,reason,,i_f_csid_21,¿Ha notado cambios en su habilidad para pensar y razonar?,"0, 1, 2",1 = 0 ; 1 = 1 ; 2 = 2,rename i_f_csid_21 reason
+,feed,,i_f_csid_22_1,¿Tiene dificultad para alimentarse por sí misma?,"0, 1, 2, 3",1 = 0 ; 1 = 1 ; 2 = 2 ; 3 = 3,rename i_f_csid_22_1 feed
+,feeddiss,,i_f_csid_22_2,¿El entrevistador piensa que estos problemas son primariamente debidos a discapacidad física?,"0,1",1 = 0 ; 1 = 1,rename i_f_csid_22_2 feeddiss
+,dress,,i_f_csid_23_1,¿Tiene dificultad para vestirse?,"0, 1, 2, 3",1 = 0 ; 1 = 1 ; 2 = 2 ; 3 = 3,rename i_f_csid_23_1 dress
+,dressdiss,,i_f_csid_23_2,¿El entrevistador piensa que estos problemas son primariamente debidos a discapacidad física?,"0,1",1 = 0 ; 1 = 1,rename i_f_csid_23_2 dressdiss
+,toilet,,i_f_csid_24_1,¿Tiene dificultad usando el sanitario? ¿Se orina o defeca?,"0, 1, 2, 3",1 = 0 ; 1 = 1 ; 2 = 2 ; 3 = 3,rename i_f_csid_24_1 toilet
+,toildiss,,i_f_csid_24_2,¿El entrevistador piensa que estos problemas son primariamente debidos a discapacidad física?,"0,1",1 = 0 ; 1 = 1,rename i_f_csid_24_2 toildiss
