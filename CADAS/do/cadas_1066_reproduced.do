@@ -383,10 +383,11 @@ if "`impute_recall'" == "yes" {
 }
 
 gen demp1066_score = exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall) / (1 + exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall))
+tab demp1066_score
 
-gen dem1066 = .
-replace dem1066 = 0 if demp1066_score <= 0.25591
-replace dem1066 = 1 if demp1066_score > 0.25591 & demp1066_score != .
+
+gen dem1066 = 0
+replace dem1066 = 1 if demp1066_score >= .5 & demp1066_score != .
 
 summarize dem1066
 *dem1066_du~e |      6,783    .1167625    .3211607          0          1

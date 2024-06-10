@@ -6,8 +6,8 @@ cls
 /*
 The goal of this do file is to reproduce the 10/66 algorithm using data that's available in the cadas dataset only.
 Here's a quick summary of what's in 10/66 but not in cadas
-1. cadas has all the variables necessary for completing the cogscore
-2. cadas has all the variables necessary for completing the relscore_adams1
+1. cadas has all the variables necessary for completing the cogscore except overlapping circles
+2. cadas has all the variables necessary for completing the relscore
 3. we might be able to construct some of the whodas12 from the sociodem
 4. the Geriatric Mental State (GMS) diagnosis might be able to be created from the sociodem
 	link to how to create it can be found here: 
@@ -61,7 +61,7 @@ drop if inlist(pid, 20028102,20041200,20076700,20129300,20131602)
 *I'm assuming it was dropped for a specific resons (singled out)
 drop if inlist(pid, 20125302)
 *the cogscores below have been dropped for a reason that's not identifiable
-*the dem1066 algo ends up dropping them somewhere in its computation
+*the cdem1066 algo ends up dropping them somewhere in its computation
 drop if inlist(pid, 1109201, 1300101, 1300901, 1312101, 1316301, 1316302, 1620901, 2026501, 2040901, 2046001, 2046002, 2066101, 2070001, 2070302, 2583601)
 }
 else if `wave' == 1 {
@@ -95,7 +95,7 @@ gen nametot_duplicate = 0
 replace nametot_duplicate = 1 if name > 0 & !missing(name)
 replace nametot_duplicate = 1 if nrecall > 0 & !missing(nrecall)
 
-egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point  pentag)
+egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point pentag)
 
 * Recoding values from na to 0 so that we can perform the arithmetic
 
@@ -298,9 +298,9 @@ gen total_pred = k_fold_dem_pred_1066_1 + k_fold_dem_pred_1066_2 + k_fold_dem_pr
 
 gen k_fold_dem_pred_1066_av = total_pred/10
 
-gen dem1066pred50 = (k_fold_dem_pred_1066_av >= .5) if !missing(k_fold_dem_pred_1066_av)
-tab dem1066pred50
-tab cdem1066 dem1066pred50, matcell(conf_matrix)
+gen cdem1066pred50 = (k_fold_dem_pred_1066_av >= .5) if !missing(k_fold_dem_pred_1066_av)
+tab cdem1066pred50
+tab cdem1066 cdem1066pred50, matcell(conf_matrix)
 
 matrix list conf_matrix
 
@@ -320,10 +320,15 @@ display "Accuracy for 1066 .50: " Accuracy
 display "Predicted Prevalence for 1066 ADAMS modified: " Prevalence
 display "Predicted Prevalence for 1066 original: " ((TP+FN) / (TP + TN + FP + FN))*100
 
-roctab cdem1066 dem1066pred50
+roctab cdem1066 cdem1066pred50
 
 *for this do file, I want to extract a set of coefficients that I can use to predict in the CADAS dataset
 logit cdem1066 cogscore_cadas relscore_cadas recall
+predict cdem1066_prob, pr
+summarize cdem1066_prob
+
+gen demp1066_score = exp(8.571528 -.4453795 * cogscore_cadas + .5031411 * relscore_cadas -.6978724 * recall) / (1 + exp(8.571528 -.4453795 * cogscore_cadas + .5031411 * relscore_cadas -.6978724 * recall))
+summarize demp1066_score
 /* the formula using logit:
 log(P/(1-P)) = 8.571528 -.4453795(cogscore) + .5031411(relscore) -.6978724(recall)
 or
