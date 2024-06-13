@@ -16,7 +16,7 @@ Language,Word finding difficulties,CSI-D,DSRS*,Yes
 ,Use the wrong words in conversations,CSI-D,DSRS*,Yes
 Judgment and Problem solving,Change in ability to think and reason,CSI-D,DSRS*,Yes
 ,Ability to handle money,CSI-D,BDS,Yes
-,General decline in cognitive functioning,JORGE,,No
+,General decline in cognitive functioning,CSI-D,,No
 Daily living activities,Difficulty performing household chores,CSI-D,BDS,Yes
 ,Difficulty performing hobbies,CSI-D,Clinical History,Yes
 ,Difficulty Dressing,CSI-D,BDS,Yes
@@ -26,19 +26,19 @@ Daily living activities,Difficulty performing household chores,CSI-D,BDS,Yes
 ,Difficulty adjusting to change in routine,CSI-D,,No
 Cognitive Interview: Cognitive Score Measures,,,,
 Memory,Logical memory immediate recall,EBMT**,WMS**,Yes
-,Long term memroy,JORGE,,No
+,Long term memroy,CSI-D,,No
 Language,Name watch,CSI-D,MMSE,Yes
 ,Name Pencil,CSI-D,MMSE,Yes
-,Name Chair,JORGE,,No
-,Name shoes,JORGE,,No
-,Name knuckles,JORGE,,No
-,Name elbow,JORGE,,No
-,Name shoulders,JORGE,,No
-,Define bridge,JORGE,,No
-,Identify hammer,JORGE,,No
-,Identify church,JORGE,,No
-,Identify pharmacy,JORGE,,No
-,Sentence repeat,JORGE,,Yes
+,Name Chair,CSI-D,,No
+,Name shoes,CSI-D,,No
+,Name knuckles,CSI-D,,No
+,Name elbow,CSI-D,,No
+,Name shoulders,CSI-D,,No
+,Define bridge,CSI-D,,No
+,Identify hammer,CSI-D,,No
+,Identify church,CSI-D,,No
+,Identify pharmacy,CSI-D,,No
+,Sentence repeat,CSI-D,,Yes
 ,Interviewer name repeat,CSI-D,,No
 Orientation,Time: Month/day/year/season,CSI-D,MMSE,Yes
 ,Place: City/Town/Room,CSI-D,MMSE,Yes
@@ -46,7 +46,11 @@ Orientation,Time: Month/day/year/season,CSI-D,MMSE,Yes
 Executive function,Animal fluency,CERAD,CERAD,Yes
 ,Constructional praxis Copying (Pentagon),CERAD,CERAD,Yes
 ,Constructional praxis Copying (Circle),CERAD,,No
-,Head nod,JORGE,,No
-,Finger point,JORGE,,No
+,Head nod,CSI-D,,No
+,Finger point,CSI-D,,No
 Cognitive Interview: Word list recall,,,,
 Memory,Word List delayed recall,CERAD,CERAD,Yes
+Geriatric Mental State Interview: Depression Measure,,,,
+,Depression diagnostic assessment,GMS,,No
+World Health Organization Disability Assessment Schedule,,,,
+,12-item version,DAS,,No

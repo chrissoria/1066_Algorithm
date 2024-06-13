@@ -1,13 +1,12 @@
----------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
        log:  /hdir/0/chrissoria/1066/ADAMS_1066_aggressive_98_to_0.log
   log type:  text
- opened on:  17 May 2024, 21:14:41
+ opened on:  12 Jun 2024, 18:59:28
 
 . 
 . ** set sample inclusion
-. egen in_samp = rowmiss(AAGE RELSCORE COGSCORE dementia cogtot27_imp2002 ragender raed
-> uc)
+. egen in_samp = rowmiss(AAGE RELSCORE COGSCORE dementia cogtot27_imp2002 ragender raeduc)
 
 . *525 people have no missingness across the board, mostly due to the cogscore variable
 . *nobody is missing age
@@ -44,7 +43,7 @@
   508
 
 . 
-. ** table 2 **
+. * Generate frequency tables for gender, age categories, and education categories
 . tab female
 
      female |      Freq.     Percent        Cum.
@@ -74,16 +73,11 @@
       Total |        508      100.00
 
 . 
+. *****     10/66    ******
 . 
-. ** table 3 **
-. ** identify cutpoints to maximize sensitivity and specificity [optimal]
-. * http://www.haghish.com/statistics/stata-blog/stata-programming/download/cutpt.html
+. *************************
 . 
-. *****  1066 *****
-. 
-. *****************
-. 
-. * optimal
+. * using optimal cutpoints
 . 
 . local num_repeats 10
 
@@ -121,10 +115,9 @@
 (508 missing values generated)
 
 . 
-. gen total_pred = k_fold_dem_pred_1066_1 + k_fold_dem_pred_1066_2 + k_fold_dem_pred_10
-> 66_3 + k_fold_dem_pred_1066_4 + k_fold_dem_pred_1066_5 + k_fold_dem_pred_1066_6 + k_f
-> old_dem_pred_1066_7 + k_fold_dem_pred_1066_8 + k_fold_dem_pred_1066_9 + k_fold_dem_pr
-> ed_1066_10
+. gen total_pred = k_fold_dem_pred_1066_1 + k_fold_dem_pred_1066_2 + k_fold_dem_pred_1066_3 + k_fold_dem_pred_1066_4 + k_
+> fold_dem_pred_1066_5 + k_fold_dem_pred_1066_6 + k_fold_dem_pred_1066_7 + k_fold_dem_pred_1066_8 + k_fold_dem_pred_1066_
+> 9 + k_fold_dem_pred_1066_10
 
 . 
 . gen k_fold_dem_pred_1066_av = total_pred/10
@@ -142,8 +135,7 @@ Specificity at cutpoint:               0.88
 Area under ROC curve at cutpoint:      0.92
 
 . 
-. gen k_fold_dem_pred_1066_opt = (k_fold_dem_pred_1066_av >= .1277115) if !missing(k_fo
-> ld_dem_pred_1066_av)
+. gen k_fold_dem_pred_1066_opt = (k_fold_dem_pred_1066_av >= .1277115) if !missing(k_fold_dem_pred_1066_av)
 
 . tab dementia k_fold_dem_pred_1066_opt, matcell(conf_matrix)
 
@@ -205,54 +197,15 @@ Predicted Prevalence for 1066 optimal: 24.80315
      ------------------------------------------------------------
            508     0.9134       0.0152        0.88358     0.94324
 
-. rocreg dementia k_fold_dem_pred_1066_av
-(running rocregstat on estimation sample)
-
-Bootstrap replications (1,000): .........10.........20.........30.........40.........50
-> .........60.........70.........80.........90.........100.........110.........120.....
-> ....130.........140.........150.........160.........170.........180.........190......
-> ...200.........210.........220.........230.........240.........250.........260.......
-> ..270.........280.........290.........300.........310.........320.........330........
-> .340.........350.........360.........370.........380.........390.........400.........
-> 410.........420.........430.........440.........450.........460.........470.........4
-> 80.........490.........500.........510.........520.........530.........540.........55
-> 0.........560.........570.........580.........590.........600.........610.........620
-> .........630.........640.........650.........660.........670.........680.........690.
-> ........700.........710.........720.........730.........740.........750.........760..
-> .......770.........780.........790.........800.........810.........820.........830...
-> ......840.........850.........860.........870.........880.........890.........900....
-> .....910.........920.........930.........940.........950.........960.........970.....
-> ....980.........990.........1,000 done
-
-Bootstrap results                                        Number of obs =   508
-                                                         Replications  = 1,000
-
-Nonparametric ROC estimation
-
-Control standardization: empirical
-ROC method             : empirical
-
-Area under the ROC curve
-
-   Status    : dementia
-   Classifier: k_fold_dem_pred_1066_av
-------------------------------------------------------------------------------
-             |    Observed               Bootstrap
-         AUC | coefficient       Bias    std. err.     [95% conf. interval]
--------------+----------------------------------------------------------------
-             |    .9707725   8.00e-06    .0067128     .9576157   .9839293  (N)
-             |                                        .9564431   .9828872  (P)
-             |                                        .9562438   .9824802 (BC)
-------------------------------------------------------------------------------
-
 . 
 . matrix drop conf_matrix
 
 . scalar drop TN FN FP TP Sensitivity Specificity Accuracy Prevalence
 
-. *ascribed
-. gen dem_pred_bin_1066a25 = (k_fold_dem_pred_1066_av >= .25) if !missing(k_fold_dem_pr
-> ed_1066_av)
+. 
+. * using ascribed cutpoint of .25
+. 
+. gen dem_pred_bin_1066a25 = (k_fold_dem_pred_1066_av >= .25) if !missing(k_fold_dem_pred_1066_av)
 
 . tab dem_pred_bin_1066a25
 
@@ -343,15 +296,15 @@ Predicted Prevalence for 1066 .25: 20.07874
 . gen cogtot27_imp2002_categorical = 2 if cogtot27_imp2002 < 7
 (417 missing values generated)
 
-. replace cogtot27_imp2002_categorical = 1 if cogtot27_imp2002 >= 7 & cogtot27_imp2002 
-> < 12
+. replace cogtot27_imp2002_categorical = 1 if cogtot27_imp2002 >= 7 & cogtot27_imp2002 < 12
 (174 real changes made)
 
 . replace cogtot27_imp2002_categorical = 0 if cogtot27_imp2002 >= 12
 (243 real changes made)
 
 . 
-. *binary tics
+. * binary cutpoint based on ascribed less than or equal to 6
+. 
 . gen dem_pred_lwa = 0
 
 . replace dem_pred_lwa = 1 if cogtot27_imp2002 >= 0 & cogtot27_imp2002 <= 6
@@ -611,8 +564,7 @@ Predicted Prevalence for lasso ascribed: 29.724409
 
 . 
 . ** education gradients [for all cutpoints]
-. foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_lw
-> a expert_dem hurd_dem lasso_dem {
+. foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_lwa expert_dem hurd_dem lasso_dem {
   2.         qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat
   3.         margins educat, post  // Only use 'post' if necessary
   4.         eststo `dem_var'
@@ -798,44 +750,81 @@ Expression: Pr(lasso_dem), predict()
      Total |       417         91 |       508 
 
 . 
-. *there are no cases of dementia in the younger group for the langa-weir
-. tabulate AAGE_cat educat if dem_pred_lwa == 1
+. * Mean and SD for COGSCORE
+. summarize COGSCORE
 
-           |              educat
-  AAGE_cat |         1          2          3 |     Total
------------+---------------------------------+----------
-         1 |        30          5          0 |        35 
-         2 |        41         10          5 |        56 
------------+---------------------------------+----------
-     Total |        71         15          5 |        91 
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+    COGSCORE |        508    14.27912    2.513749          5    17.1875
 
 . 
-. tab educat hurd_dem
+. * Mean and SD for RELSCORE
+. summarize RELSCORE
 
-           |       hurd_dem
-    educat |         0          1 |     Total
------------+----------------------+----------
-         1 |       158         72 |       230 
-         2 |        92         31 |       123 
-         3 |       131         24 |       155 
------------+----------------------+----------
-     Total |       381        127 |       508 
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+    RELSCORE |        508    1.553072    2.110364          0       13.5
 
-. tab educat lasso_dem
+. 
+. * Mean and SD for 10 Word delayed recall
+. summarize aRECALLcs
 
-           |       lasso_dem
-    educat |         0          1 |     Total
------------+----------------------+----------
-         1 |       140         90 |       230 
-         2 |        88         35 |       123 
-         3 |       129         26 |       155 
------------+----------------------+----------
-     Total |       357        151 |       508 
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+   aRECALLcs |        508    4.541339     2.50606          0         10
 
+. 
+. * Frequency distribution for Sex
+. tabulate ragender
+
+ragender: r |
+     gender |      Freq.     Percent        Cum.
+------------+-----------------------------------
+     1.male |        226       44.49       44.49
+   2.female |        282       55.51      100.00
+------------+-----------------------------------
+      Total |        508      100.00
+
+. 
+. * Frequency distribution for Age
+. tabulate AAGE_cat
+
+   AAGE_cat |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |        258       50.79       50.79
+          2 |        250       49.21      100.00
+------------+-----------------------------------
+      Total |        508      100.00
+
+. summarize AAGE
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+        AAGE |        508    79.68898    6.113789         70         97
+
+. 
+. * Frequency distribution for Education
+. tabulate educat
+
+     educat |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |        230       45.28       45.28
+          2 |        123       24.21       69.49
+          3 |        155       30.51      100.00
+------------+-----------------------------------
+      Total |        508      100.00
+
+. summarize EDYRS
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+       EDYRS |        508    10.76378    4.136157          0         17
+
+. 
 . 
 . log close
       name:  <unnamed>
        log:  /hdir/0/chrissoria/1066/ADAMS_1066_aggressive_98_to_0.log
   log type:  text
- closed on:  17 May 2024, 21:14:55
----------------------------------------------------------------------------------------
+ closed on:  12 Jun 2024, 18:59:32
+-------------------------------------------------------------------------------------------------------------------------

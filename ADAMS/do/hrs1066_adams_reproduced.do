@@ -1,9 +1,3 @@
-*classifying 98 to 0 in the cogscore
-*98 in the ADAMS data means I don't know (incorrect)
-*however, the original 10/66 didn't provide an i don't know response (just correct or incorrect)
-*the decision is to A. recode to incorrect or B. recode to missing
-*in the previous version I recoded to missing, in this version I will recode to incorrect
-
 clear all
 capture log close
 cd "/hdir/0/chrissoria/1066/"
@@ -17,49 +11,29 @@ use "/hdir/0/chrissoria/ADAMS/DTA/ADAMS_WAVE_A_aggressive.dta", clear
 **********************************
 * replicate COGSCORE [10/66] and RELSCORE [10/66] in ADAMS
 * started: 12/03/2021
-* last update: 08/01/2023
+* last update: 06/12/2024
 **********************************
 
-**
+* Compare the 10/66 algorithm with the following measures (download links provided):
 
-/*First I'm going to create the langa-weir 27-point score using the existing the ADAMS data.
-The 27-point scale includes: 1) immediate and delayed 10-noun free recall test to measure
-memory (0 to 20 points); 2) a serial sevens subtraction test to measure working memory (0 to 5
-points); and 3) a counting backwards test to measure speed of mental processing (0 to 2 points).
+* HRS Core Interview Data
+* https://hrsdata.isr.umich.edu/data-products/rand-hrs-archived-data-products
+* Each individual with an HRS Core Interview record is included.
 
-Backwards Count starting from 20 and 86
-
-ANIMMCR1 = 10 point immediate recall sum (first attempt)
-ANDELCOR = 10 point delayed recall sum
-ANSER7T = 0-5 point serial sevens score
-ANBWC201 = 0-1 score for counting backwards from 20
-ANBWC861 = 0-1 score for counting backwards from 86
-
-*/
-
-*we're comparing these algorithms
-
-** https://hrsdata.isr.umich.edu/data-products/rand-hrs-archived-data-products
-* Every individual who has ever completed an HRS Core Interview has a record in this file.
 merge 1:1 hhidpn using "/hdir/0/chrissoria/ADAMS/DTA/randhrs1992_2016v2.dta", keepusing (raeduc raracem rahispan ragender) gen(_merge5)
 keep if _merge5 == 3
-**
 
-**https://hrsdata.isr.umich.edu/data-products/cross-wave-imputation-cognitive-functioning-measures-1992-2020
-* The Cross-Wave Imputation of Cognitive Functioning Measures: 1992-2020 (Final, Version 3.0) data release contains imputations for cognitive functioning data for HRS 1992 through 2020.
+* Cross-Wave Imputation of Cognitive Functioning Measures: 1992-2020 (Version 3.0)
+* https://hrsdata.isr.umich.edu/data-products/cross-wave-imputation-cognitive-functioning-measures-1992-2020
 
 merge 1:1 hhidpn using "/hdir/0/chrissoria/ADAMS/DTA/cogfinalimp_9520wide.dta", keepusing (cogtot27_imp2000 cogtot27_imp2002 cogfunction2000 cogfunction2002) gen(_merge3)
 keep if _merge3 == 3
-**
 
-/* https://hrsdata.isr.umich.edu/data-products/gianattasio-power-predicted-dementia-probability-scores-and-dementia-classifications
-Gianattasio-Power Predicted Dementia Probability Scores and Dementia Classifications
-
-*/
+* Gianattasio-Power Predicted Dementia Probability Scores and Dementia Classifications
+* https://hrsdata.isr.umich.edu/data-products/gianattasio-power-predicted-dementia-probability-scores-and-dementia-classifications
 
 merge 1:1 hhidpn using "/hdir/0/chrissoria/ADAMS/DTA/hrsdementia_2021_1109_2002.dta", keepusing (expert_dem hurd_dem lasso_dem hurd_p expert_p lasso_p) gen(_merge4)
 keep if _merge4 == 3
-**
 
 destring hurd_p expert_p lasso_p, force replace
 
@@ -77,11 +51,8 @@ gen educat = .
 	replace educat = 2 if raeduc == 3
 	replace educat = 3 if raeduc == 4 | raeduc == 5
 
-*chris adding this in based on Jordan's instruction
-
 foreach i in A{
 
-*variable BDFDX1 not found
 codebook `i'DFDX1
 
 tab `i'DFDX1
@@ -124,24 +95,39 @@ tab `i'DFDX1 if cognormal==1 //307 normal
 * COGSCORE
 ****************
 
-*chris adding this
 rename ANAFTOT aANIMALS
+* Animal Fluency
 rename ANWM1TOT aSTORY
+* Logical memory immediate recall
 rename ANMSE17 aPENCIL
+* Name pencil
 rename ANMSE7 aREPEAT
+* Sentence repeat
 rename ANMSE16 aWATCH
+* Name watch
 rename ANMSE8 aTOWN
+* town
 rename ANPRES aCHIEF
+* Name of political leader
 rename ANMSE10 aSTREET
+* name street
 rename ANMSE6 aADDRESS
+* name address 
 rename ANMSE3 aMONTH
+* recite month 
 rename ANMSE5 aDAY
+* recite day 
 rename ANMSE1 aYEAR
+* recite year
 rename ANMSE2 aSEASON
+* recite season
 rename ANMSE22 aPENTAG
+*Constructional praxis Copying
 
 
-*recoding everything that's reported as missing for whatever reason as missing  
+* Recode all missing values to . (missing)
+* Set 98 to 0 in cogscore (98 means "incorrect" in ADAMS)
+* Note: Original 10/66 data only had "correct" or "incorrect" responses, no "I don't know" option
 foreach var in aPENCIL aWATCH aREPEAT aTOWN aCHIEF aSTREET aADDRESS aMONTH aDAY aYEAR aSEASON aPENTAG {
 	recode `var' (97 = .)
 	recode `var' (98 = 0)
@@ -158,13 +144,10 @@ foreach var in aANIMALS aSTORY{
 recode aWATCH 2 = 1
 recode aPENCIL 2 = 1
 
-*below is what already was (haven't added two variables i found
-
 sum aPENCIL aWATCH aREPEAT aTOWN aCHIEF aSTREET aADDRESS aMONTH aDAY aYEAR aSEASON aPENTAG
 gen count = aPENCIL + aWATCH + aREPEAT + aTOWN + aCHIEF + aSTREET + aADDRESS + aMONTH + aDAY + aYEAR + aSEASON + aPENTAG
 
-*I changed the 23 to 33 based on the survey question
-* if we leave as 23 some people will have a score for animtot that's greater than 1
+* This ensures no animtot score exceeds 1
 sum aANIMALS
 gen animtot=aANIMALS/33
 tab animtot, miss
@@ -186,7 +169,7 @@ foreach var in ANMSE20F ANMSE20L ANMSE20R {
 gen aPAPER = ANMSE20F + ANMSE20L + ANMSE20R
 tab aPAPER, miss
 
-*check to see if there's one or two variables driving the missing
+* Check if specific variables are causing missing cogscores
 sum aWORDIMM aWORDDEL aPAPER aSTORY
 gen wordtot1=aWORDIMM/3
 tab wordtot1, miss
@@ -197,6 +180,8 @@ tab papertot, miss
 gen storytot=aSTORY/37 
 tab storytot, miss
 
+* Calculate the cogscore
+* Multiplying by 1.03125 is part of the original 10/66 algorithm, but not necessary for non-categorical classification
 sum count animtot wordtot1 wordtot2 papertot storytot
 gen COGSCORE = 1.03125*(count + animtot + wordtot1 + wordtot2 + papertot + storytot)
 sum COGSCORE, d
@@ -207,28 +192,33 @@ tab COGSCORE, miss
 * RELSCORE
 ***********
 
-***chris adding this***
 rename ADDRS1 aMEMORY
+* Inability to recall recent events
 gen aFRDNAME = ADDRS8 
+* Forget the names of friends
 gen aFAMNAME = ADDRS8
+* Forget the names of family members
 rename ADBL1G aLASTDAY
+* Inability to recall recent events
 rename ADDRS2 aORIENT
+* Place: Forgets where is, generally
 rename ADBL1E aLOSTOUT
+* Place: Inability to find way about familiar streets
 rename ADBL1D aLOSTIN
+* Place: Inability to find way about indoors
 rename ADBL1A aCHORES
+* Difficulty performing household chores
 rename ADBL1B aMONEY
+* Ability to handle money
 rename ADDRS3 aREASON
+* Change in ability to think and reason
 rename ADBL2EA aFEED
+* Difficulty Eating
 rename ADBL2DRE aDRESS
+* Difficulty Dressing
 rename ADBL2TO aTOILET
+* Difficulty with Sphincter control
 
-/*removing for now
-*****variables chris found*****
-* these comes from the informant questionairre which would require us to drop over 100 cases
-rename AGQ20 aPUTcs
-rename AGQ19 aKEPTcs
-*/
-*this comes from section C which has a high response rate
 rename AC99 aHOBBYcs
 rename ANDELCOR aRECALLcs
 
@@ -238,14 +228,14 @@ recode `var' (98 = .)
 recode `var' (99 = .)
 }
 
-*recoding according to what's in the excel document
-*I made this so that they are how the SPSS document wants it
 gen aWORDFIND = ADDRS7
+* Word finding difficulties.
 tab aWORDFIND, miss
 recode aWORDFIND (1=0) (2=.5) (3/max=1)
 tab aWORDFIND, miss
 
 gen aWORDWRG = ADDRS7
+* Use the wrong words in conversations.
 tab aWORDWRG, miss
 recode aWORDWRG (1=0) (2=.5) (3/max=1)
 tab aWORDWRG, miss
@@ -254,25 +244,9 @@ tab aMEMORY, miss
 recode aMEMORY (1 2=0) (3/max=1)
 tab aMEMORY, miss
 
-/*
-tab aPUTcs, miss
-recode aPUTcs (1 2 3=0) (4=.5) (5=1)
-tab aPUTcs, miss
-
-tab aKEPTcs, miss
-recode aKEPTcs (1 2 3=0) (4=.5) (5=1)
-tab aKEPTcs, miss
-
-
-tab aKEPT, miss
-recode aKEPT (1 2 3=0) (4=.5) (5=1)
-tab aKEPT, miss
-*/
-
 tab aHOBBYcs, miss
 recode aHOBBYcs (4=0) (1 2 3=1) (7 8=.)
 tab aHOBBYcs, miss
-
 
 tab aFRDNAME, miss
 recode aFRDNAME (1 2 3=0) (4=.5) (5 6=1)
@@ -319,7 +293,7 @@ tab aDRESS, miss
 *max score 3
 tab aTOILET
 
-*now let's cancel out in case of physical disabiity
+* instances of being unable to do something because of physical disability will not be counted
 rename ADBL2DRR aDRESSDIS
 recode aDRESSDIS (1 2=0) (0=1)
 replace aDRESS = 0 if aDRESSDIS == 1
@@ -346,11 +320,9 @@ egen MISS3 = rowmiss(aFEED aDRESS aTOILET)
 gen MISSTOT = (MISS3*3) + MISS1
 summ MISS*
 
-*this only works after we recode everything and have all variables (we have to change the 30 to 25 if we use the variables i added in)
-* and X if we don't add them in
 gen U = 23 / (23 - MISSTOT)
 summ U
-*max S should be 25
+
 gen S = (cond(missing(aMEMORY), 0, aMEMORY) + ///
                     cond(missing(aFRDNAME), 0, aFRDNAME) + ///
                     cond(missing(aFAMNAME), 0, aFAMNAME) + ///
@@ -397,21 +369,16 @@ egen in_samp2 = rowmiss(hurd_p expert_p lasso_p)
 keep if in_samp2 == 0
 count
 
-** table 2 **
+* Generate frequency tables for gender, age categories, and education categories
 tab female
 tab AAGE_cat
 tab educat
 
+*****     10/66    ******
 
-** table 3 **
-** identify cutpoints to maximize sensitivity and specificity [optimal]
-* http://www.haghish.com/statistics/stata-blog/stata-programming/download/cutpt.html
+*************************
 
-*****  1066 *****
-
-*****************
-
-* optimal
+* using optimal cutpoints
 
 local num_repeats 10
 
@@ -464,11 +431,12 @@ display "Accuracy for 1066 .25: " Accuracy
 display "Predicted Prevalence for 1066 optimal: " Prevalence
 
 roctab dementia k_fold_dem_pred_1066_opt
-rocreg dementia k_fold_dem_pred_1066_av
 
 matrix drop conf_matrix
 scalar drop TN FN FP TP Sensitivity Specificity Accuracy Prevalence
-*ascribed
+
+* using ascribed cutpoint of .25
+
 gen dem_pred_bin_1066a25 = (k_fold_dem_pred_1066_av >= .25) if !missing(k_fold_dem_pred_1066_av)
 tab dem_pred_bin_1066a25
 tab dementia dem_pred_bin_1066a25, matcell(conf_matrix)
@@ -506,7 +474,8 @@ gen cogtot27_imp2002_categorical = 2 if cogtot27_imp2002 < 7
 replace cogtot27_imp2002_categorical = 1 if cogtot27_imp2002 >= 7 & cogtot27_imp2002 < 12
 replace cogtot27_imp2002_categorical = 0 if cogtot27_imp2002 >= 12
 
-*binary tics
+* binary cutpoint based on ascribed less than or equal to 6
+
 gen dem_pred_lwa = 0
 replace dem_pred_lwa = 1 if cogtot27_imp2002 >= 0 & cogtot27_imp2002 <= 6
 
@@ -621,11 +590,26 @@ tab AAGE_cat hurd_dem
 tab AAGE_cat lasso_dem
 tab educat dem_pred_lwa
 
-*there are no cases of dementia in the younger group for the langa-weir
-tabulate AAGE_cat educat if dem_pred_lwa == 1
+* Mean and SD for COGSCORE
+summarize COGSCORE
 
-tab educat hurd_dem
-tab educat lasso_dem
+* Mean and SD for RELSCORE
+summarize RELSCORE
+
+* Mean and SD for 10 Word delayed recall
+summarize aRECALLcs
+
+* Frequency distribution for Sex
+tabulate ragender
+
+* Frequency distribution for Age
+tabulate AAGE_cat
+summarize AAGE
+
+* Frequency distribution for Education
+tabulate educat
+summarize EDYRS
+
 
 log close
 exit, clear
