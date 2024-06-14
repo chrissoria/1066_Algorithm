@@ -10,7 +10,7 @@ $$
 \text{relscore} = \left( \frac{S}{S - \text{misstot}} \right) \times S - (\text{miss1} + \text{miss3}) \times 9
 $$
 
-where \( S \) is:
+where \( S \) is the total sum of all responses that supply the relscore:
 
 $$
 S = \sum_{n=1}^{n} S_i
@@ -29,25 +29,43 @@ $$
 \text{miss3} = \sum_{i \in \{S_j \mid S_j \text{ is missing and max score is 3}\}} 1
 $$
 
-and misstot represents the total possible score obtainable by missing responses:
+and `misstot` represents the total possible score obtainable by missing responses:
 
 $$
-\text{miss3}) \times 3 + \text{miss1}
+\text{misstot} =  \text{miss3} \times 3 + \text{miss1}
 $$
 
 **Example Relscore Calculation:**
 
-If there are 4 missing values in `miss1` and `miss3` and the respondent scores 1.5 for \( S \):
+If there are 4 missing values in `miss1` and `miss3` and the respondent scores 1.5 for \( S \) in the original 10/66 data:
 
-- Left of the subtraction: `$ \left( \frac{30}{30 - 0} \right) \times 1.5 = 1.5 $`
-- Right of the subtraction: `$ 4 \times 9 = 36 $`
-- Total `relscore`: `$ 1.5 - 36 = -34.5 $`
+- Left of the subtraction: 
+
+$$ 
+\left( \frac{30}{30 - 0} \right) \times 1.5 = 1.5 
+$$
+
+- Right of the subtraction: 
+
+$$ 
+4 \times 9 = 36 
+$$
+
+- Total `relscore`: 
+
+$$ 
+1.5 - 36 = -34.5 
+$$
 
 This score becomes more negative as:
 A. Missingness increases.
 B. \( S \) trends towards 0.
 
+To resolve this problem, we propose the following solutions below.
+
 ### Potential Relscore Solutions
+
+To obtain a score that is more comparable to the original 10/66 formulation, we can simplify the `relscore`  in the following two ways: 
 
 1. **Remove the Subtraction Term:**
    - Upweights \( S \) assuming some missingness.
@@ -60,7 +78,7 @@ $$
 2. **Exclude Incomplete Responses:**
    - Only include respondents who answered all questions.
 
-The default in the do files is solution 1, with an option to switch to solution 2.
+The default in the do files is solution 1, with an option to switch to solution 2. Solution 1 assumes that missing responses are equally likely to be correct or incorrect, effectively increasing the `relscore` by half of the points possible from the missing responses. 
 
 ### Relscore in ADAMS (HRS) data
 
