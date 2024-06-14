@@ -33,6 +33,7 @@ B. \( S \) trends towards 0.
 1. **Remove the Subtraction Term:**
    - Upweights \( S \) assuming some missingness.
    - New formula:
+
 $$
 \text{relscore} = \left( \frac{30}{30 - \text{misstot}} \right) \times S
 $$
@@ -50,7 +51,7 @@ $$
 \text{relscore} = \left( \frac{23}{23 - \text{misstot}} \right) \times S
 $$
 
-# Datasets for Reproducing the Algorithm in ADAMS
+### Datasets for Reproducing the Algorithm in ADAMS 
 
 Here are the datasets that we use to reproduce the algorithm in ADAMS:
 
