@@ -11,4 +11,8 @@ $$
 \text{relscore} = \left( \frac{R}{R - \text{misstot}} \right) \times \sum_{n=1}^{r} S_i - (\text{miss1} + \text{miss3}) \times 9
 $$
 
-where \( S \) is defined as:
+where \( R \) is defined as the maximum possible score obtainable by the relscore
+
+And 
+
+\(r \) is defined as the total amount of questions that are supplying the relscore
