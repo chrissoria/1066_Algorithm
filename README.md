@@ -7,22 +7,41 @@ The Stata do files in this repository reproduce the original 10/66 algorithm usi
 The relative score (`relscore`) is calculated using:
 
 $$
-\text{relscore} = \left( \frac{30}{30 - \text{misstot}} \right) \times S - (\text{miss1} + \text{miss3}) \times 9
+\text{relscore} = \left( \frac{S}{S - \text{misstot}} \right) \times S - (\text{miss1} + \text{miss3}) \times 9
 $$
 
 where \( S \) is:
 
 $$
-S = \sum_{n=1}^{24} S_i
+S = \sum_{n=1}^{n} S_i
+$$
+
+
+The variable `miss1` is defined as the sum of all missing values in the \( S \) column where responses are binary (yes or no):
+
+$$
+\text{miss1} = \sum_{i \in \{S_j \mid S_j \text{ is missing and binary}\}} 1
+$$
+
+The variable `miss3` is defined as the sum of all missing values in the \( S \) column where the maximum possible score is 3:
+
+$$
+\text{miss3} = \sum_{i \in \{S_j \mid S_j \text{ is missing and max score is 3}\}} 1
+$$
+
+and misstot represents the total possible score obtainable by missing responses:
+
+$$
+\text{miss3}) \times 3 + \text{miss1}
 $$
 
 **Example Relscore Calculation:**
 
-If there are 4 negative values for `miss1` and `miss3` and the respondent scores 1.5 for \( S \):
+If there are 4 missing values in `miss1` and `miss3` and the respondent scores 1.5 for \( S \):
 
-- Left of the subtraction: \( \left( \frac{30}{30 - 0} \right) \times 1.5 = 1.5 \)
-- Right of the subtraction: \( 4 \times 9 = 36 \)
-- Total `relscore`: \( 1.5 - 36 = -34.5 \)
+- Left of the subtraction: `$ \left( \frac{30}{30 - 0} \right) \times 1.5 = 1.5 $`
+- Right of the subtraction: `$ 4 \times 9 = 36 $`
+- Total `relscore`: `$ 1.5 - 36 = -34.5 $`
 
 This score becomes more negative as:
 A. Missingness increases.
