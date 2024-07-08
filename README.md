@@ -2,12 +2,12 @@
 
 The Stata do files in this repository reproduce the original 10/66 algorithm using both waves of the 10/66 data. The original files are located in the `10_66` folder.
 
-### Relative Score Calculation
+### Relative Score Calculation in the Original 10/66 data
 
 The relative score (`relscore`) is calculated using:
 
 $$
-\text{relscore} = \left( \frac{S}{S - \text{misstot}} \right) \times S - (\text{miss1} + \text{miss3}) \times 9
+\text{relscore} = \left( \frac{S_max}{S_max - \text{misstot}} \right) \times S - (\text{miss1} + \text{miss3}) \times 9
 $$
 
 where \( S \) is the total sum of all responses that supply the relscore:

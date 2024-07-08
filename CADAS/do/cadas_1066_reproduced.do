@@ -205,8 +205,12 @@ gen cogscore = nametot + count + animtot + wordtot1 + wordtot2 + papertot + stor
 
 summarize cogscore
 
+histogram cogscore
+
 /* in CU the averae cogscore is 28.70772 
 in DR the average cogscore is 27.34616
+
+in 1066 it's 26.13309
 */
 
 ***** relscore ********
@@ -357,7 +361,8 @@ replace U = cond(missing(misstot), 0, U)
 
 gen relscore_cadas = U*S
 
-summarize relscore_cadas
+summarize relscore
+tab relscore, miss
 /* our relscore in DR is bigger than 10/66 by over a whole point.  
 in Cuba it's smaller by a half a point.
 
