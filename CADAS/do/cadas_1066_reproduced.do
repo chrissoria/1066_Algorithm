@@ -92,6 +92,11 @@ rename cs_32 pentag
 rename c_32 pentag_diss
 rename cs_40 animals
 rename c_40 animals_diss
+
+foreach var in c_11 c_12 c_13 c_21 c_22 c_23 {
+	replace `var' = 0 if `var' ==.i
+}
+
 gen wordimm = c_11 + c_12 + c_13
 gen worddel = c_21 + c_22 + c_23
 
@@ -105,6 +110,7 @@ foreach var in c_66a c_66b c_66c c_66d c_66e c_66f {
 	tab `var'
 	replace `var' = 1 if `var' == 0 | `var' == 1
 	replace `var' = 0 if `var' == 2
+	replace `var' = 0 if `var' == .i
 	summarize `var'
 }
 gen story = c_66a + c_66b + c_66c + c_66d + c_66e + c_66f
@@ -362,9 +368,8 @@ replace U = cond(missing(misstot), 0, U)
 gen relscore_cadas = U*S
 
 summarize relscore
-tab relscore, miss
 /* our relscore in DR is bigger than 10/66 by over a whole point.  
-in Cuba it's smaller by a half a point.
+in Cuba: 1.794301
 
 score in 10/66:
 
@@ -375,7 +380,7 @@ relscore_o~l |      6,799    2.271145    4.129672  -9.310345         30
 */
 
 summarize recall
-/* in CU the average recall is 3.402985
+/* in CU the average recall is 3.432124 
 in DR the average recall is 2.318493
 */
 
@@ -388,7 +393,6 @@ if "`impute_recall'" == "yes" {
 }
 
 gen dem1066_score = exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall) / (1 + exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall))
-tab dem1066_score, missing
 
 
 gen dem1066 = .
@@ -396,5 +400,13 @@ replace dem1066 = 1 if dem1066_score >= .5 & dem1066_score != .
 replace dem1066 = 0 if dem1066_score <.5 & dem1066_score != .
 
 summarize dem1066
-*dem1066_du~e |      6,783    .1167625    .3211607          0          1
-tab dem1066, missing
+*DR dem1066_du~e |      6,783    .1167625    .3211607          0          1
+*CU CADAS dem1066 |        911    .0351262       .1842          0          1
+
+*the below is only for analyzing the output
+
+keep pid relscore cogscore nametot count animals_diss animals animtot wordtot1 wordtot2 papertot c_66a c_66b c_66c c_66d c_66e c_66f story storytot pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town street store address month day year nod point pentag pentag_diss animals animals_diss chief longmem season c_11 c_12 c_13 wordimm c_21 c_22 c_23 worddel misstot activ mental memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason feed dress toilet recall dem1066_score dem1066
+
+order pid relscore cogscore nametot count animals_diss animals animtot wordtot1 wordtot2 papertot c_66a c_66b c_66c c_66d c_66e c_66f story storytot pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town street store address month day year nod point pentag pentag_diss animals animals_diss chief longmem season c_11 c_12 c_13 wordimm c_21 c_22 c_23 worddel misstot activ mental memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason feed dress toilet recall dem1066_score dem1066
+
+keep if cogscore == .
