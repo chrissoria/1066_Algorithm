@@ -6,7 +6,7 @@ set maxvar 100000
 set more off
 
 use "/hdir/0/chrissoria/ADAMS/DTA/ADAMS_WAVE_A_aggressive.dta", clear
-
+count
  
 **********************************
 * replicate COGSCORE [10/66] and RELSCORE [10/66] in ADAMS
@@ -50,6 +50,11 @@ gen educat = .
 	replace educat = 1 if raeduc == 1 | raeduc == 2
 	replace educat = 2 if raeduc == 3
 	replace educat = 3 if raeduc == 4 | raeduc == 5
+	
+gen race_cat = .
+	replace race_cat = 1 if raracem == 1 & rahispan == 0
+	replace race_cat = 2 if raracem == 2 & rahispan == 0
+	replace race_cat = 3 if rahispan == 1
 
 foreach i in A{
 
@@ -124,6 +129,8 @@ rename ANMSE2 aSEASON
 rename ANMSE22 aPENTAG
 *Constructional praxis Copying
 
+tab aPENCIL, miss
+
 
 * Recode all missing values to . (missing)
 * Set 98 to 0 in cogscore (98 means "incorrect" in ADAMS)
@@ -146,6 +153,9 @@ recode aPENCIL 2 = 1
 
 sum aPENCIL aWATCH aREPEAT aTOWN aCHIEF aSTREET aADDRESS aMONTH aDAY aYEAR aSEASON aPENTAG
 gen count = aPENCIL + aWATCH + aREPEAT + aTOWN + aCHIEF + aSTREET + aADDRESS + aMONTH + aDAY + aYEAR + aSEASON + aPENTAG
+
+egen missing_count_cogscore = rowmiss(aPENCIL aWATCH aREPEAT aTOWN aCHIEF aSTREET aADDRESS aMONTH aDAY aYEAR aSEASON aPENTAG)
+tab missing_count_cogscore
 
 * This ensures no animtot score exceeds 1
 sum aANIMALS
@@ -347,8 +357,62 @@ summ RELSCORE
 
 log using "/hdir/0/chrissoria/1066/ADAMS_1066_aggressive_98_to_0.log", text replace
 
+drop if ADFDX1 == .
+
+count
+gen white = 0
+replace white = 1 if race_cat == 1
+
+gen black = 0
+replace black = 1 if race_cat == 2
+
+gen hispanic = 0
+replace hispanic = 1 if race_cat == 3
+
+gen college_grad = 0
+replace college_grad = 1 if raeduc > 2
+
+replace female = 0
+replace female = 1 if ragender == 2
+
+gen married = 0
+replace married = 1 if AAMARRD == 2
+
+gen core_proxy = 0
+replace core_proxy = 1 if HPROXY == 5
+
+summarize AAGE
+summarize white
+summarize black
+summarize hispanic
+summarize college_grad
+summarize female
+summarize married
+summarize dementia
+summarize AACOGSTR
+
+/*      AACOGSTR     
+	  414           1.  Low
+
+           381           2.  Borderline
+
+           347           3.  Low Normal
+
+           270           4.  Moderate Normal
+
+           358           5.  High Normal
+	   
+*/
+summarize core_proxy
+
+* Calculate means for the SES vars before subet
+summarize AAGE white black hispanic college_grad female married dementia AACOGSTR core_proxy
+matrix means = r(mean)
+
 ** set sample inclusion
+
 egen in_samp = rowmiss(AAGE RELSCORE COGSCORE dementia cogtot27_imp2002 ragender raeduc)
+egen in_samp2 = rowmiss(hurd_p expert_p lasso_p)
 *525 people have no missingness across the board, mostly due to the cogscore variable
 *nobody is missing age
 egen in_AAGE = rowmiss(AAGE)
@@ -362,17 +426,28 @@ egen in_dementia = rowmiss(dementia)
 egen in_cogtot27_imp2002 = rowmiss(cogtot27_imp2002)
 *nobody is missing gender or education
 egen in_ragender = rowmiss(ragender)
+count
+
+preserve
+keep if in_samp2 > 0 | in_samp > 0
+
+* Calculate means for those being dropped in the subset
+summarize AAGE white black hispanic college_grad female married dementia AACOGSTR core_proxy
+restore
+
 keep if in_samp == 0
 count
-egen in_samp2 = rowmiss(hurd_p expert_p lasso_p)
-
 keep if in_samp2 == 0
 count
+
+* Calculate means for the SES vars after subet
+summarize AAGE white black hispanic college_grad female married dementia AACOGSTR core_proxy
 
 * Generate frequency tables for gender, age categories, and education categories
 tab female
 tab AAGE_cat
 tab educat
+tab race_cat
 
 *****     10/66    ******
 
@@ -409,6 +484,73 @@ gen total_pred = k_fold_dem_pred_1066_1 + k_fold_dem_pred_1066_2 + k_fold_dem_pr
 gen k_fold_dem_pred_1066_av = total_pred/10
 
 cutpt dementia k_fold_dem_pred_1066_av
+
+local num_repeats 10  
+
+foreach r in 1 2 3 {
+    preserve 
+    keep if race_cat == `r'
+    
+    forvalues n = 1/`num_repeats' {
+        set seed `n'010
+        gen ranum_`r' = uniform()
+        sort ranum_`r'
+        drop ranum_`r'
+        
+        gen fold_`n'_`r' = mod(_n, 10) + 1
+        gen k_fold_dem_pred_1066_`n'_`r' = .
+        
+        display "Running iteration `n' for race category `r'"
+        
+        forvalues i = 1/10 {  
+            local train "fold_`n'_`r' != `i'"
+            local test "fold_`n'_`r' == `i'"
+            
+            * Perform Firth's Penalized Logistic Regression
+            firthlogit dementia COGSCORE RELSCORE aRECALLcs if `train'
+            
+            * Generate linear predictions
+            predict xb_p_`n'_`r'_`i' if `test', xb
+            
+            * Cap xb to prevent numerical issues
+            replace xb_p_`n'_`r'_`i' = 20 if xb_p_`n'_`r'_`i' > 20
+            replace xb_p_`n'_`r'_`i' = -20 if xb_p_`n'_`r'_`i' < -20
+            
+            * Convert linear predictions to probabilities using the logistic function
+            gen prob_`n'_`r'_`i' = 1 / (1 + exp(-xb_p_`n'_`r'_`i'))
+            
+            display "Predicted probabilities for iteration `n' and fold `i':"
+            summarize prob_`n'_`r'_`i'
+            
+            * Replace the predicted probabilities in the designated variable
+            replace k_fold_dem_pred_1066_`n'_`r' = prob_`n'_`r'_`i' if `test'
+        }
+    }
+    
+    * Aggregate predicted probabilities across folds
+    gen total_pred_`r' = 0
+    forvalues i = 1/10 {
+        replace total_pred_`r' = total_pred_`r' + k_fold_dem_pred_1066_`i'_`r'
+    }
+    keep hhidpn total_pred_`r'
+    save data/total_pred_`r'.dta, replace
+    restore
+}
+
+merge 1:1 hhidpn using "data/total_pred_1.dta"
+drop _merge
+
+merge 1:1 hhidpn using "data/total_pred_2.dta"
+drop _merge
+
+merge 1:1 hhidpn using "data/total_pred_3.dta"
+drop _merge
+
+gen total_pred_race_specific = total_pred_1
+replace total_pred_race_specific = total_pred_2 if total_pred_race_specific == .
+replace total_pred_race_specific = total_pred_3 if total_pred_race_specific == .
+
+gen k_fold_dem_pred_1066_av_rs = total_pred_race_specific/10
 
 gen k_fold_dem_pred_1066_opt = (k_fold_dem_pred_1066_av >= .1277115) if !missing(k_fold_dem_pred_1066_av)
 tab dementia k_fold_dem_pred_1066_opt, matcell(conf_matrix)
@@ -463,6 +605,33 @@ roctab dementia dem_pred_bin_1066a25
 matrix drop conf_matrix
 scalar drop TN FN FP TP Sensitivity Specificity Accuracy Prevalence
 
+* using ascribed cutpoint of .25 with race specific probabilities
+
+gen dem_pred_bin_1066a25_rs = (k_fold_dem_pred_1066_av_rs >= .25) if !missing(k_fold_dem_pred_1066_av)
+tab dem_pred_bin_1066a25_rs
+tab dementia dem_pred_bin_1066a25_rs, matcell(conf_matrix)
+
+matrix list conf_matrix
+
+scalar TN = conf_matrix[1,1]
+scalar FN = conf_matrix[2,1]
+scalar FP = conf_matrix[1,2]
+scalar TP = conf_matrix[2,2]
+
+scalar Sensitivity = TP / (TP + FN)
+scalar Specificity = TN / (TN + FP)
+scalar Accuracy = (TP + TN) / (TP + TN + FP + FN)
+scalar Prevalence = ((TP+FP) / (TP + TN + FP + FN))*100
+display TP+FP
+
+display "Sensitivity for 1066 .25 race specific: " Sensitivity
+display "Specificity for 1066 .25 race specific: " Specificity
+display "Accuracy for 1066 .25 race specific: " Accuracy
+display "Predicted Prevalence for 1066 .25 race specific: " Prevalence
+
+roctab dementia dem_pred_bin_1066a25
+matrix drop conf_matrix
+scalar drop TN FN FP TP Sensitivity Specificity Accuracy Prevalence
 *****  hrs, tics   ******
 
 *************************
@@ -574,10 +743,16 @@ display "Predicted Prevalence for lasso ascribed: " Prevalence
 
 roctab dementia lasso_dem
 
-** education gradients [for all cutpoints]
-foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_lwa expert_dem hurd_dem lasso_dem {
+** education gradients
+foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_bin_1066a25_rs dem_pred_lwa expert_dem hurd_dem lasso_dem {
         qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat
         margins educat, post  // Only use 'post' if necessary
+        eststo `dem_var'
+}
+** race gradients
+foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_bin_1066a25_rs dem_pred_lwa expert_dem hurd_dem lasso_dem {
+        qui: logit `dem_var' ib2.race_cat AAGE AAGE2 if AAGE_cat
+        margins race_cat, post  // Only use 'post' if necessary
         eststo `dem_var'
 }
 
