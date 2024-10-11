@@ -487,6 +487,9 @@ foreach r in 1 2 3 {
     preserve 
     keep if race_cat == `r'
     cutpt dementia k_fold_dem_pred_1066_av
+    gen k_fold_dem_pred_1066_lat = (k_fold_dem_pred_1066_av >= .88367432) if !missing(k_fold_dem_pred_1066_av)
+    roctab dementia k_fold_dem_pred_1066_lat
+    tab dementia k_fold_dem_pred_1066_lat
     restore
     
     /* results:
@@ -528,7 +531,7 @@ local num_repeats 10
 foreach r in 1 2 3 {
     preserve 
     keep if race_cat == `r'
-    
+    quietly {
     forvalues n = 1/`num_repeats' {
         set seed `n'010
         gen ranum_`r' = uniform()
@@ -557,6 +560,7 @@ foreach r in 1 2 3 {
             summarize prob_`n'_`r'_`i'
             
             replace k_fold_dem_pred_1066_`n'_`r' = prob_`n'_`r'_`i' if `test'
+	}
         }
     }
     
@@ -641,9 +645,10 @@ matrix drop conf_matrix
 scalar drop TN FN FP TP Sensitivity Specificity Accuracy Prevalence
 
 * using race-specific optimal cutpoints
-gen dem_pred_bin_1066_opt_rs = (k_fold_dem_pred_1066_av_rs >= .08938869) if (!missing(k_fold_dem_pred_1066_av) & race_cat == 1)
-replace dem_pred_bin_1066_opt_rs = (k_fold_dem_pred_1066_av_rs >= .25129401) if (!missing(k_fold_dem_pred_1066_av) & race_cat == 2)
-replace dem_pred_bin_1066_opt_rs = (k_fold_dem_pred_1066_av_rs >= .88367432) if (!missing(k_fold_dem_pred_1066_av) & race_cat == 3)
+gen dem_pred_bin_1066_opt_rs = 0
+replace dem_pred_bin_1066_opt_rs = 1 if (k_fold_dem_pred_1066_av >= .08938869) & (!missing(k_fold_dem_pred_1066_av) & race_cat == 1)
+replace dem_pred_bin_1066_opt_rs = 1 if (k_fold_dem_pred_1066_av >= .25129401) & (!missing(k_fold_dem_pred_1066_av) & race_cat == 2)
+replace dem_pred_bin_1066_opt_rs = 1 if (k_fold_dem_pred_1066_av >= .88367432) & (!missing(k_fold_dem_pred_1066_av) & race_cat == 3)
 
 tab dem_pred_bin_1066_opt_rs
 tab dementia dem_pred_bin_1066_opt_rs, matcell(conf_matrix)
