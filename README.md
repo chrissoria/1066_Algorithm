@@ -7,7 +7,7 @@ The Stata do files in this repository reproduce the original 10/66 algorithm usi
 The relative score (`relscore`) is calculated using:
 
 $$
-\text{relscore} = \left( \frac{S_max}{S_max - \text{misstot}} \right) \times S - (\text{miss1} + \text{miss3}) \times 9
+\text{relscore} = \left( \frac{Smax}{Smax - \text{misstot}} \right) \times S - (\text{miss1} + \text{miss3}) \times 9
 $$
 
 where \( S \) is the total sum of all responses that supply the relscore:
