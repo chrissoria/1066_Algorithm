@@ -31,18 +31,23 @@ local path = cond("`user'" == "Chris", "`Chris'", "`Will'")
 cd "`path'"
 
 local wave 1
+local full_sample "no"
 
 local drop_missing_from_relscore "no"
 local drop_missing_from_cogscore "yes"
 
 
-***** SCRIPT STARTS HERE *********
+***** SETUP STARTS HERE *********
 
 **********************************
 
 if `wave' == 1 {
-    *use "`path'/data/1066_Baseline_data.dta"
-    import delimited "`path'/data/prevalence_db.csv", delimiter(comma) 
+	if "`full_sample'" == "yes" {
+		import delimited "`path'/data/prevalence_db.csv", delimiter(comma) 
+	}
+	else {
+		use "`path'/data/1066_Baseline_data.dta"
+	}
 }
 else if `wave' == 2 {
     use "`path'/data/1066_full_follow_up_Caribbean.dta"
@@ -70,6 +75,8 @@ else if `wave' == 1 {
     rename `var' `=lower("`var'")'
     
     }
+    
+    if "`full_sample'" == "yes" {
     gen countryid = .
     replace countryid = 1 if householdcountry == "Cuba"
     replace countryid = 2 if householdcountry == "Dominican Republic"
@@ -79,10 +86,21 @@ else if `wave' == 1 {
     replace countryid = 6 if householdcountry == "Puerto Rico"
     
     gen pid = (countryid*1000000) + (householdid*100) + particid
+    }
+    else {
+    	gen pid = (countryid*1000000) + (houseid*100) + particid
+    }
+    
 }
 
 if `wave' == 1 {
-    log using 1066_algo_w1.log, text replace
+	
+	if "`full_sample'" == "yes" {
+		log using 1066_algo_w1_full_sample.log, text replace
+	}
+	else {
+		log using 1066_algo_w1.log, text replace
+	}
 }
 else if `wave' == 2 {
     log using 1066_algo_w2.log, text replace
@@ -91,7 +109,7 @@ else if `wave' == 2 {
 *************COGSCORE******************
 
 
-**************************************
+***************************************
 
 /*
 
@@ -362,11 +380,11 @@ ADAMS
 */
 
 gen educat = .
-	replace educat = 1 if peduc == 1 | peduc == 2
-	replace educat = 2 if peduc == 4 | peduc == 3
-	replace educat = 3 if peduc == 5
+	replace educat = 1 if peduc == 1 | peduc == 2 //less than primary
+	replace educat = 2 if peduc == 3 //completed primary
+	replace educat = 3 if peduc == 4 | peduc == 5 //secondary school or above
 
-label define educat_label 1 "Less than high school" 2 "High school graduate" 3 "college graduate"
+label define educat_label 1 "Less than primary" 2 "completed primary" 3 "secondary school and above"
 label values educat educat_label
 	
 gen agesq = age^2

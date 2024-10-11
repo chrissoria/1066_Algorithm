@@ -453,8 +453,6 @@ tab race_cat
 
 *************************
 
-* using optimal cutpoints
-
 local num_repeats 10
 
 forvalues r = 1/`num_repeats' {
@@ -482,8 +480,48 @@ forvalues r = 1/`num_repeats' {
 gen total_pred = k_fold_dem_pred_1066_1 + k_fold_dem_pred_1066_2 + k_fold_dem_pred_1066_3 + k_fold_dem_pred_1066_4 + k_fold_dem_pred_1066_5 + k_fold_dem_pred_1066_6 + k_fold_dem_pred_1066_7 + k_fold_dem_pred_1066_8 + k_fold_dem_pred_1066_9 + k_fold_dem_pred_1066_10
 
 gen k_fold_dem_pred_1066_av = total_pred/10
-
 cutpt dementia k_fold_dem_pred_1066_av
+
+* below I'm producing race-specific cutpoints
+foreach r in 1 2 3 {
+    preserve 
+    keep if race_cat == `r'
+    cutpt dementia k_fold_dem_pred_1066_av
+    restore
+    
+    /* results:
+Empirical cutpoint estimation
+Method:                                Liu
+Reference variable:                    dementia (0=neg, 1=pos)
+Classification variable:               k_fold_dem_pred_1066_av
+Empirical optimal cutpoint:            .08938869
+Sensitivity at cutpoint:               0.98
+Specificity at cutpoint:               0.93
+Area under ROC curve at cutpoint:      0.95
+(414 observations deleted)
+
+Empirical cutpoint estimation
+Method:                                Liu
+Reference variable:                    dementia (0=neg, 1=pos)
+Classification variable:               k_fold_dem_pred_1066_av
+Empirical optimal cutpoint:            .25129401
+Sensitivity at cutpoint:               0.90
+Specificity at cutpoint:               0.86
+Area under ROC curve at cutpoint:      0.88
+(459 observations deleted)
+
+Empirical cutpoint estimation
+Method:                                Liu
+Reference variable:                    dementia (0=neg, 1=pos)
+Classification variable:               k_fold_dem_pred_1066_av
+Empirical optimal cutpoint:            .88367432
+Sensitivity at cutpoint:               1.00
+Specificity at cutpoint:               1.00
+Area under ROC curve at cutpoint:      1.00
+*/
+}
+
+* below I'm running race-specific models to obtain race-specific probabilities 
 
 local num_repeats 10  
 
@@ -506,23 +544,18 @@ foreach r in 1 2 3 {
             local train "fold_`n'_`r' != `i'"
             local test "fold_`n'_`r' == `i'"
             
-            * Perform Firth's Penalized Logistic Regression
             firthlogit dementia COGSCORE RELSCORE aRECALLcs if `train'
             
-            * Generate linear predictions
             predict xb_p_`n'_`r'_`i' if `test', xb
             
-            * Cap xb to prevent numerical issues
             replace xb_p_`n'_`r'_`i' = 20 if xb_p_`n'_`r'_`i' > 20
             replace xb_p_`n'_`r'_`i' = -20 if xb_p_`n'_`r'_`i' < -20
             
-            * Convert linear predictions to probabilities using the logistic function
             gen prob_`n'_`r'_`i' = 1 / (1 + exp(-xb_p_`n'_`r'_`i'))
             
             display "Predicted probabilities for iteration `n' and fold `i':"
             summarize prob_`n'_`r'_`i'
             
-            * Replace the predicted probabilities in the designated variable
             replace k_fold_dem_pred_1066_`n'_`r' = prob_`n'_`r'_`i' if `test'
         }
     }
@@ -552,7 +585,8 @@ replace total_pred_race_specific = total_pred_3 if total_pred_race_specific == .
 
 gen k_fold_dem_pred_1066_av_rs = total_pred_race_specific/10
 
-gen k_fold_dem_pred_1066_opt = (k_fold_dem_pred_1066_av >= .1277115) if !missing(k_fold_dem_pred_1066_av)
+* using optimal cutpoints, everyone
+gen k_fold_dem_pred_1066_opt = (k_fold_dem_pred_1066_av >= .11659183) if !missing(k_fold_dem_pred_1066_av)
 tab dementia k_fold_dem_pred_1066_opt, matcell(conf_matrix)
 matrix list conf_matrix
 
@@ -577,9 +611,10 @@ roctab dementia k_fold_dem_pred_1066_opt
 matrix drop conf_matrix
 scalar drop TN FN FP TP Sensitivity Specificity Accuracy Prevalence
 
-* using ascribed cutpoint of .25
+* using ascribed cutpoint of .25, everyone
 
 gen dem_pred_bin_1066a25 = (k_fold_dem_pred_1066_av >= .25) if !missing(k_fold_dem_pred_1066_av)
+
 tab dem_pred_bin_1066a25
 tab dementia dem_pred_bin_1066a25, matcell(conf_matrix)
 
@@ -605,9 +640,39 @@ roctab dementia dem_pred_bin_1066a25
 matrix drop conf_matrix
 scalar drop TN FN FP TP Sensitivity Specificity Accuracy Prevalence
 
+* using race-specific optimal cutpoints
+gen dem_pred_bin_1066_opt_rs = (k_fold_dem_pred_1066_av_rs >= .08938869) if (!missing(k_fold_dem_pred_1066_av) & race_cat == 1)
+replace dem_pred_bin_1066_opt_rs = (k_fold_dem_pred_1066_av_rs >= .25129401) if (!missing(k_fold_dem_pred_1066_av) & race_cat == 2)
+replace dem_pred_bin_1066_opt_rs = (k_fold_dem_pred_1066_av_rs >= .88367432) if (!missing(k_fold_dem_pred_1066_av) & race_cat == 3)
+
+tab dem_pred_bin_1066_opt_rs
+tab dementia dem_pred_bin_1066_opt_rs, matcell(conf_matrix)
+
+matrix list conf_matrix
+
+scalar TN = conf_matrix[1,1]
+scalar FN = conf_matrix[2,1]
+scalar FP = conf_matrix[1,2]
+scalar TP = conf_matrix[2,2]
+
+scalar Sensitivity = TP / (TP + FN)
+scalar Specificity = TN / (TN + FP)
+scalar Accuracy = (TP + TN) / (TP + TN + FP + FN)
+scalar Prevalence = ((TP+FP) / (TP + TN + FP + FN))*100
+display TP+FP
+
+display "Sensitivity for 1066 optimal race specific: " Sensitivity
+display "Specificity for 1066 optimal race specific: " Specificity
+display "Accuracy for 1066 optimal race specific: " Accuracy
+display "Predicted Prevalence for 1066 optimal race specific: " Prevalence
+
+roctab dementia dem_pred_bin_1066_opt_rs
+matrix drop conf_matrix
+scalar drop TN FN FP TP Sensitivity Specificity Accuracy Prevalence
+
 * using ascribed cutpoint of .25 with race specific probabilities
 
-gen dem_pred_bin_1066a25_rs = (k_fold_dem_pred_1066_av_rs >= .25) if !missing(k_fold_dem_pred_1066_av)
+gen dem_pred_bin_1066a25_rs = (k_fold_dem_pred_1066_av_rs >= .25) if !missing(k_fold_dem_pred_1066_av_rs)
 tab dem_pred_bin_1066a25_rs
 tab dementia dem_pred_bin_1066a25_rs, matcell(conf_matrix)
 
@@ -629,7 +694,7 @@ display "Specificity for 1066 .25 race specific: " Specificity
 display "Accuracy for 1066 .25 race specific: " Accuracy
 display "Predicted Prevalence for 1066 .25 race specific: " Prevalence
 
-roctab dementia dem_pred_bin_1066a25
+roctab dementia dem_pred_bin_1066a25_rs
 matrix drop conf_matrix
 scalar drop TN FN FP TP Sensitivity Specificity Accuracy Prevalence
 *****  hrs, tics   ******
@@ -744,13 +809,13 @@ display "Predicted Prevalence for lasso ascribed: " Prevalence
 roctab dementia lasso_dem
 
 ** education gradients
-foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_bin_1066a25_rs dem_pred_lwa expert_dem hurd_dem lasso_dem {
+foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_bin_1066_opt_rs dem_pred_bin_1066a25_rs dem_pred_lwa expert_dem hurd_dem lasso_dem {
         qui: logit `dem_var' ib2.educat AAGE AAGE2 if AAGE_cat
         margins educat, post  // Only use 'post' if necessary
         eststo `dem_var'
 }
 ** race gradients
-foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_bin_1066a25_rs dem_pred_lwa expert_dem hurd_dem lasso_dem {
+foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pred_bin_1066_opt_rs dem_pred_bin_1066a25_rs dem_pred_lwa expert_dem hurd_dem lasso_dem {
         qui: logit `dem_var' ib2.race_cat AAGE AAGE2 if AAGE_cat
         margins race_cat, post  // Only use 'post' if necessary
         eststo `dem_var'
