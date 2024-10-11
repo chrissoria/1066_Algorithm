@@ -1,0 +1,318 @@
+------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /hdir/0/chrissoria/1066/w1_cadas_1066_comparison_full.log
+  log type:  text
+ opened on:  11 Oct 2024, 10:29:43
+.         }
+.         else {
+.                 log using "/hdir/0/chrissoria/1066/w1_cadas_1066_comparison.log", text replace
+.         }
+. }
+
+. else if `wave' == 2 {
+.     log using "/hdir/0/chrissoria/1066/w2_cadas_1066_comparison.log", text replace
+. }
+
+. 
+. local num_repeats 10
+
+. 
+. forvalues r = 1/`num_repeats' {
+  2.     set seed `r'010
+  3.     
+.     gen ranum = uniform()
+  4.     sort ranum
+  5.     drop ranum
+  6.     
+.     gen fold_`r' = mod(_n, 10) + 1
+  7.     
+.     gen k_fold_dem_pred_1066_`r' = .
+  8.     
+.     forvalues i = 1/10 {  
+  9.         local train = "fold_`r' != `i'" 
+ 10.         local test = "fold_`r' == `i'"  
+ 11.         
+.         quietly logit cdem1066 cogscore_cadas relscore_cadas recall if `train'
+ 12.         quietly predict p_`r'_`i' if `test', pr
+ 13.         
+.         quietly replace k_fold_dem_pred_1066_`r' = p_`r'_`i' if `test'
+ 14.     }
+ 15. }
+(12,865 missing values generated)
+(12,865 missing values generated)
+(12,865 missing values generated)
+(12,865 missing values generated)
+(12,865 missing values generated)
+(12,865 missing values generated)
+(12,865 missing values generated)
+(12,865 missing values generated)
+(12,865 missing values generated)
+(12,865 missing values generated)
+
+. 
+. gen total_pred = k_fold_dem_pred_1066_1 + k_fold_dem_pred_1066_2 + k_fold_dem_pred_1066_3 + k_fold_dem_pred_1066
+> _4 + k_fold_dem_pred_1066_5 + k_fold_dem_pred_1066_6 + k_fold_dem_pred_1066_7 + k_fold_dem_pred_1066_8 + k_fold_
+> dem_pred_1066_9 + k_fold_dem_pred_1066_10
+(38 missing values generated)
+
+. 
+. gen k_fold_dem_pred_1066_av = total_pred/10
+(38 missing values generated)
+
+. 
+. gen cdem1066pred50 = (k_fold_dem_pred_1066_av >= .5) if !missing(k_fold_dem_pred_1066_av)
+(38 missing values generated)
+
+. tab cdem1066pred50
+
+cdem1066pre |
+        d50 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |     11,716       91.34       91.34
+          1 |      1,111        8.66      100.00
+------------+-----------------------------------
+      Total |     12,827      100.00
+
+. tab cdem1066 cdem1066pred50, matcell(conf_matrix)
+
+           |    cdem1066pred50
+  cdem1066 |         0          1 |     Total
+-----------+----------------------+----------
+         0 |    11,422        132 |    11,554 
+         1 |       282        978 |     1,260 
+-----------+----------------------+----------
+     Total |    11,704      1,110 |    12,814 
+
+. 
+. matrix list conf_matrix
+
+conf_matrix[2,2]
+       c1     c2
+r1  11422    132
+r2    282    978
+
+. 
+. scalar TN = conf_matrix[1,1]
+
+. scalar FN = conf_matrix[2,1]
+
+. scalar FP = conf_matrix[1,2]
+
+. scalar TP = conf_matrix[2,2]
+
+. 
+. scalar Sensitivity = TP / (TP + FN)
+
+. scalar Specificity = TN / (TN + FP)
+
+. scalar Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+. scalar Prevalence = ((TP+FP) / (TP + TN + FP + FN))*100
+
+. 
+. display "Sensitivity for 1066 .50: " Sensitivity
+Sensitivity for 1066 .50: .77619048
+
+. display "Specificity for 1066 .50: " Specificity
+Specificity for 1066 .50: .98857539
+
+. display "Accuracy for 1066 .50: " Accuracy
+Accuracy for 1066 .50: .96769159
+
+. display "Predicted Prevalence for 1066 ADAMS modified: " Prevalence
+Predicted Prevalence for 1066 ADAMS modified: 8.6624005
+
+. display "Predicted Prevalence for 1066 original: " ((TP+FN) / (TP + TN + FP + FN))*100
+Predicted Prevalence for 1066 original: 9.8329952
+
+. 
+. roctab cdem1066 cdem1066pred50
+
+                      ROC                     Asymptotic normal  
+           Obs       area     Std. err.      [95% conf. interval]
+     ------------------------------------------------------------
+        12,814     0.8824       0.0059        0.87083     0.89394
+
+. 
+. /*education gradients CADAS
+>             level of education |      Freq.     Percent        Cum.
+> -------------------------------+-----------------------------------
+>                           none |        537        7.89        7.89
+> some, did not complete primary |      2,030       29.83       37.72
+>              completed primary |      1,722       25.30       63.02
+>            completed secondary |      1,553       22.82       85.84
+>             tertiary (college) |        954       14.02       99.85
+>                              6 |         10        0.15      100.00
+> -------------------------------+-----------------------------------
+>                          Total |      6,806      100.00
+> ADAMS                    
+>    raeduc: r education |
+>                (categ) |      Freq.     Percent        Cum.
+> -----------------------+-----------------------------------
+>       1.lt high-school |        219       43.11       43.11
+>                  2.ged |         11        2.17       45.28
+> 3.high-school graduate |        123       24.21       69.49
+>         4.some college |         88       17.32       86.81
+>    5.college and above |         67       13.19      100.00
+> -----------------------+-----------------------------------
+>                  Total |        508      100.00
+> 
+> 
+>         replace educat = "less than high school" if peduc == 1 | peduc == 2
+>         replace educat = "high school graduate" if peduc == 4 | peduc == 3
+>         replace educat = "college graduate" if peduc == 5        
+> */
+. 
+. gen educat = .
+(12,865 missing values generated)
+
+.         replace educat = 1 if peduc == 1 | peduc == 2 //less than primary
+(4,976 real changes made)
+
+.         replace educat = 2 if peduc == 3 //completed primary
+(3,807 real changes made)
+
+.         replace educat = 3 if peduc == 4 | peduc == 5 //secondary school or above
+(3,989 real changes made)
+
+. 
+. label define educat_label 1 "Less than primary" 2 "completed primary" 3 "secondary school and above"
+
+. label values educat educat_label
+
+.         
+. gen agesq = age^2
+(12 missing values generated)
+
+. 
+. tab educat
+
+                    educat |      Freq.     Percent        Cum.
+---------------------------+-----------------------------------
+         Less than primary |      4,976       38.96       38.96
+         completed primary |      3,807       29.81       68.77
+secondary school and above |      3,989       31.23      100.00
+---------------------------+-----------------------------------
+                     Total |     12,772      100.00
+
+. 
+. foreach dem_var in cdem1066 cdem1066pred50 {
+  2.         qui: logit `dem_var' ib2.educat age agesq
+  3.         margins educat, post  // Only use 'post' if necessary
+  4.         eststo `dem_var'
+  5. }
+
+Predictive margins                                      Number of obs = 12,736
+Model VCE: OIM
+
+Expression: Pr(cdem1066), predict()
+
+---------------------------------------------------------------------------------------------
+                            |            Delta-method
+                            |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+----------------------------+----------------------------------------------------------------
+                     educat |
+         Less than primary  |   .1097821   .0039982    27.46   0.000     .1019458    .1176184
+         completed primary  |   .0924124   .0045209    20.44   0.000     .0835515    .1012733
+secondary school and above  |   .0720091   .0043066    16.72   0.000     .0635684    .0804499
+---------------------------------------------------------------------------------------------
+
+Predictive margins                                      Number of obs = 12,724
+Model VCE: OIM
+
+Expression: Pr(cdem1066pred50), predict()
+
+---------------------------------------------------------------------------------------------
+                            |            Delta-method
+                            |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+----------------------------+----------------------------------------------------------------
+                     educat |
+         Less than primary  |   .1031503   .0038983    26.46   0.000     .0955098    .1107908
+         completed primary  |   .0704038   .0040446    17.41   0.000     .0624766     .078331
+secondary school and above  |   .0631864   .0040881    15.46   0.000     .0551739    .0711989
+---------------------------------------------------------------------------------------------
+
+. 
+. *we extract a set of coefficients that I can use to predict in other datasets
+. logit cdem1066 cogscore_cadas relscore_cadas recall
+
+Iteration 0:  Log likelihood = -4118.3931  
+Iteration 1:  Log likelihood =  -1624.338  
+Iteration 2:  Log likelihood = -1117.9165  
+Iteration 3:  Log likelihood = -1035.4706  
+Iteration 4:  Log likelihood = -1033.6799  
+Iteration 5:  Log likelihood = -1033.6733  
+Iteration 6:  Log likelihood = -1033.6733  
+
+Logistic regression                                    Number of obs =  12,814
+                                                       LR chi2(3)    = 6169.44
+                                                       Prob > chi2   =  0.0000
+Log likelihood = -1033.6733                            Pseudo R2     =  0.7490
+
+--------------------------------------------------------------------------------
+      cdem1066 | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+---------------+----------------------------------------------------------------
+cogscore_cadas |  -.3729699   .0187188   -19.92   0.000    -.4096582   -.3362816
+relscore_cadas |   .4964214   .0178117    27.87   0.000     .4615111    .5313317
+        recall |  -.6614009   .0381221   -17.35   0.000    -.7361189   -.5866829
+         _cons |   6.769813   .4326639    15.65   0.000     5.921807    7.617819
+--------------------------------------------------------------------------------
+Note: 0 failures and 53 successes completely determined.
+
+. predict cdem1066_prob, pr
+(38 missing values generated)
+
+. summarize cdem1066_prob
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+cdem1066_p~b |     12,827    .0983513    .2576605   .0000147          1
+
+. 
+. gen demp1066_score = exp(8.571528 -.4453795 * cogscore_cadas + .5031411 * relscore_cadas -.6978724 * recall) / (
+> 1 + exp(8.571528 -.4453795 * cogscore_cadas + .5031411 * relscore_cadas -.6978724 * recall))
+(38 missing values generated)
+
+. summarize demp1066_score
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+demp1066_s~e |     12,827    .0990937    .2616648   6.89e-06          1
+
+. /* the formula using logit:
+> log(P/(1-P)) = 8.571528 -.4453795(cogscore) + .5031411(relscore) -.6978724(recall)
+> or
+> P/(1-P) = exp(8.571528 -.4453795(cogscore) + ..5031411(relscore) -.6978724(recall))
+> or
+> P = exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall) / (1 + exp(8.571528 -.4453795 * 
+> cogscore + .5031411 * relscore -.6978724 * recall))
+> */
+. 
+. regress cdem1066 cogscore_cadas relscore_cadas recall
+
+      Source |       SS           df       MS      Number of obs   =    12,814
+-------------+----------------------------------   F(3, 12810)     =   6144.83
+       Model |  670.310071         3   223.43669   Prob > F        =    0.0000
+    Residual |   465.79419    12,810  .036361763   R-squared       =    0.5900
+-------------+----------------------------------   Adj R-squared   =    0.5899
+       Total |  1136.10426    12,813  .088668092   Root MSE        =    .19069
+
+--------------------------------------------------------------------------------
+      cdem1066 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+---------------+----------------------------------------------------------------
+cogscore_cadas |  -.0220883   .0005289   -41.77   0.000     -.023125   -.0210517
+relscore_cadas |   .0331905    .000596    55.69   0.000     .0320223    .0343587
+        recall |  -.0176655   .0008983   -19.67   0.000    -.0194263   -.0159048
+         _cons |   .6866987   .0138871    49.45   0.000     .6594779    .7139196
+--------------------------------------------------------------------------------
+
+. 
+. /*the formula using LPM:
+> P = 0.6946127 - 0.0212441(cogscore) + 0.0317057(relscore) - 0.0192426(recall)
+> */
+. log close
+      name:  <unnamed>
+       log:  /hdir/0/chrissoria/1066/w1_cadas_1066_comparison_full.log
+  log type:  text
+ closed on:  11 Oct 2024, 10:29:49
+------------------------------------------------------------------------------------------------------------------
