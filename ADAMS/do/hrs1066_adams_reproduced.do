@@ -47,9 +47,9 @@ gen AAGE_cat = .
 	replace AAGE_cat = 1 if AAGE >= 70 & AAGE < 80
 		replace AAGE_cat = 2 if AAGE >= 80 & AAGE < 120
 gen educat = .
-	replace educat = 1 if raeduc == 1 | raeduc == 2
-	replace educat = 2 if raeduc == 3
-	replace educat = 3 if raeduc == 4 | raeduc == 5
+	replace educat = 1 if raeduc == 1 | raeduc == 2 // less than high school
+	replace educat = 2 if raeduc == 3 // high school graduate
+	replace educat = 3 if raeduc == 4 | raeduc == 5 // some college and above
 	
 gen race_cat = .
 	replace race_cat = 1 if raracem == 1 & rahispan == 0
@@ -379,7 +379,7 @@ gen married = 0
 replace married = 1 if AAMARRD == 2
 
 gen core_proxy = 0
-replace core_proxy = 1 if HPROXY == 5
+replace core_proxy = 1 if HPROXY < 5
 
 summarize AAGE
 summarize white
@@ -444,10 +444,11 @@ count
 summarize AAGE white black hispanic college_grad female married dementia AACOGSTR core_proxy
 
 * Generate frequency tables for gender, age categories, and education categories
-tab female
+summarize female
+summarize AAGE_cat
 tab AAGE_cat
-tab educat
-tab race_cat
+summarize educat
+summarize race_cat
 
 *****     10/66    ******
 
@@ -826,6 +827,81 @@ foreach dem_var in dementia k_fold_dem_pred_1066_opt dem_pred_bin_1066a25 dem_pr
         eststo `dem_var'
 }
 
+** tables showing proportion classified as dementia by age group
+
+* Recode age into 5-year intervals
+recode AAGE (70/74=1 "70-74") (75/79=2 "75-79") (80/84=3 "80-84") ///
+                   (85/89=4 "85-89") (90/94=5 "90-94") (95/max=6 "95+"), ///
+                   gen(AAGE_GROUPS)
+		  
+label variable AAGE_GROUPS "Age Groups (5-year intervals)"
+
+tab AAGE_GROUPS AAGE
+
+* bar plot for age groups only
+preserve
+collapse (mean) dementia_prop=dementia, by(AAGE_GROUPS)
+
+graph bar dementia_prop, over(AAGE_GROUPS) ///
+    ytitle("Proportion with Dementia") ///
+    title("Proportion with Dementia by Age Group") ///
+    ylabel(0(0.1)1) ///
+    bar(1, color(blue))
+restore
+    
+* bar plot for age groups and gender
+preserve
+
+collapse (mean) dementia_prop=dementia, by(AAGE_GROUPS GENDER)
+graph bar dementia_prop, over(AAGE_GROUPS) by(GENDER) ///
+    ytitle("Proportion with Dementia") ///
+    title("Proportion with Dementia by Age Group and Gender") ///
+    subtitle("") ///
+    ylabel(0(0.1)1) ///
+    bar(1, color(blue)) ///
+    note("") ///
+    legend(off)
+    
+restore
+
+preserve
+collapse (mean) dementia_prop=dementia, by(AAGE GENDER)
+
+// Create the plot with smooth lines
+twoway (lowess dementia_prop AAGE if GENDER == 1, lcolor(blue) lwidth(medium)) ///
+       (lowess dementia_prop AAGE if GENDER == 2, lcolor(orange) lwidth(medium)) ///
+       (scatter dementia_prop AAGE if GENDER == 1, mcolor(blue%30) msymbol(oh)) ///
+       (scatter dementia_prop AAGE if GENDER == 2, mcolor(orange%30) msymbol(oh)), ///
+       ytitle("Proportion with Dementia") ///
+       xtitle("Age") ///
+       title("Proportion with Clinical Diagnosis of Dementia by Age and Gender") ///
+       legend(order(1 "Male" 2 "Female") rows(1) position(6) ring(1)) ///
+       ylabel(0(0.1)1) ///
+       xlabel(70(10)97)
+       
+graph export "dementia_by_age_gender.png", replace width(1000)
+
+restore
+
+preserve
+collapse (mean) dementia_prop=dem_pred_bin_1066a25, by(AAGE GENDER)
+
+// Create the plot with smooth lines
+twoway (lowess dementia_prop AAGE if GENDER == 1, lcolor(blue) lwidth(medium)) ///
+       (lowess dementia_prop AAGE if GENDER == 2, lcolor(orange) lwidth(medium)) ///
+       (scatter dementia_prop AAGE if GENDER == 1, mcolor(blue%30) msymbol(oh)) ///
+       (scatter dementia_prop AAGE if GENDER == 2, mcolor(orange%30) msymbol(oh)), ///
+       ytitle("Proportion with Dementia") ///
+       xtitle("Age") ///
+       title("Proportion Ascribed 10/66 Dementia Classification by Age and Gender") ///
+       legend(order(1 "Male" 2 "Female") rows(1) position(6) ring(1)) ///
+       ylabel(0(0.1)1) ///
+       xlabel(70(10)97)
+       
+graph export "1066_by_age_gender.png", replace width(1000)
+
+restore
+
 *tabulating to see distribution
 tab AAGE_cat k_fold_dem_pred_1066_opt
 tab AAGE_cat dem_pred_bin_1066a25
@@ -856,6 +932,8 @@ tabulate educat
 summarize EDYRS
 
 
+keep dem_pred_bin_1066a25_rs dem_pred_bin_1066_opt_rs dem_pred_bin_1066a25 k_fold_dem_pred_1066_opt total_pred_2 k_fold_dem_pred_1066_av_rs k_fold_dem_pred_1066_av dementia race_cat ragender hhidpn
+export delimited using "data/probabilities_classification.csv", replace
+
 log close
 exit, clear
-
