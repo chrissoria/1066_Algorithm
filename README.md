@@ -6,11 +6,9 @@ Information on the original algorithm can found in this paper by Prince et al.: 
 
 This algorithm has been validated in the HRS <a href="https://hrsdata.isr.umich.edu/data-products/aging-demographics-and-memory-study-adams-wave">ADAMS</a> data here: https://alz-journals.onlinelibrary.wiley.com/doi/10.1002/alz.086959
 
-The files necessary to reproduce the algorithm using 10/66 data can be found in the `10_66` folder.
-
-The files necessary to reproduce the algorithm using ADAMS data can be found in the `ADAMS` folder.
-
-The files necessary to reproduce the algorithm using CADAS data can be found in the `CADAS` folder.
+- The files necessary to reproduce the algorithm using 10/66 data can be found in the `10_66` folder.
+- The files necessary to reproduce the algorithm using ADAMS data can be found in the `ADAMS` folder.
+- The files necessary to reproduce the algorithm using CADAS data can be found in the `CADAS` folder.
 
 ### Relative Score Calculation in the Original 10/66 data
 
