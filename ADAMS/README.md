@@ -1,16 +1,6 @@
-# The 10/66 Dementia Classification Algorithm
+# The 10/66 Dementia Classification Algorithm in HRS ADAMS
 
-The Stata do files in this repository reproduce the original 10/66 algorithm using the first two waves of the 10/66 data available <a href="https://community.addi.ad-datainitiative.org/datasets/a/d/DA61/10-66">HERE</a>. 
-
-Information on the original algorithm can found in this paper by Prince et al.: https://bmcpublichealth.biomedcentral.com/articles/10.1186/1471-2458-8-219
-
-This algorithm has been validated in the HRS <a href="https://hrsdata.isr.umich.edu/data-products/aging-demographics-and-memory-study-adams-wave">ADAMS</a> data here: https://alz-journals.onlinelibrary.wiley.com/doi/10.1002/alz.086959
-
-The files necessary to reproduce the algorithm using 10/66 data can be found in the `10_66` folder.
-
-The files necessary to reproduce the algorithm using ADAMS data can be found in the `ADAMS` folder.
-
-The files necessary to reproduce the algorithm using CADAS data can be found in the `CADAS` folder.
+The Stata do files in this repository reproduce the original 10/66 algorithm using both waves of the 10/66 data. The original files are located in the `10_66` folder.
 
 ### Relative Score Calculation in the Original 10/66 data
 
