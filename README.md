@@ -1,5 +1,17 @@
 # The 10/66 Dementia Classification Algorithm
 
+The 10/66 algorithm was designed to help identify dementia using a set of standard tests and interviews. It works by combining information from several sources:
+
+- Memory and thinking tests
+- Interviews with the person being assessed
+- Reports from someone who knows the person well
+
+The 10/66 algorithm uses results from well-known tools, such as the Community Screening Instrument for Dementia, the CERAD 10-word recall and animal-naming tests, and structured clinical interviews. It follows guidelines from the DSM-IV, a widely used manual for diagnosing dementia, but puts these rules into a step-by-step process a computer can follow.
+
+The goal is to make dementia diagnosis more consistent and reliable, especially in large studies. The algorithm was checked against expert clinical diagnoses to make sure it works well. It tends to identify people with clear, significant dementia but may miss milder cases. Compared to other methods, it is more specific but less sensitive, meaning it is good at confirming dementia when it is present, but might not catch every case.
+
+Note: This version of the algorithm does not use depression measures in its process.
+
 The Stata do files in this repository reproduce the original 10/66 algorithm using the first two waves of the 10/66 data available <a href="https://community.addi.ad-datainitiative.org/datasets/a/d/DA61/10-66">HERE</a>. 
 
 Information on the original algorithm can found in this paper by Prince et al.: https://bmcpublichealth.biomedcentral.com/articles/10.1186/1471-2458-8-219

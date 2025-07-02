@@ -1,43 +1,40 @@
 # The 10/66 Dementia Classification Algorithm in HRS ADAMS
 
-The Stata do files in this repository reproduce the original 10/66 algorithm using both waves of the 10/66 data. The original files are located in the `10_66` folder.
+### Relscore in ADAMS (HRS) data
 
-### Relative Score Calculation in the Original 10/66 data
-
-To obtain a score the relscore like in the original 10/66 formulation, we use the following formula: 
-
-1. **Remove the Subtraction Term:**
-   - Upweights \( S \) assuming some missingness.
-   - New formula:
+In the ADAMS version, the maximum score is 23. Therefore, the equation is:
 
 $$
-\text{relscore} = \left( \frac{30}{30 - \text{misstot}} \right) \times S
+\text{relscore} = \left( \frac{23}{23 - \text{misstot}} \right) \times S
 $$
 
-where \( S \) is the total sum of all responses that supply the relscore:
+### Datasets for Reproducing the Algorithm in ADAMS 
 
-$$
-S = \sum_{n=1}^{n} S_i
-$$
+Here are the datasets that we use to reproduce the algorithm in ADAMS:
 
-and `misstot` represents the total possible score obtainable by missing responses:
-
-$$
-\text{misstot} =  \text{miss3} \times 3 + \text{miss1}
-$$
-
-The variable `miss1` is defined as the sum of all missing values in the \( S \) column where responses are binary (yes or no):
-
-$$
-\text{miss1} = \sum_{i \in \{S_j \mid S_j \text{ is missing and binary}\}} 1
-$$
-
-The variable `miss3` is defined as the sum of all missing values in the \( S \) column where the maximum possible score is 3:
-
-$$
-\text{miss3} = \sum_{i \in \{S_j \mid S_j \text{ is missing and max score is 3}\}} 1
-$$
-
-2. **Exclude Incomplete Responses from the relscore:**
-
-The above works well for researchers who want to keep all cases rather than drop a respondent simply because they are missing a single question that supplies the relscore. If you prefer to only include respondents who answered all questions change local drop_missing_from_relscore from "no" to "yes"
+1. **ADAMS wave A**
+   - **Section B**
+     - Neuropsychiatric Inventory (NPI)
+     - Composite International Diagnostic Interview (CIDI depression screen)
+     - Blood pressure and heart rate
+   - **Section D**
+     - ADAMS Consensus conference research diagnoses for dementia
+     - Clinical Dementia Rating (CDR) Scale
+     - Dementia Severity Rating Scale (DSRS)
+     - Modified Hachinski Ischemic Score
+     - Apolipoprotein E genotype Blessed Dementia Scale
+     - Medical History (some)
+   - **Section N**
+     - Memory Impairment Screen (MIS)
+     - HRS Self-report of memory problem questions 
+     - Neuropsychological Measures
+   - **Tracker**
+     - Demographics and Field Outcomes for Waves A-C
+   - **Section C**
+     - Clinical History
+2. **Langa-Weir Classification of Cognitive Function** (27 point scale)
+   - Telephone Interview for Cognitive Status (TICS) classification in: **cogfinalimp_9520wide.dta**
+3. **Gianattasio-Power Predicted Dementia Probability Scores and Dementia Classifications**More actions
+   - Modified Hurd Model in: **hrsdementia_2021_1109.dta**
+4. **RAND HRS Longitudinal File and the RAND HRS Detailed Imputation File**
+   - Education and race variables in: **randhrs1992_2016v2.dta**
