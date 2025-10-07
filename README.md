@@ -24,17 +24,24 @@ This algorithm has been validated in the HRS <a href="https://hrsdata.isr.umich.
 
 ### Relative Score Calculation in the Original 10/66 data
 
-To obtain a score the relscore like in the original 10/66 formulation, we use the following formula: 
+To obtain a score the `relscore` like in the original 10/66 formulation, we use the following formula: 
 
-1. **Remove the Subtraction Term:**
-   - Upweights \( S \) assuming some missingness.
+1. We calculate the sum of informant reports on the respondent.  
+Here, we will label this sum as \( `S` \). See  [a full variable mapping list](https://github.com/chrissoria/1066_Algorithm/blob/main/ADAMS/mapping/full_detailed_mapping.csv) for all variables to include in the \( `S` \) vector.
+
+$$
+S = \sum \text{(informant reports on cognitive and physical ability of the respondent)}
+$$
+
+2. **Remove the Subtraction Term:**
+   - Upweights \( `S` \) assuming some missingness.
    - New formula:
 
 $$
 \text{relscore} = \left( \frac{30}{30 - \text{misstot}} \right) \times S
 $$
 
-where \( S \) is the total sum of all responses that supply the relscore:
+where, as a reminder, \( S \) is the total sum of all responses that supply the relscore:
 
 $$
 S = \sum_{n=1}^{n} S_i
@@ -58,6 +65,49 @@ $$
 \text{miss3} = \sum_{i \in \{S_j \mid S_j \text{ is missing and max score is 3}\}} 1
 $$
 
-2. **Exclude Incomplete Responses from the relscore:**
+3. **Exclude Incomplete Responses from the relscore:**
 
 The above works well for researchers who want to keep all cases rather than drop a respondent simply because they are missing a single question that supplies the relscore. If you prefer to only include respondents who answered all questions change local drop_missing_from_relscore from "no" to "yes"
+
+### Cognitive Score Calculation in the Original 10/66 data
+
+To calculate the `cogscore`, aggregate the results from several domains measured during assessment:
+
+1. Sum up all of these individual scores
+
+- `nametot`: Ability to say and remember the interviewer's name.
+- `count`: Ability to identify common objects, repeat simple words, orient in space/time, and demonstrate motor skills.
+- `animtot`: Quickly list the names of animals.
+- `wordtot1`: Immediate recall of words.
+- `wordtot2`: Delayed recall of words.
+- `papertot`: Ability to fold paper and follow instructions.
+- `storytot`: Ability to recall the elements of a story.
+
+2. All these components are summed and weighted to produce the overall cognitive score.
+
+*Calculation Formula:*
+
+$$
+\text{cogscore} = 1.03125 \times (\text{nametot} + \text{count} + \text{animtot} + \text{wordtot1} + \text{wordtot2} + \text{papertot} + \text{storytot})
+$$
+
+**Explanation and Handling other Datasets:**
+
+The multiplier 1.03125 (= 33/32) is a scaling constant in the operational CSI-D code. 
+The raw cognitive composite (nametot + count + animtot + wordtot1 + wordtot2 + papertot + storytot) has a maximum of 32 points (with count ≤ 26, and each of nametot, animtot, wordtot1, wordtot2, papertot, storytot ≤ 1). 
+Multiplying by 33/32 linearly rescales this 0–32 sum to the canonical 0–33 CSI-D COGSCORE range. 
+
+
+In some datasets, the full theoretical maximum of **32 points** cannot be reached because of missing or modified items.  In these cases, the interpretation of the **1.03125** multiplier becomes **ambiguous**.
+
+#### Recommended Approaches
+
+1. **Preserve the original upweighting intent**  
+   Retain the fixed multiplier of **1.03125**, as it reflects the authors’ empirical calibration  
+   and maintains comparability with official **10/66** scoring implementations.
+
+2. **Dynamic normalization**  
+
+   $$
+   \text{cogscore} = \left(\frac{\text{max\_possible\_score} + 1}{\text{max\_possible\_score}}\right) \times \text{raw\_sum}
+   $$

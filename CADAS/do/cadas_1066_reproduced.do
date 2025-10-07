@@ -207,7 +207,7 @@ summarize storytot
 
 
 * generate the cogscore. anyone who does not have all components will be dropped.
-gen cogscore = nametot + count + animtot + wordtot1 + wordtot2 + papertot + storytot
+gen cogscore = 1.03125 * (nametot + count + animtot + wordtot1 + wordtot2 + papertot + storytot)
 
 summarize cogscore
 
