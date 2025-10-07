@@ -83,22 +83,27 @@ To calculate the `cogscore`, aggregate the results from several domains measured
 - `papertot`: Ability to fold paper and follow instructions.
 - `storytot`: Ability to recall the elements of a story.
 
+Let the raw sum of these components be:
+
+$$
+C = \text{nametot} + \text{count} + \text{animtot} + \text{wordtot1} + \text{wordtot2} + \text{papertot} + \text{storytot}
+$$
+
 2. All these components are summed and weighted to produce the overall cognitive score.
 
 *Calculation Formula:*
 
 $$
-\text{cogscore} = 1.03125 \times (\text{nametot} + \text{count} + \text{animtot} + \text{wordtot1} + \text{wordtot2} + \text{papertot} + \text{storytot})
+\text{cogscore} = 1.03125 \times C
 $$
 
-**Explanation and Handling other Datasets:**
+**Explanation of weighting and handling other datasets:**
 
-The multiplier 1.03125 (= 33/32) is a scaling constant in the operational CSI-D code. 
-The raw cognitive composite (nametot + count + animtot + wordtot1 + wordtot2 + papertot + storytot) has a maximum of 32 points (with count ≤ 26, and each of nametot, animtot, wordtot1, wordtot2, papertot, storytot ≤ 1). 
-Multiplying by 33/32 linearly rescales this 0–32 sum to the canonical 0–33 CSI-D COGSCORE range. 
+The multiplier 1.03125 (= 33/32) is a scaling constant in the operational CSI-D code.  
+The raw cognitive composite `C` has a maximum of 32 points (with `count ≤ 26`, and each of `nametot`, `animtot`, `wordtot1`, `wordtot2`, `papertot`, `storytot ≤ 1`).  
+Multiplying by 33/32 linearly rescales this 0–32 sum to the canonical 0–33 CSI-D COGSCORE range.  
 
-
-In some datasets, the full theoretical maximum of **32 points** cannot be reached because of missing or modified items.  In these cases, the interpretation of the **1.03125** multiplier becomes **ambiguous**.
+In some datasets, the full theoretical maximum of **32 points** cannot be reached because of missing or modified items. In these cases, the interpretation of the **1.03125** multiplier becomes **ambiguous**.
 
 #### Recommended Approaches
 
@@ -106,8 +111,67 @@ In some datasets, the full theoretical maximum of **32 points** cannot be reache
    Retain the fixed multiplier of **1.03125**, as it reflects the authors’ empirical calibration  
    and maintains comparability with official **10/66** scoring implementations.
 
-2. **Dynamic normalization**  
+2. **Dynamic normalization**
 
-   $$
-   \text{cogscore} = \left(\frac{\text{max\_possible\_score} + 1}{\text{max\_possible\_score}}\right) \times \text{raw\_sum}
-   $$
+$$
+\text{cogscore} = \left( \frac{C_{\max} + 1}{C_{\max}} \right) \times C
+$$
+
+Note: this normalization simply adjusts the range of the composite score.
+If a logistic or discriminant model (like the 10/66 algorithm) is re-fitted after scaling, it automatically compensates for this change.
+However, if the model coefficients are fixed (as in the official algorithm), scaling the input score (e.g., multiplying by a constant) will alter its effective weight and therefore shift the resulting probabilities and classifications.
+
+### Incorporating CERAD ten-word delayed recall
+
+The `Recall` variable, representing the delayed recall score from the ten-word list-learning task, is one of the most important components of the 10/66 diagnostic algorithm. It captures episodic memory, which is a central cognitive domain affected early in dementia. That is, delayed recall is one of the strongest independent predictors of dementia, with odds of true dementia increasing sharply as recall performance declined. Within the 10/66 framework, it forms a core part of the combined predictive model, as important as the CSI-D cognitive and informant scores. 
+
+Here, we do not compute an index or new composite. Instead, we retain `Recall` as a standalone variable to be included later as a covariate in the predictive model.
+
+### Generating binned variables
+
+The above, alongside the GMS Diagnosis, form the core components of the **10/66 Dementia Diagnostic Algorithm**.
+Each continuous variable is first **converted into categorical bands** before being assigned a corresponding weight in the final predictive model.
+You can review how these variables are categorized and scored in the following section of the code:
+
+[Full_Algo_Computation.do — Lines 394–444](https://github.com/chrissoria/1066_Algorithm/blob/10109417901debc63fd36ac361d1a509d140ccad/10_66/do/Full_Algo_Computation.do#L394-L444)
+
+The resulting variables are the `brelscor` (informant report), `bcogscor` (cognitive score), `bdelay` (delayed recall), and `bgmsdiag` (GMS diagnosis).
+
+**Note:**  
+In datasets other than the original training sample, it is often preferable to **retain the continuous versions** of these variables when re-estimating or adapting the model. 
+The original category thresholds were derived from the empirical distributions of the 10/66 training data; applying them unchanged to new populations may introduce **miscalibration** rather than overfitting, since score ranges and variances can differ across studies.
+
+### Generating the 10/66 Dementia Score and Classification
+
+1. Each of the four weighted components—`brelscor`, `bcogscor`, `bdelay`, and `bgmsdiag`—are summed into a single linear index `Q`.
+
+$$
+Q = b_{\text{relscore}} + b_{\text{cogscore}} + b_{\text{delay}} + b_{\text{gmsdiag}}
+$$
+
+2. An intercept of **−9.53**, estimated from the original logistic regression model in *Prince et al.* (2003, *The Lancet*), is then added to align the model with the baseline dementia prevalence observed in the 10/66 training sample. 
+This intercept represents the model’s constant term—the baseline log-odds of dementia when all predictors are at their lowest levels.
+
+$$
+\text{logit}(p) = -9.53 + Q
+$$
+
+3. The exponential of this value converts log-odds to odds, which are then transformed into a probability between 0 and 1.
+
+$$
+p = \frac{e^{\text{logit}(p)}}{1 + e^{\text{logit}(p)}}
+$$
+
+4. Finally, participants are classified as having **probable dementia** if their predicted probability exceeds 0.25591, the empirically derived threshold that maximized sensitivity and specificity in the original 10/66 validation sample; those below this cutoff are classified as **non-cases**.
+
+$$
+\text{dem1066} =
+\begin{cases}
+1, & \text{if } p > 0.25591 \\
+0, & \text{if } p \leq 0.25591
+\end{cases}
+$$
+
+---
+
+For any questions, concerns, or suggestions, please email Chris Soria at chrissoria@berkeley.edu.
