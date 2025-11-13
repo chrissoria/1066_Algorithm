@@ -3,6 +3,20 @@ set more off
 capture log close
 cls
 
+/* The purpose of this script is the following:
+
+1. to adjust the algorithm and test whether the adjustments brings it in line a bit closer with the Cuban diagnosis
+2. to identify the adjustments that improve its alignment with the cuban diagnosis
+
+I will try to following:
+
+1. convert continuous variables into categorical based on quintile distribution
+2. down-weight the reslcore
+3. convert the reslcore into a binary (5 or more = 1, else 0)
+4. down-weight the relscore AND use as a categorical quintile
+5. down-weight the relscore AND use as a binary
+*/
+
 *******ADJUST LOCALS HERE**********
 
 ***********************************
@@ -87,24 +101,11 @@ else {
 rename i_a2 street
 rename i_a3 store
 rename i_a4 address
-gen longmem = .
-if inlist("`country'", "CU", "DR") {
-    replace longmem = cond(missing(c_69_c),0,c_69_c) + cond(missing(c_69_d),0,c_69_d)
-}
-else {
-    replace longmem = cond(missing(c_69_p),0,c_69_p)
-}
-
+gen longmem = cond(missing(c_69_c),0,c_69_c) + cond(missing(c_69_d),0,c_69_d) + cond(missing(c_69_p),0,c_69_p)
 rename c_3 month
 rename c_5 day
 rename c_1 year
-gen season = .
-if inlist("`country'", "CU", "DR") {
-    replace season = cond(missing(c_2_p_c),0,c_2_p_c) + cond(missing(c_2_d),0,c_2_d)
-}
-else {
-    replace season = cond(missing(c_2_p_c),0,c_2_p_c)
-}
+gen season = cond(missing(c_2_p_c),0,c_2_p_c) + cond(missing(c_2_d),0,c_2_d)
 rename c_61 nod
 rename c_62 point
 rename cs_32 pentag
@@ -189,7 +190,7 @@ foreach var in animals wordimm worddel paper story learn1 learn2 learn3 recall p
     replace `var' = . if `var' == .v | `var' == .i
 }
 
-egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point  pentag)
+egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point pentag)
 
 *max should be 27
 summarize count
@@ -386,23 +387,6 @@ replace U = cond(missing(misstot), 0, U)
 
 gen relscore_cadas = U*S
 
-summarize relscore
-/* our relscore in DR is bigger than 10/66 by over a whole point.  
-in Cuba: 1.794301
-
-score in 10/66:
-
-     Variable |        Obs        Mean    Std. dev.       Min        Max
--------------+---------------------------------------------------------
-relscore_d~e |      6,825    2.267357    4.131984          0         30
-relscore_o~l |      6,799    2.271145    4.129672  -9.310345         30
-*/
-
-summarize recall
-/* in CU the average recall is 3.432124 
-in DR the average recall is 2.318493
-*/
-
 if "`impute_recall'" == "yes" {
 	gen recall_original = recall
 
@@ -460,14 +444,32 @@ replace bdelay = 2.575 if ndelay == 3
 replace bdelay = 2.176 if ndelay == 4
 replace bdelay = 0     if ndelay == 5
 
-* For cognitive score quintiles
+* Quintiles
 xtile ncogscor_quint = cogscore, nq(5)
-
-* For informant score quintiles
 xtile nrelscor_quint = relscore, nq(5)
-
-* For delayed recall quintiles
 xtile ndelay_quint = recall, nq(5)
+
+gen bcogscor_quint = .
+replace bcogscor_quint = 2.801  if ncogscor_quint == 1
+replace bcogscor_quint = 1.377  if ncogscor_quint == 2
+replace bcogscor_quint = 0.866  if ncogscor_quint == 3
+replace bcogscor_quint = -0.231 if ncogscor_quint == 4
+replace bcogscor_quint = 0      if ncogscor_quint == 5 & ncogscor_quint != .
+
+gen brelscor_quint = .
+replace brelscor_quint = 0     if nrelscor_quint == 1
+replace brelscor_quint = 1.908 if nrelscor_quint == 2
+replace brelscor_quint = 2.311 if nrelscor_quint == 3
+replace brelscor_quint = 4.171 if nrelscor_quint == 4
+replace brelscor_quint = 5.680 if nrelscor_quint == 5 & nrelscor_quint != .
+
+gen bdelay_quint = .
+replace bdelay_quint = 3.822 if ndelay_quint == 1
+replace bdelay_quint = 3.349 if ndelay_quint == 2
+replace bdelay_quint = 2.575 if ndelay_quint == 3
+replace bdelay_quint = 2.176 if ndelay_quint == 4
+replace bdelay_quint = 0     if ndelay_quint == 5 & ndelay_quint != .
+
 
 * 1066 formulas
 
@@ -481,9 +483,160 @@ summarize dem1066
 *DR dem1066_du~e |      6,783    .1167625    .3211607          0          1
 *CU CADAS dem1066 |        911    .0351262       .1842          0          1
 
-*the below is only for analyzing the output
-/*
-keep pid relscore cogscore nametot count animals_diss animals animtot wordtot1 wordtot2 papertot c_66a c_66b c_66c c_66d c_66e c_66f story storytot pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town street store address month day year nod point pentag pentag_diss animals animals_diss chief longmem season c_11 c_12 c_13 wordimm c_21 c_22 c_23 worddel misstot activ mental memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason feed dress toilet recall dem1066_score dem1066
+*linear version
 
-order pid relscore cogscore nametot count animals_diss animals animtot wordtot1 wordtot2 papertot c_66a c_66b c_66c c_66d c_66e c_66f story storytot pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town street store address month day year nod point pentag pentag_diss animals animals_diss chief longmem season c_11 c_12 c_13 wordimm c_21 c_22 c_23 worddel misstot activ mental memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason feed dress toilet recall dem1066_score dem1066
+gen dem1066_score_linear = .6936593 -.019811 * cogscore + .0319944 * relscore -.0196586 * recall
+
+gen dem1066_linear = .
+replace dem1066_linear = 1 if dem1066_score_linear >= .5 & dem1066_score_linear != .
+replace dem1066_linear = 0 if dem1066_score_linear <.5 & dem1066_score_linear != .
+
+*categorical version using 10/66 own categories
+gen dem1066_score_categorical_orig = exp(-17.71921 + 2.76109 * bcogscor + 1.836585 * brelscor + 2.126105 * bdelay) / (1 + exp(-17.71921 + 2.76109 * bcogscor + 1.836585 * brelscor + 2.126105 * bdelay))
+
+gen dem1066_categorical_orig = .
+replace dem1066_categorical_orig = 1 if dem1066_score_categorical_orig >= .5 & dem1066_score_categorical_orig != .
+replace dem1066_categorical_orig = 0 if dem1066_score_categorical_orig <.5 & dem1066_score_categorical_orig != .
+
+*categorical version using 10/66 own categories but quints from cadas
+gen dem1066_score_orig_quint = exp(-17.71921 + 2.76109 * bcogscor_quint + 1.836585 * brelscor_quint + 2.126105 * bdelay_quint) / (1 + exp(-17.71921 + 2.76109 * bcogscor_quint + 1.836585 * brelscor_quint + 2.126105 * bdelay_quint))
+
+gen dem1066_orig_quint = .
+replace dem1066_orig_quint = 1 if dem1066_score_orig_quint >= .5 & dem1066_score_orig_quint != .
+replace dem1066_orig_quint = 0 if dem1066_score_orig_quint <.5 & dem1066_score_orig_quint != .
+
+
+*categorical version using quintiles based on our own data
+gen dem1066_score_quint = exp(-3.99328 - 2.147228 * ncogscor_quint + 1.857513 * nrelscor_quint - 1.312263 * ndelay_quint) / (1 + exp(-3.99328 - 2.147228 * ncogscor_quint + 1.857513 * nrelscor_quint - 1.312263 * ndelay_quint))
+
+gen dem1066_categorical_quint = .
+replace dem1066_categorical_quint = 1 if dem1066_score_quint >= .5 & dem1066_score_quint != .
+replace dem1066_categorical_quint = 0 if dem1066_score_quint <.5 & dem1066_score_quint != .
+
+*down-weighted relscore
+gen dem1066_score_downweighted = exp(8.486511 - .4001659 * cogscore + (.5024221*.7) * relscore - .6997248 * recall) / (1 + exp(8.486511 - .4001659 * cogscore + (.5024221*.7) * relscore - .6997248 * recall))
+
+gen dem1066_rel_downweighted = .
+replace dem1066_rel_downweighted = 1 if dem1066_score_downweighted >= .5 & dem1066_score_downweighted != .
+replace dem1066_rel_downweighted = 0 if dem1066_score_downweighted <.5 & dem1066_score_downweighted != .
+
+*binary relscore
+gen rel_binary = (relscore > 4) if relscore != .
+gen dem1066_score_binary = exp(9.736947 - .426476 * cogscore + 3.41575 * rel_binary - .6517573 * recall) / (1 + exp(9.736947 - .426476 * cogscore + 3.41575 * rel_binary - .6517573 * recall))
+
+gen dem1066_rel_binary = .
+replace dem1066_rel_binary = 1 if dem1066_score_binary >= .5 & dem1066_score_binary != .
+replace dem1066_rel_binary = 0 if dem1066_score_binary <.5 & dem1066_score_binary != .
+
+*quints from cadas
+gen dem1066_score_cadas = exp(-3.190348 - 2.113413 * ncogscor_quint + 1.637074 * nrelscor_quint - 1.119034 * ndelay_quint) / (1 + exp(-3.190348 - 2.113413 * ncogscor_quint + 1.637074 * nrelscor_quint - 1.119034 * ndelay_quint))
+
+gen dem1066_cadas_quint = .
+replace dem1066_cadas_quint = 1 if dem1066_score_cadas >= .5 & dem1066_score_cadas != .
+replace dem1066_cadas_quint = 0 if dem1066_score_cadas <.5 & dem1066_score_cadas != .
+
+*now, let's run sensitivity, specificity, accuracy tests against the cuban diagnosis cuba_CDR_binary
+local preds dem1066 dem1066_linear dem1066_categorical_orig dem1066_categorical_quint dem1066_rel_downweighted dem1066_rel_binary dem1066_cadas_quint dem1066_orig_quint
+
+preserve
+tempfile results
+postfile handle str30 var sensitivity specificity accuracy auc TP TN FP FN using `results', replace
+
+foreach var of local preds {
+    // Get confusion matrix
+    tab cuba_CDR_binary `var', matcell(freq)
+    local TP = freq[2,2]
+    local TN = freq[1,1]
+    local FP = freq[1,2]
+    local FN = freq[2,1]
+    local sens = (`TP'/(`TP'+`FN'))
+    local spec = (`TN'/(`TN'+`FP'))
+    local acc = ((`TP'+`TN')/(`TP'+`TN'+`FP'+`FN'))
+
+    // Save r(area) = AUC after roctab
+    roctab cuba_CDR_binary `var', nograph
+    local auc = r(area)
+
+    post handle ("`var'") (`sens') (`spec') (`acc') (`auc') (`TP') (`TN') (`FP') (`FN')
+}
+postclose handle
+
+use `results', clear
+export delimited using "1066_CDR_sens_spec_output.csv", replace
+
+restore
+
+drop _merge
+
+save 1066_sensitivity.dta, replace
+
+use "../consensus/consensus_long.dta", clear
+keep pid finalniaa_int_binary
+sort pid
+by pid: gen dup = _n == 1
+keep if dup
+drop dup
+
+save "../consensus/unique_classifications.dta", replace
+use 1066_sensitivity, clear
+
+merge m:1 pid using "../consensus/unique_classifications.dta"
+
+save 1066_sensitivity.dta, replace 
+
+preserve
+tempfile results
+postfile handle str30 var sensitivity specificity accuracy auc TP TN FP FN using `results', replace
+
+foreach var of local preds {
+    // Get confusion matrix
+    tab finalniaa_int_binary `var', matcell(freq)
+    local TP = freq[2,2]
+    local TN = freq[1,1]
+    local FP = freq[1,2]
+    local FN = freq[2,1]
+    local sens = (`TP'/(`TP'+`FN'))
+    local spec = (`TN'/(`TN'+`FP'))
+    local acc = ((`TP'+`TN')/(`TP'+`TN'+`FP'+`FN'))
+
+    // Save r(area) = AUC after roctab
+    roctab finalniaa_int_binary `var', nograph
+    local auc = r(area)
+
+    post handle ("`var'") (`sens') (`spec') (`acc') (`auc') (`TP') (`TN') (`FP') (`FN')
+}
+postclose handle
+
+use `results', clear
+export delimited using "1066_consensus_sens_spec_output.csv", replace
+
+/*
+
+*the below is only for analyzing the output
+
+keep pid relscore cogscore nametot count animals_diss animals animtot wordtot1 wordtot2 papertot c_66a c_66b c_66c c_66d c_66e c_66f story storytot pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town street store address month day year nod point pentag pentag_diss animals animals_diss chief longmem season c_11 c_12 c_13 wordimm c_21 c_22 c_23 worddel misstot activ mental memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason feed dress toilet recall dem1066_score dem1066 S
+
+order pid relscore cogscore nametot count animals_diss animals animtot wordtot1 wordtot2 papertot c_66a c_66b c_66c c_66d c_66e c_66f story storytot pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town street store address month day year nod point pentag pentag_diss animals animals_diss chief longmem season c_11 c_12 c_13 wordimm c_21 c_22 c_23 worddel misstot activ mental memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason feed dress toilet recall dem1066_score dem1066 S
+
+preserve
+* Define the variables as a local macro
+local vars relscore cogscore nametot count animals animtot wordtot1 wordtot2 papertot story storytot pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town street store address month day year nod point pentag chief longmem season wordimm worddel misstot activ mental memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason feed dress toilet recall dem1066_score dem1066 S
+
+* Get mean, min, and max for each variable and save as rows in one table
+postfile handle str32 variable mean min max using results_temp.dta, replace
+foreach v of local vars {
+    quietly summarize `v'
+    post handle ("`v'") (r(mean)) (r(min)) (r(max))
+}
+postclose handle
+
+* Use this new table and export
+use results_temp.dta, clear
+
+* Save to CSV file (replace "output.csv" as needed)
+export delimited using "/Users/chrissoria/Documents/CADAS/Data/Cuba_Out/cadas_1066_diagnostics.csv", replace
+
+restore
+
 */
+

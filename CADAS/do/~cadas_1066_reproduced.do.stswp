@@ -481,6 +481,7 @@ summarize dem1066
 *DR dem1066_du~e |      6,783    .1167625    .3211607          0          1
 *CU CADAS dem1066 |        911    .0351262       .1842          0          1
 
+*
 *the below is only for analyzing the output
 /*
 keep pid relscore cogscore nametot count animals_diss animals animtot wordtot1 wordtot2 papertot c_66a c_66b c_66c c_66d c_66e c_66f story storytot pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town street store address month day year nod point pentag pentag_diss animals animals_diss chief longmem season c_11 c_12 c_13 wordimm c_21 c_22 c_23 worddel misstot activ mental memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason feed dress toilet recall dem1066_score dem1066

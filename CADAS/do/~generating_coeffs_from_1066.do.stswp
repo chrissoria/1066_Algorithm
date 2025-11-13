@@ -436,6 +436,33 @@ replace bgmsdiag_duplicate = -0.635 if gmsdiag == 3
 replace bgmsdiag_duplicate = -0.674 if gmsdiag == 4
 replace bgmsdiag_duplicate = 0.34   if gmsdiag == 5 & gmsdiag != .
 
+*using quintiles from this data
+xtile ncogscor_quint = cogscore, nq(5)
+xtile nrelscor_quint = relscore_duplicate, nq(5)
+xtile ndelay_quint = recall, nq(5)
+
+*using quintiles from cadas
+gen ncogscore_cadas = .
+replace ncogscore_cadas = 1 if cogscore <= 28.38926696777344
+replace ncogscore_cadas = 2 if cogscore > 28.38926696777344 & cogscore <= 29.75679397583008
+replace ncogscore_cadas = 3 if cogscore > 29.75679397583008 & cogscore <= 30.57880401611328
+replace ncogscore_cadas = 4 if cogscore > 30.57880401611328 & cogscore <= 31.3485050201416
+replace ncogscore_cadas = 5 if cogscore > 31.3485050201416 & cogscore != .
+
+gen nrelscore_cadas = .
+replace nrelscore_cadas = 1 if relscore <= 0
+replace nrelscore_cadas = 2 if relscore > 0 & relscore <= .5
+replace nrelscore_cadas = 3 if relscore > .5 & relscore <= 1.5
+replace nrelscore_cadas = 4 if relscore > 1.5 & relscore <= 2.5
+replace nrelscore_cadas = 5 if relscore > 2.5 & relscore != .
+
+gen ndelay_cadas = .
+replace ndelay_cadas = 1 if recall <= 2
+replace ndelay_cadas = 2 if recall > 2 & recall <= 3
+replace ndelay_cadas = 3 if recall > 3 & recall <= 4
+replace ndelay_cadas = 4 if recall > 4 & recall <= 5
+replace ndelay_cadas = 5 if recall > 5 & recall != .
+
 gen Q = brelscor_duplicate + bcogscor_duplicate + bdelay_duplicate + bgmsdiag_duplicate
 gen logodds_duplicate = -9.53 + Q
 
@@ -454,40 +481,13 @@ tab dem1066_duplicate dem1066, miss
 count if dem1066_duplicate == 1
 count if cdem1066 == 1
 
-/*
-gen is_diff = 0
-replace is_diff = 1 if dem1066 != dem1066_duplicate
-drop if is_diff == 0
-*/
-
-gen is_diff = 0
-replace is_diff = 1 if (abs(relscore - relscore_duplicate) > 0.0001) & (relscore != .) & (relscore_duplicate != .)
-replace is_diff = 1 if (relscore == . & relscore_duplicate != .) | (relscore != . & relscore_duplicate == .)
-drop if is_diff == 0
-
-* Keep only the relscore and relscore_duplicate variables
-keep pid S dem1066_duplicate dem1066 misstot_duplicate relscore relscore_original relscore_duplicate is_diff ///
- put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores change money
-
-* Export the modified data to an Excel file
-export excel using "/Users/chrissoria/Documents/Research/CADAS_1066/1066/differences.xlsx", firstrow(variables) replace
 
 *for this do file, I want to extract a set of coefficients that I can use to predict in the CADAS dataset
-logit cdem1066 cogscore_cadas relscore_cadas recall // coefficients coming from here
+logit cdem1066 cogscore relscore recall // coefficients coming from here
 predict cdem1066_prob, pr
 summarize cdem1066_prob
 
-gen demp1066_score = exp(8.571528 -.4453795 * cogscore_cadas + .5031411 * relscore_cadas -.6978724 * recall) / (1 + exp(8.571528 -.4453795 * cogscore_cadas + .5031411 * relscore_cadas -.6978724 * recall))
-summarize demp1066_score
-/* the formula using logit:
-log(P/(1-P)) = 8.571528 -.4453795(cogscore) + .5031411(relscore) -.6978724(recall)
-or
-P/(1-P) = exp(8.571528 -.4453795(cogscore) + .5031411(relscore) -.6978724(recall))
-or
-P = exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall) / (1 + exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall))
-*/
-
-regress cdem1066 cogscore_cadas relscore_cadas recall
+regress cdem1066 cogscore relscore_duplicate recall
 
 /*the formula using LPM:
 P = 0.6946127 - 0.0212441(cogscore) + 0.0317057(relscore) - 0.0192426(recall)
@@ -496,4 +496,34 @@ P = 0.6946127 - 0.0212441(cogscore) + 0.0317057(relscore) - 0.0192426(recall)
 *if I were to convert to categoricals
 logit cdem1066 bcogscor brelscor bdelay
 
+*quint categoricals
+logit cdem1066 ncogscor_quint nrelscor_quint ndelay_quint
+
+*relscore binary version
+gen rel_binary = (relscore_duplicate > 4) if relscore_duplicate != .
+logit cdem1066 cogscore rel_binary recall
+
+*quints from cadas data
+logit cdem1066 ncogscore_cadas nrelscore_cadas ndelay_cadas
+
 log close
+
+preserve
+* Define the variables as a local macro
+local vars relscore_duplicate cogscore nametot count animals animtot wordtot1 wordtot2 papertot story storytot pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town street store address month day year nod point pentag chief longmem season wordimm worddel misstot activ mental memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason feed dress toilet recall cdem1066_prob cdem1066 S
+
+* Get mean, min, and max for each variable and save as rows in one table
+postfile handle str32 variable mean min max using results_temp.dta, replace
+foreach v of local vars {
+    quietly summarize `v'
+    post handle ("`v'") (r(mean)) (r(min)) (r(max))
+}
+postclose handle
+
+* Use this new table and export
+use results_temp.dta, clear
+
+* Save to CSV file (replace "output.csv" as needed)
+export delimited using "/Users/chrissoria/Documents/CADAS/Data/Cuba_Out/1066_1066_diagnostics.csv", replace
+
+restore

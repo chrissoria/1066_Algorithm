@@ -1,0 +1,278 @@
+-----------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/chrissoria/Documents/Research/1066/cadas_1066_comparison.log
+  log type:  text
+ opened on:  12 Nov 2025, 21:33:45
+
+. 
+. local num_repeats 10
+
+. 
+. forvalues r = 1/`num_repeats' {
+  2.     set seed `r'010
+  3.     
+.     gen ranum = uniform()
+  4.     sort ranum
+  5.     drop ranum
+  6.     
+.     gen fold_`r' = mod(_n, 10) + 1
+  7.     
+.     gen k_fold_dem_pred_1066_`r' = .
+  8.     
+.     forvalues i = 1/10 {  
+  9.         local train = "fold_`r' != `i'" 
+ 10.         local test = "fold_`r' == `i'"  
+ 11.         
+.         quietly logit cdem1066 cogscore_cadas relscore_cadas recall if `train'
+ 12.         quietly predict p_`r'_`i' if `test', pr
+ 13.         
+.         quietly replace k_fold_dem_pred_1066_`r' = p_`r'_`i' if `test'
+ 14.     }
+ 15. }
+(6,833 missing values generated)
+(6,833 missing values generated)
+(6,833 missing values generated)
+(6,833 missing values generated)
+(6,833 missing values generated)
+(6,833 missing values generated)
+(6,833 missing values generated)
+(6,833 missing values generated)
+(6,833 missing values generated)
+(6,833 missing values generated)
+
+. 
+. gen total_pred = k_fold_dem_pred_1066_1 + k_fold_dem_pred_1066_2 + k_fold_dem_pred_1066_3 + k
+> _fold_dem_pred_1066_4 + k_fold_dem_pred_1066_5 + k_fold_dem_pred_1066_6 + k_fold_dem_pred_106
+> 6_7 + k_fold_dem_pred_1066_8 + k_fold_dem_pred_1066_9 + k_fold_dem_pred_1066_10
+(34 missing values generated)
+
+. 
+. gen k_fold_dem_pred_1066_av = total_pred/10
+(34 missing values generated)
+
+. 
+. gen cdem1066pred50 = (k_fold_dem_pred_1066_av >= .5) if !missing(k_fold_dem_pred_1066_av)
+(34 missing values generated)
+
+. tab cdem1066pred50
+
+cdem1066pre |
+        d50 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      6,102       89.75       89.75
+          1 |        697       10.25      100.00
+------------+-----------------------------------
+      Total |      6,799      100.00
+
+. tab cdem1066 cdem1066pred50, matcell(conf_matrix)
+
+ Education |
+  adjusted |
+      1066 |
+    Lancet |
+  dementia |    cdem1066pred50
+ diagnosis |         0          1 |     Total
+-----------+----------------------+----------
+  non-case |     5,954         74 |     6,028 
+      case |       138        622 |       760 
+-----------+----------------------+----------
+     Total |     6,092        696 |     6,788 
+
+. 
+. matrix list conf_matrix
+
+conf_matrix[2,2]
+      c1    c2
+r1  5954    74
+r2   138   622
+
+. 
+. scalar TN = conf_matrix[1,1]
+
+. scalar FN = conf_matrix[2,1]
+
+. scalar FP = conf_matrix[1,2]
+
+. scalar TP = conf_matrix[2,2]
+
+. 
+. scalar Sensitivity = TP / (TP + FN)
+
+. scalar Specificity = TN / (TN + FP)
+
+. scalar Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+. scalar Prevalence = ((TP+FP) / (TP + TN + FP + FN))*100
+
+. 
+. display "Sensitivity for 1066 .50: " Sensitivity
+Sensitivity for 1066 .50: .81842105
+
+. display "Specificity for 1066 .50: " Specificity
+Specificity for 1066 .50: .98772395
+
+. display "Accuracy for 1066 .50: " Accuracy
+Accuracy for 1066 .50: .96876841
+
+. display "Predicted Prevalence for 1066 ADAMS modified: " Prevalence
+Predicted Prevalence for 1066 ADAMS modified: 10.253388
+
+. display "Predicted Prevalence for 1066 original: " ((TP+FN) / (TP + TN + FP + FN))*100
+Predicted Prevalence for 1066 original: 11.196229
+
+. 
+. roctab cdem1066 cdem1066pred50
+
+                      ROC                     Asymptotic normal  
+           Obs       area     Std. err.      [95% conf. interval]
+     ------------------------------------------------------------
+         6,788     0.9031       0.0070        0.88929     0.91686
+
+. 
+. *for this do file, I want to extract a set of coefficients that I can use to predict in the C
+> ADAS dataset
+. logit cdem1066 cogscore_cadas relscore_cadas recall // coefficients coming from here
+
+Iteration 0:  Log likelihood =  -2379.862  
+Iteration 1:  Log likelihood = -851.34227  
+Iteration 2:  Log likelihood = -566.06361  
+Iteration 3:  Log likelihood = -518.90148  
+Iteration 4:  Log likelihood = -517.67529  
+Iteration 5:  Log likelihood = -517.67317  
+Iteration 6:  Log likelihood = -517.67317  
+
+Logistic regression                                    Number of obs =   6,788
+                                                       LR chi2(3)    = 3724.38
+                                                       Prob > chi2   =  0.0000
+Log likelihood = -517.67317                            Pseudo R2     =  0.7825
+
+--------------------------------------------------------------------------------
+      cdem1066 | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+---------------+----------------------------------------------------------------
+cogscore_cadas |  -.4453795   .0295911   -15.05   0.000    -.5033771    -.387382
+relscore_cadas |   .5031411   .0250798    20.06   0.000     .4539855    .5522967
+        recall |  -.6978724   .0562487   -12.41   0.000    -.8081178    -.587627
+         _cons |   8.571528   .6836945    12.54   0.000     7.231511    9.911544
+--------------------------------------------------------------------------------
+Note: 0 failures and 52 successes completely determined.
+
+. predict cdem1066_prob, pr
+(34 missing values generated)
+
+. summarize cdem1066_prob
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+cdem1066_p~b |      6,799    .1120047    .2794218   6.98e-06          1
+
+. 
+. gen demp1066_score = exp(8.571528 -.4453795 * cogscore_cadas + .5031411 * relscore_cadas -.69
+> 78724 * recall) / (1 + exp(8.571528 -.4453795 * cogscore_cadas + .5031411 * relscore_cadas -.
+> 6978724 * recall))
+(34 missing values generated)
+
+. summarize demp1066_score
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+demp1066_s~e |      6,799    .1120047    .2794218   6.98e-06          1
+
+. /* the formula using logit:
+> log(P/(1-P)) = 8.571528 -.4453795(cogscore) + .5031411(relscore) -.6978724(recall)
+> or
+> P/(1-P) = exp(8.571528 -.4453795(cogscore) + .5031411(relscore) -.6978724(recall))
+> or
+> P = exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall) / (1 + exp(8.
+> 571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall))
+> */
+. 
+. regress cdem1066 cogscore_cadas relscore_cadas recall
+
+      Source |       SS           df       MS      Number of obs   =     6,788
+-------------+----------------------------------   F(3, 6784)      =   3663.86
+       Model |  417.331556         3  139.110519   Prob > F        =    0.0000
+    Residual |  257.577106     6,784  .037968323   R-squared       =    0.6184
+-------------+----------------------------------   Adj R-squared   =    0.6182
+       Total |  674.908662     6,787  .099441382   Root MSE        =    .19485
+
+--------------------------------------------------------------------------------
+      cdem1066 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+---------------+----------------------------------------------------------------
+cogscore_cadas |  -.0219634   .0007164   -30.66   0.000    -.0233678   -.0205589
+relscore_cadas |   .0317713   .0007963    39.90   0.000     .0302102    .0333323
+        recall |  -.0195026   .0012774   -15.27   0.000    -.0220068   -.0169984
+         _cons |   .6964319   .0187625    37.12   0.000     .6596516    .7332122
+--------------------------------------------------------------------------------
+
+. 
+. /*the formula using LPM:
+> P = 0.6946127 - 0.0212441(cogscore) + 0.0317057(relscore) - 0.0192426(recall)
+> */
+. 
+. *if I were to convert to categoricals
+. logit cdem1066 bcogscor brelscor bdelay
+variable bcogscor not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. summarize pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat tow
+> n chief street store address longmem month day year season nod point pentag
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+      pencil |      6,833    .9723401    .1640084          0          1
+       watch |      6,833    .9708766    .1681646          0          1
+       chair |      6,833    .9701449       .1702          0          1
+       shoes |      6,833    .9713157      .16693          0          1
+     knuckle |      6,833    .7115469    .4530761          0          1
+-------------+---------------------------------------------------------
+       elbow |      6,833    .9566808    .2035895          0          1
+      should |      6,833    .9015074    .2980014          0          1
+      bridge |      6,833    .9585833    .1992665          0          1
+      hammer |      6,833    .9702912    .1697951          0          1
+        pray |      6,833    .9719011    .1652676          0          1
+-------------+---------------------------------------------------------
+     chemist |      6,833    .9695595    .1718086          0          1
+      repeat |      6,833    .9219962    .2681972          0          1
+        town |      6,833    .9439485     .230038          0          1
+       chief |      6,833    .8150154    .3883135          0          1
+      street |      6,833    .9121908    .2830379          0          1
+-------------+---------------------------------------------------------
+       store |      6,833     .923606    .2656469          0          1
+     address |      6,833    .9250695    .2632984          0          1
+     longmem |      6,833    .8716523    .3345011          0          1
+       month |      6,833    .8949217    .3066767          0          1
+         day |      6,833    .8892141    .3138898          0          1
+-------------+---------------------------------------------------------
+        year |      6,833    .8507244     .356386          0          1
+      season |      6,833    .8703351    .3359589          0          1
+         nod |      6,833    .9597541    .1965497          0          1
+       point |      6,833    .9524367     .212856          0          1
+      pentag |      6,833     .517196    .4997408          0          1
+
+. do "/var/folders/89/6bdxzk2j30v5n3wstywbcpg80000gn/T//SD18651.000000"
+
+. egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemis
+> t repeat town chief street store address longmem month day year season nod point circle penta
+> g)
+variable count already defined
+r(110);
+
+end of do-file
+
+r(110);
+
+. clear
+
+. do "/var/folders/89/6bdxzk2j30v5n3wstywbcpg80000gn/T//SD18651.000000"
+
+. 
+. 
+. clear all
+
+. set more off
+
+. capture log close
