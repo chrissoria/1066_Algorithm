@@ -101,11 +101,24 @@ else {
 rename i_a2 street
 rename i_a3 store
 rename i_a4 address
-gen longmem = cond(missing(c_69_c),0,c_69_c) + cond(missing(c_69_d),0,c_69_d) + cond(missing(c_69_p),0,c_69_p)
+gen longmem = .
+if inlist("`country'", "CU", "DR") {
+    replace longmem = cond(missing(c_69_c),0,c_69_c) + cond(missing(c_69_d),0,c_69_d)
+}
+else {
+    replace longmem = cond(missing(c_69_p),0,c_69_p)
+}
+
 rename c_3 month
 rename c_5 day
 rename c_1 year
-gen season = cond(missing(c_2_p_c),0,c_2_p_c) + cond(missing(c_2_d),0,c_2_d)
+gen season = .
+if inlist("`country'", "CU", "DR") {
+    replace season = cond(missing(c_2_p_c),0,c_2_p_c) + cond(missing(c_2_d),0,c_2_d)
+}
+else {
+    replace season = cond(missing(c_2_p_c),0,c_2_p_c)
+}
 rename c_61 nod
 rename c_62 point
 rename cs_32 pentag
@@ -610,7 +623,7 @@ postclose handle
 use `results', clear
 export delimited using "1066_consensus_sens_spec_output.csv", replace
 
-/*
+restore
 
 *the below is only for analyzing the output
 
@@ -637,6 +650,4 @@ use results_temp.dta, clear
 export delimited using "/Users/chrissoria/Documents/CADAS/Data/Cuba_Out/cadas_1066_diagnostics.csv", replace
 
 restore
-
-*/
 
