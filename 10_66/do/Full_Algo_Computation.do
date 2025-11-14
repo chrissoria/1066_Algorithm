@@ -331,6 +331,9 @@ gen T = cond(missing(miss1_duplicate), 0, miss1_duplicate) + ///
 gen U = 30 / (30 - misstot)
 replace U = cond(missing(misstot), 0, U)
 
+summarize activ mental memory put kept frdname famname convers ///
+         wordfind wordwrg past lastsee lastday orient lostout ///
+         lostin chores hobby money change reason feed dress toilet
 
 gen relscore_duplicate = U * S
 
@@ -454,46 +457,5 @@ tab dem1066_duplicate dem1066, miss
 count if dem1066_duplicate == 1
 count if cdem1066 == 1
 
-/*
-gen is_diff = 0
-replace is_diff = 1 if dem1066 != dem1066_duplicate
-drop if is_diff == 0
-*/
-
-gen is_diff = 0
-replace is_diff = 1 if (abs(relscore - relscore_duplicate) > 0.0001) & (relscore != .) & (relscore_duplicate != .)
-replace is_diff = 1 if (relscore == . & relscore_duplicate != .) | (relscore != . & relscore_duplicate == .)
-drop if is_diff == 0
-
-* Keep only the relscore and relscore_duplicate variables
-keep pid S dem1066_duplicate dem1066 misstot_duplicate relscore relscore_original relscore_duplicate is_diff ///
- put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores change money
-
-* Export the modified data to an Excel file
-export excel using "/Users/chrissoria/Documents/Research/CADAS_1066/1066/differences.xlsx", firstrow(variables) replace
-
-*for this do file, I want to extract a set of coefficients that I can use to predict in the CADAS dataset
-logit cdem1066 cogscore_cadas relscore_cadas recall // coefficients coming from here
-predict cdem1066_prob, pr
-summarize cdem1066_prob
-
-gen demp1066_score = exp(8.571528 -.4453795 * cogscore_cadas + .5031411 * relscore_cadas -.6978724 * recall) / (1 + exp(8.571528 -.4453795 * cogscore_cadas + .5031411 * relscore_cadas -.6978724 * recall))
-summarize demp1066_score
-/* the formula using logit:
-log(P/(1-P)) = 8.571528 -.4453795(cogscore) + .5031411(relscore) -.6978724(recall)
-or
-P/(1-P) = exp(8.571528 -.4453795(cogscore) + .5031411(relscore) -.6978724(recall))
-or
-P = exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall) / (1 + exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall))
-*/
-
-regress cdem1066 cogscore_cadas relscore_cadas recall
-
-/*the formula using LPM:
-P = 0.6946127 - 0.0212441(cogscore) + 0.0317057(relscore) - 0.0192426(recall)
-*/
-
-*if I were to convert to categoricals
-logit cdem1066 bcogscor brelscor bdelay
 
 log close

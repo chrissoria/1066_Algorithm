@@ -174,6 +174,11 @@ else if "`drop_physical_disability'" == "no" {
 replace pentag = 0 if pentag_diss == 6 | pentag_diss == 7
 }
 
+*street, store, and address come from informant and therefore have a different structure
+recode street (2 = 0)
+recode store (2 = 0)
+recode address (2 = 0)
+
 replace pentag = 1 if pentag == 2
 
 replace animals = . if animals == 777
@@ -189,7 +194,7 @@ foreach var in animals wordimm worddel paper story learn1 learn2 learn3 recall p
     replace `var' = . if `var' == .v | `var' == .i
 }
 
-egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point  pentag)
+egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point pentag)
 
 *max should be 27
 summarize count
@@ -229,8 +234,6 @@ summarize storytot
 gen cogscore = 1.03125 * (nametot + count + animtot + wordtot1 + wordtot2 + papertot + storytot)
 
 summarize cogscore
-
-histogram cogscore
 
 /* in CU the averae cogscore is 28.70772 
 in DR the average cogscore is 27.34616
@@ -329,7 +332,7 @@ summarize misstot
 summarize miss1
 summarize miss3
 
-foreach var in put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores change money {
+foreach var in put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores change money reason {
     replace `var'= `var'/2
 }
 
@@ -385,6 +388,10 @@ gen U = 30 / (30 - misstot)
 replace U = cond(missing(misstot), 0, U)
 
 gen relscore_cadas = U*S
+
+summarize activ mental memory put kept frdname famname convers ///
+         wordfind wordwrg past lastsee lastday orient lostout ///
+         lostin chores hobby money change reason feed dress toilet
 
 summarize relscore
 /* our relscore in DR is bigger than 10/66 by over a whole point.  
