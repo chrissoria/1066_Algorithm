@@ -1,0 +1,1880 @@
+
+  ___  ____  ____  ____  ____ ®
+ /__    /   ____/   /   ____/      StataNow 19.5
+___/   /   /___/   /   /___/       SE—Standard Edition
+
+ Statistics and Data Science       Copyright 1985-2025 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-782-8272        https://www.stata.com
+                                   979-696-4600        service@stata.com
+
+Stata license: Single-user , expiring  6 Aug 2026
+Serial number: 401909206182
+  Licensed to: Chris Soria
+               UC Berkeley
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. Maximum number of variables is set to 5,000 but can be increased;
+          see help set_maxvar.
+
+. do /Users/chrissoria/Documents/Research/1066/CADAS/do/generating_coeffs_from_
+> 1066.do 
+
+. 
+. 
+. clear all
+
+. set more off
+
+. capture log close
+
+. 
+. *******ADJUST LOCALS HERE**********
+. 
+. ***********************************
+. local user "Chris"  // Change this to "Will" to switch paths
+
+. 
+. local Chris "/Users/chrissoria/Documents/Research/CADAS_1066/1066"
+
+. local Will "PATH"
+
+. 
+. local path = cond("`user'" == "Chris", "`Chris'", "`Will'")
+
+. 
+. cd "`path'"
+/Users/chrissoria/Documents/Research/CADAS_1066/1066
+
+. 
+. local wave 1
+
+. 
+. local drop_missing_from_relscore "no" // change to yes or no
+
+. 
+. ***** SCRIPT STARTS HERE *********
+. 
+. **********************************
+. 
+. if `wave' == 1 {
+.     use "`path'/data/1066_Baseline_data.dta"
+. }
+
+. else if `wave' == 2 {
+.     use "`path'/data/1066_full_follow_up_Caribbean.dta"
+. }
+
+. 
+. if `wave' == 2 {
+.     foreach var of varlist _all {
+  2.         local lowvar = lower("`var'")
+  3.         rename `var' `lowvar'
+  4.         local newname = substr("`lowvar'", 3, .)
+  5.         rename `lowvar' `newname'
+  6.     }
+. gen pid = (ntreid*1000000) + (useid*100) + rticid
+. *I'm dropping these because they look to have been dropped in the data possib
+> le incomplete
+. drop if inlist(pid, 20028102,20041200,20076700,20129300,20131602)
+. *I'm dropping this case but I cannot see a reason why it would've been droppe
+> d (no missing in relscore)
+. *I'm assuming it was dropped for a specific resons (singled out)
+. drop if inlist(pid, 20125302)
+. *the cogscores below have been dropped for a reason that's not identifiable
+. *the dem1066 algo ends up dropping them somewhere in its computation
+. drop if inlist(pid, 1109201, 1300101, 1300901, 1312101, 1316301, 1316302, 162
+> 0901, 2026501, 2040901, 2046001, 2046002, 2066101, 2070001, 2070302, 2583601)
+. }
+
+. else if `wave' == 1 {
+.     foreach var of varlist _all {
+  2.     rename `var' `=lower("`var'")'
+  3. }
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+  (all newnames==oldnames)
+. gen pid = (countryid*1000000) + (region*100000) + (houseid*100) + particid
+. }
+
+. 
+. if `wave' == 1 {
+.     log using 1066_algo_w1.log, text replace
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/chrissoria/Documents/Research/CADAS_1066/1066/1066_algo_w1.
+> log
+  log type:  text
+ opened on:  24 Nov 2025, 12:11:28
+. }
+
+. else if `wave' == 2 {
+.     log using 1066_algo_w2.log, text replace
+. }
+
+. 
+. recode pdas2 (1 2 =1) (3 4 =2), gen(pdas2a)
+(1,667 differences between pdas2 and pdas2a)
+
+. recode pdas4 (1 2 =1) (3 4 =2), gen(pdas4a)
+(1,215 differences between pdas4 and pdas4a)
+
+. recode pdas8 (1 2 =1) (3 4 =2), gen(pdas8a)
+(593 differences between pdas8 and pdas8a)
+
+. recode pdas10 (1 2 =1) (3 4 =2), gen(pdas10a)
+(356 differences between pdas10 and pdas10a)
+
+. recode pdas11 (1 2 =1) (3 4 =2), gen(pdas11a)
+(390 differences between pdas11 and pdas11a)
+
+. recode pdas12 (1 2 =1) (3 4 =2), gen(pdas12a)
+(1,355 differences between pdas12 and pdas12a)
+
+. 
+. * sum, re-scaled from 36 to 100
+. gen whodas12_duplicate=(pdas1+pdas2a+pdas3+pdas4a+pdas5+pdas6+pdas7+pdas8a+pd
+> as9+pdas10a+pdas11a+pdas12a)*(100/36)
+(34 missing values generated)
+
+. summarize whodas12 whodas12_duplicate
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+    whodas12 |      6,799    15.32006    21.12798          0        100
+whodas12_d~e |      6,799    15.32006    21.12798          0        100
+
+. 
+. replace whodas12 = whodas12_duplicate
+(4,034 real changes made)
+
+. drop whodas12_duplicate
+
+. 
+. gen nametot_duplicate = 0
+
+. 
+. replace nametot_duplicate = 1 if name > 0 & !missing(name)
+(6,583 real changes made)
+
+. replace nametot_duplicate = 1 if nrecall > 0 & !missing(nrecall)
+(67 real changes made)
+
+. 
+. * Counting the number of 1s in specific columns (all binary)
+. 
+. egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge ha
+> mmer pray chemist repeat town chief street store address longmem month day ye
+> ar season nod point circle pentag)
+
+. 
+. * Recoding values from na to 0 so that we can perform the arithmetic\
+. 
+. foreach var in animals wordimm worddel paper story learn1 learn2 learn3 recal
+> l pencil watch chair shoes knuckle elbow should bridge hammer pray chemist re
+> peat town chief street store address longmem month day year season nod point 
+> circle pentag nametot nrecall {
+  2.     replace `var' = 0 if `var' == .
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. * recoding 9's and 99's to 0
+. 
+. * Replace 99 with 0 for specific columns
+. foreach var in animals wordimm worddel paper story {
+  2.     replace `var' = 0 if `var' == 99
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. * Replace 9 with 0 for specific columns
+. foreach var in wordimm worddel paper story {
+  2.     replace `var' = 0 if `var' == 9
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. * cleaning the learn variables and recoding, from what I can tell this is to 
+> fix possible errors
+. * I assume this on the basis that the learn1-3 max words possible is 10
+. * replacing the values 11, 20, 21, 30, 31, 40, 41, 50, 51, 60, 61, 70, 71, 80
+> , 81, and 90 
+. * with the values 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, and 9, respect
+> ively.
+. * this may or may not be a good idea, given that we are assuming 11 was meant
+>  to be typed in as 11 and not 10
+. 
+. foreach var in learn1 learn2 learn3 recall {
+  2.     replace `var' = 1 if `var' == 11
+  3.     replace `var' = 2 if inlist(`var', 20, 21)
+  4.     replace `var' = 3 if inlist(`var', 30, 31)
+  5.     replace `var' = 4 if inlist(`var', 40, 41)
+  6.     replace `var' = 5 if inlist(`var', 50, 51)
+  7.     replace `var' = 6 if inlist(`var', 60, 61)
+  8.     replace `var' = 7 if inlist(`var', 70, 71)
+  9.     replace `var' = 8 if inlist(`var', 80, 81)
+ 10.     replace `var' = 9 if inlist(`var', 90, 91)
+ 11.     * Map 99 to sysmis (in Stata, missing values are represented by .)
+.     replace `var' = . if `var' == 99
+ 12. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. * below should all be binary 0 1 variables, we will recode any values greater
+>  than 2 but less than 9 as na
+. * this is an odd recoding, why less than 9? We will have to be careful with t
+> his in CADAS
+. 
+. foreach var in name pencil watch chair shoes knuckle elbow should bridge hamm
+> er pray chemist repeat town chief street store address longmem month day year
+>  season nod point circle pentag {
+  2.     replace `var' = . if `var' >= 2 & `var' <= 9
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. gen immed_duplicate = cond(missing(learn1),0,learn1) + cond(missing(learn2),0
+> ,learn2) + cond(missing(learn3),0,learn3)
+
+. summarize immed immed_duplicate
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+       immed |      6,832    13.80299    4.921144          0         29
+immed_dupl~e |      6,833    13.80228    4.921127          0         29
+
+. 
+. * more cleaning, recoding any values higher than a certain amount as "na"
+. 
+. local vars "animals wordimm worddel paper story recall immed nrecall"
+
+. local nums "45 3 3 3 6 10 29 1"
+
+. 
+. local n : word count `vars'
+
+. 
+. forval i = 1/`n' {
+  2.     local var : word `i' of `vars'
+  3.     local num : word `i' of `nums'
+  4.     replace `var' = . if `var' > `num'
+  5. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. *dividing by total amount of possible correct answers to get a "total"
+. 
+. local divide_var "animals wordimm worddel paper story"
+
+. local divisor "23 3 3 3 6"
+
+. local new_column "animtot wordtot1 wordtot2 papertot storytot"
+
+. 
+. local n : word count `divide_var'
+
+. 
+. forvalues i = 1/`n' {
+  2.     local col : word `i' of `divide_var'
+  3.     local num : word `i' of `divisor'
+  4.     local new : word `i' of `new_column'
+  5.     
+.     capture gen `new' = `col'/`num'
+  6.     
+.     if _rc capture replace `new' = `col'/`num'
+  7. }
+
+. 
+. * then put it all together below
+. * nametot = ability to say the interviewer's name and remember it
+. * count = ability to identify common objects, repeat simple words, orient the
+> mselves in space and time, and motor skills
+. * animtot = quickly list the names of animals 
+. * wordtot1 = immediate recall of words
+. * wordtot2 = delayed recall of words
+. * papertot = ability to fold paper and follow instructions
+. * storytot = ability to recall the elements of a story
+. 
+. * Calculate the cognitive score
+. * Try to generate the new variable
+. capture gen cogscore_duplicate = 1.03125 * (nametot + count + animtot + wordt
+> ot1 + wordtot2 + papertot + storytot)
+
+. 
+. if `wave' == 1 {
+. format cogscore_duplicate %21.8f
+. }
+
+. 
+. else if `wave' == 2 {
+. format cogscore_duplicate %9.4f
+. }
+
+. 
+. /*
+> if "`wave'" == "1" \{
+>     replace cogscore = cogscore_duplicate\
+>     drop cogscore_duplicate
+> }
+> */
+. 
+. else if "`wave'" == "2" {
+.     replace cogscore_duplicate = round(cogscore_duplicate, 0.0001)
+.     replace cogscore = round(cogscore, 0.0001)
+. }
+
+. 
+. summarize cogscore cogscore_duplicate
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+    cogscore |      6,833     28.8248    5.454179          0   33.76223
+cogscore_d~e |      6,833    28.82405    5.458085          0   33.76223
+
+. 
+. * Creating binary missing indicators without changing the original missing va
+> lues
+. local miss1_variables "mental activ memory put kept frdname famname convers w
+> ordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money
+>  change reason"
+
+. 
+. * Creating new binary variables for each original variable to indicate whethe
+> r the value is missing
+. foreach var of local miss1_variables {
+  2.     gen missing_`var' = missing(`var')
+  3. }
+
+. 
+. * Generating the miss1 variable by summing up the binary missing indicators
+. egen miss1_duplicate = rowtotal(missing_mental missing_activ missing_memory /
+> * 
+>     */ missing_put missing_kept missing_frdname missing_famname /* 
+>     */ missing_convers missing_wordfind missing_wordwrg missing_past /* 
+>     */ missing_lastsee missing_lastday missing_orient missing_lostout /* 
+>     */ missing_lostin missing_chores missing_hobby missing_money /* 
+>     */ missing_change missing_reason)
+
+. 
+. *replace miss1_duplicate = 0 if miss1_duplicate == 21
+. if `wave' == 1 {
+. replace miss1_duplicate = 0 if miss1_duplicate == .
+(0 real changes made)
+. }
+
+. 
+. /*these are the three variables that i believe are changed in wave 1
+> */
+. 
+. if `wave' == 1 & "`drop_missing_from_relscore'" != "yes" {
+. replace miss1_duplicate = miss1_duplicate + 1 if inlist(pid, 2108501, 2012280
+> 2, 20164200)
+(3 real changes made)
+. }
+
+. 
+. * counting up the remaining missing values to generate miss 3 variable
+. local miss3_variables "feed dress toilet"
+
+. 
+. gen miss3_duplicate = 0
+
+. 
+. foreach var of local miss3_variables {
+  2.     * Sum up the variables that are missing
+.     replace miss3_duplicate = miss3_duplicate + missing(`var')
+  3. }
+(38 real changes made)
+(37 real changes made)
+(39 real changes made)
+
+. 
+. if `wave' == 1 {
+. *the logic below makes these match, which also implies an inconcisistent conv
+> ersion of miss3 to missing versus 0
+. replace miss3_duplicate = . if miss3_duplicate + miss1_duplicate == 24 & miss
+> 3 == . 
+(26 real changes made, 26 to missing)
+. }
+
+. 
+. local all_miss "feed dress toilet"
+
+. 
+. foreach var of local all_miss {
+  2.     gen missing_`var' = missing(`var')
+  3. }
+
+. 
+. * Generating the miss1 variable by summing up the binary missing indicators
+. egen all_miss = rowtotal(missing_mental missing_activ missing_memory /* 
+>     */ missing_put missing_kept missing_frdname missing_famname /* 
+>     */ missing_convers missing_wordfind missing_wordwrg missing_past /* 
+>     */ missing_lastsee missing_lastday missing_orient missing_lostout /* 
+>     */ missing_lostin missing_chores missing_hobby missing_money /* 
+>     */ missing_change missing_reason missing_feed missing_dress missing_toile
+> t)
+
+.     
+. replace miss1_duplicate = . if (all_miss ==24 & miss3 == .)
+(26 real changes made, 26 to missing)
+
+. 
+. gen misstot_duplicate = (miss3_duplicate * 3) + miss1_duplicate
+(26 missing values generated)
+
+. 
+. /* below should be the correct logic
+> replace misstot = . if misstot == 30
+> replace misstot = 0 if misstot == .
+> 
+> replace misstot_duplicate = . if misstot_duplicate == 30
+> replace misstot_duplicate = 0 if misstot_duplicate == .
+> 
+> */
+. 
+. summarize misstot misstot_duplicate
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     misstot |      6,807    .0581754    1.125465          0         30
+misstot_du~e |      6,807    .0581754    1.125465          0         30
+
+. summarize miss1 miss1_duplicate
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+       miss1 |      6,807    .0423094    .8009155          0         21
+miss1_dupl~e |      6,807    .0423094    .8009155          0         21
+
+. summarize miss3 miss3_duplicate
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+       miss3 |      6,807    .0052887    .1223062          0          3
+miss3_dupl~e |      6,807    .0052887    .1223062          0          3
+
+. 
+. foreach var in put kept frdname famname convers wordfind wordwrg past lastsee
+>  lastday orient lostout lostin chores change money {
+  2.     replace `var'= `var'/2
+  3. }
+(3,589 real changes made)
+(1,927 real changes made)
+(1,176 real changes made)
+(612 real changes made)
+(1,355 real changes made)
+(612 real changes made)
+(482 real changes made)
+(1,453 real changes made)
+(340 real changes made)
+(711 real changes made)
+(319 real changes made)
+(315 real changes made)
+(223 real changes made)
+(401 real changes made)
+(652 real changes made)
+(676 real changes made)
+
+. 
+. if `wave' == 2 {
+. replace chores = chores_original
+. }
+
+. 
+. *this whole chunk of code produces no changes
+. * Backup original 'dress' variable and recode if 'dressdis' is 1
+. replace dress = 0 if dressdis == 1
+(0 real changes made)
+
+. 
+. * Backup original 'chores' variable and recode if 'choredis' is 1
+. replace chores = 0 if choredis == 1
+(0 real changes made)
+
+. 
+. * Backup original 'feed' variable and recode if 'feeddis' is 1
+. replace feed = 0 if feeddis == 1
+(0 real changes made)
+
+. 
+. * Backup original 'toilet' variable and recode if 'toildis' is 1
+. replace toilet = 0 if toildis == 1
+(0 real changes made)
+
+. 
+. *replace misstot_duplicate = 0 if misstot_duplicate == .
+. 
+. if "`drop_missing_from_relscore'" == "yes" {
+.     drop if misstot_duplicate > 0
+. }
+
+. 
+. gen S = cond(missing(activ), 0, activ) +  ///
+>             cond(missing(mental), 0, mental) + ///
+>             cond(missing(memory), 0, memory) + ///
+>             cond(missing(put), 0, put) + ///
+>             cond(missing(kept), 0, kept) + ///
+>             cond(missing(frdname), 0, frdname) + ///
+>             cond(missing(famname), 0, famname) + ///
+>             cond(missing(convers), 0, convers) + ///
+>             cond(missing(wordfind), 0, wordfind) + ///
+>             cond(missing(wordwrg), 0, wordwrg) + ///
+>             cond(missing(past), 0, past) + ///
+>             cond(missing(lastsee), 0, lastsee) + ///
+>             cond(missing(lastday), 0, lastday) + ///
+>             cond(missing(orient), 0, orient) + ///
+>             cond(missing(lostout), 0, lostout) + ///
+>             cond(missing(lostin), 0, lostin) + ///
+>             cond(missing(chores), 0, chores) + ///
+>             cond(missing(hobby), 0, hobby) + ///
+>             cond(missing(money), 0, money) + ///
+>             cond(missing(change), 0, change) + ///
+>             cond(missing(reason), 0, reason) + ///
+>             cond(missing(feed), 0, feed) + ///
+>             cond(missing(dress), 0, dress) + ///
+>             cond(missing(toilet), 0, toilet)
+
+. 
+. gen T = cond(missing(miss1_duplicate), 0, miss1_duplicate) + ///
+>         cond(missing(miss3_duplicate), 0, miss3_duplicate)
+
+. 
+. gen U = 30 / (30 - misstot)
+(34 missing values generated)
+
+. replace U = cond(missing(misstot), 0, U)
+(26 real changes made)
+
+. 
+. 
+. gen relscore_duplicate = U * S
+(8 missing values generated)
+
+. 
+. summarize relscore_duplicate relscore_original
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+relscore_d~e |      6,825    2.267357    4.131984          0         30
+relscore_o~l |      6,799    2.271145    4.129672  -9.310345         30
+
+. 
+. gen pred_relscore = 0.004 + (0.072 * whodas12) + (0.338 * npisev)
+(197 missing values generated)
+
+. 
+. 
+. /*RECODE
+>   pred_relscore  (Lowest thru 0=0)  (30 thru Highest=10)  .
+> EXECUTE .
+> */
+. 
+. *I believe the above code is supposed to say 30 thru highest=30
+. 
+. replace pred_relscore = 0 if pred_relscore <= 0
+(0 real changes made)
+
+. replace pred_relscore = 30 if pred_relscore >= 30 & !missing(pred_relscore)
+(0 real changes made)
+
+. 
+. /*RECODE\
+>   relscore  (MISSING=999).
+> EXECUTE .
+> 
+> IF (relscore=999) relscore = pred_relscore .
+> EXECUTE .*/
+. 
+. 
+. * Replace missing values in relscore_duplicate with non-missing values from p
+> red_relscore
+. replace relscore_duplicate = pred_relscore if relscore_duplicate == . & pred_
+> relscore != .
+(3 real changes made)
+
+. 
+. *exactly the same
+. summarize relscore_duplicate relscore
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+relscore_d~e |      6,828    2.266884    4.131184          0         30
+    relscore |      6,802    2.270669     4.12887  -9.310345         30
+
+. 
+. generate dfscore_duplicate = 0.452322 - (0.01669918 * cogscore_duplicate) + (
+> 0.03033851 * relscore_duplicate)
+(5 missing values generated)
+
+. 
+. 
+. *exact
+. summarize dfscore dfscore_duplicate
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     dfscore |      6,802    .0398275    .1993708  -.2838767   1.362477
+dfscore_du~e |      6,828    .0397295     .199505   -.109982   1.362477
+
+. 
+. *again, have to be careful to exclude missing here
+. gen dfcase_duplicate = .
+(6,833 missing values generated)
+
+. replace dfcase_duplicate = 1 if dfscore_duplicate <= 0.119999999
+(5,770 real changes made)
+
+. replace dfcase_duplicate = 2 if dfscore_duplicate >= 0.12 & dfscore_duplicate
+>  < 0.184
+(250 real changes made)
+
+. replace dfcase_duplicate = 3 if dfscore_duplicate >= 0.184 & dfscore_duplicat
+> e < .
+(808 real changes made)
+
+. 
+. *exact
+. summarize dfcase_duplicate dfcase
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+dfcase_dup~e |      6,828    1.273286    .6598009          1          3
+      dfcase |      6,802    1.274037    .6607436          1          3
+
+. 
+. gen cogcase_duplicate = .
+(6,833 missing values generated)
+
+. replace cogcase_duplicate = 3 if cogscore <= 28.5
+(1,752 real changes made)
+
+. replace cogcase_duplicate = 2 if cogscore > 28.5 & cogscore <= 29.5
+(766 real changes made)
+
+. replace cogcase_duplicate = 1 if cogscore > 29.5 & cogscore != .
+(4,315 real changes made)
+
+. 
+. *exact
+. summarize cogcase_duplicate cogcase
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+cogcase_du~e |      6,833    1.624909    .8644725          1          3
+     cogcase |      6,833    1.624909    .8644725          1          3
+
+. 
+. gen ncogscor_duplicate = .
+(6,833 missing values generated)
+
+. replace ncogscor_duplicate = 1 if cogscore <= 23.699
+(589 real changes made)
+
+. replace ncogscor_duplicate = 2 if cogscore > 23.699 & cogscore <= 28.619
+(1,222 real changes made)
+
+. replace ncogscor_duplicate = 3 if cogscore > 28.619 & cogscore <= 30.619
+(1,921 real changes made)
+
+. replace ncogscor_duplicate = 4 if cogscore > 30.619 & cogscore <= 31.839
+(1,749 real changes made)
+
+. replace ncogscor_duplicate = 5 if cogscore > 31.839 & cogscore != .
+(1,352 real changes made)
+
+. 
+. gen nrelscor_duplicate = .
+(6,833 missing values generated)
+
+. replace nrelscor_duplicate = 1 if relscore_duplicate == 0
+(1,993 real changes made)
+
+. replace nrelscor_duplicate = 2 if relscore_duplicate > 0 & relscore_duplicate
+>  <= 1.99
+(2,925 real changes made)
+
+. replace nrelscor_duplicate = 3 if relscore_duplicate > 1.99 & relscore_duplic
+> ate <= 5.0
+(1,046 real changes made)
+
+. replace nrelscor_duplicate = 4 if relscore_duplicate > 5.0 & relscore_duplica
+> te <= 12.0
+(593 real changes made)
+
+. replace nrelscor_duplicate = 5 if relscore_duplicate > 12.0 & relscore_duplic
+> ate != .
+(271 real changes made)
+
+. 
+. gen ndelay_duplicate = .
+(6,833 missing values generated)
+
+. replace ndelay_duplicate = 1 if recall == 0
+(553 real changes made)
+
+. replace ndelay_duplicate = 2 if recall >= 1 & recall <= 3
+(1,832 real changes made)
+
+. replace ndelay_duplicate = 3 if recall == 4
+(1,203 real changes made)
+
+. replace ndelay_duplicate = 4 if recall >= 5 & recall <= 6
+(2,192 real changes made)
+
+. replace ndelay_duplicate = 5 if recall >= 7 & recall != .
+(1,045 real changes made)
+
+. 
+. gen brelscor_duplicate = .
+(6,833 missing values generated)
+
+. replace brelscor_duplicate = 0     if nrelscor_duplicate == 1
+(1,993 real changes made)
+
+. replace brelscor_duplicate = 1.908 if nrelscor_duplicate == 2
+(2,925 real changes made)
+
+. replace brelscor_duplicate = 2.311 if nrelscor_duplicate == 3
+(1,046 real changes made)
+
+. replace brelscor_duplicate = 4.171 if nrelscor_duplicate == 4
+(593 real changes made)
+
+. replace brelscor_duplicate = 5.680 if nrelscor_duplicate == 5 & nrelscor_dupl
+> icate != .
+(271 real changes made)
+
+. 
+. gen bcogscor_duplicate = .
+(6,833 missing values generated)
+
+. replace bcogscor_duplicate = 2.801  if ncogscor_duplicate == 1
+(589 real changes made)
+
+. replace bcogscor_duplicate = 1.377  if ncogscor_duplicate == 2
+(1,222 real changes made)
+
+. replace bcogscor_duplicate = 0.866  if ncogscor_duplicate == 3
+(1,921 real changes made)
+
+. replace bcogscor_duplicate = -0.231 if ncogscor_duplicate == 4
+(1,749 real changes made)
+
+. replace bcogscor_duplicate = 0      if ncogscor_duplicate == 5 & ncogscor_dup
+> licate != .
+(1,352 real changes made)
+
+. 
+. gen bdelay_duplicate = .
+(6,833 missing values generated)
+
+. replace bdelay_duplicate = 3.822 if ndelay_duplicate == 1
+(553 real changes made)
+
+. replace bdelay_duplicate = 3.349 if ndelay_duplicate == 2
+(1,832 real changes made)
+
+. replace bdelay_duplicate = 2.575 if ndelay_duplicate == 3
+(1,203 real changes made)
+
+. replace bdelay_duplicate = 2.176 if ndelay_duplicate == 4
+(2,192 real changes made)
+
+. replace bdelay_duplicate = 0     if ndelay_duplicate == 5 & ndelay_duplicate 
+> != .
+(1,045 real changes made)
+
+. 
+. gen bgmsdiag_duplicate = .
+(6,833 missing values generated)
+
+. replace bgmsdiag_duplicate = 0      if gmsdiag == 6
+(2,272 real changes made)
+
+. replace bgmsdiag_duplicate = 1.566  if gmsdiag == 1
+(721 real changes made)
+
+. replace bgmsdiag_duplicate = 1.545  if gmsdiag == 2
+(165 real changes made)
+
+. replace bgmsdiag_duplicate = -0.635 if gmsdiag == 3
+(2,166 real changes made)
+
+. replace bgmsdiag_duplicate = -0.674 if gmsdiag == 4
+(821 real changes made)
+
+. replace bgmsdiag_duplicate = 0.34   if gmsdiag == 5 & gmsdiag != .
+(687 real changes made)
+
+. 
+. *using quintiles from this data
+. xtile ncogscor_quint = cogscore, nq(5)
+
+. xtile nrelscor_quint = relscore_duplicate, nq(5)
+
+. xtile ndelay_quint = recall, nq(5)
+
+. 
+. *using quintiles from cadas
+. gen ncogscore_cadas = .
+(6,833 missing values generated)
+
+. replace ncogscore_cadas = 1 if cogscore <= 28.38926696777344
+(1,700 real changes made)
+
+. replace ncogscore_cadas = 2 if cogscore > 28.38926696777344 & cogscore <= 29.
+> 75679397583008
+(1,045 real changes made)
+
+. replace ncogscore_cadas = 3 if cogscore > 29.75679397583008 & cogscore <= 30.
+> 57880401611328
+(928 real changes made)
+
+. replace ncogscore_cadas = 4 if cogscore > 30.57880401611328 & cogscore <= 31.
+> 3485050201416
+(1,074 real changes made)
+
+. replace ncogscore_cadas = 5 if cogscore > 31.3485050201416 & cogscore != .
+(2,086 real changes made)
+
+. 
+. gen nrelscore_cadas = .
+(6,833 missing values generated)
+
+. replace nrelscore_cadas = 1 if relscore <= 0
+(1,968 real changes made)
+
+. replace nrelscore_cadas = 2 if relscore > 0 & relscore <= .5
+(1,063 real changes made)
+
+. replace nrelscore_cadas = 3 if relscore > .5 & relscore <= 1.5
+(1,855 real changes made)
+
+. replace nrelscore_cadas = 4 if relscore > 1.5 & relscore <= 2.5
+(640 real changes made)
+
+. replace nrelscore_cadas = 5 if relscore > 2.5 & relscore != .
+(1,276 real changes made)
+
+. 
+. gen ndelay_cadas = .
+(6,833 missing values generated)
+
+. replace ndelay_cadas = 1 if recall <= 2
+(1,460 real changes made)
+
+. replace ndelay_cadas = 2 if recall > 2 & recall <= 3
+(925 real changes made)
+
+. replace ndelay_cadas = 3 if recall > 3 & recall <= 4
+(1,206 real changes made)
+
+. replace ndelay_cadas = 4 if recall > 4 & recall <= 5
+(1,275 real changes made)
+
+. replace ndelay_cadas = 5 if recall > 5 & recall != .
+(1,967 real changes made)
+
+. 
+. gen Q = brelscor_duplicate + bcogscor_duplicate + bdelay_duplicate + bgmsdiag
+> _duplicate
+(14 missing values generated)
+
+. gen logodds_duplicate = -9.53 + Q
+(14 missing values generated)
+
+. 
+. gen odds_duplicate = exp(logodds_duplicate)
+(14 missing values generated)
+
+. 
+. gen prob_duplicate = odds_duplicate / (1 + odds_duplicate)
+(14 missing values generated)
+
+. 
+. gen dem1066_duplicate = .
+(6,833 missing values generated)
+
+. replace dem1066_duplicate = 0 if prob_duplicate <= 0.25591
+(6,015 real changes made)
+
+. replace dem1066_duplicate = 1 if prob_duplicate > 0.25591 & prob_duplicate !=
+>  .
+(804 real changes made)
+
+. 
+. summarize dem1066_duplicate dem1066
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+dem1066_du~e |      6,819    .1179059    .3225203          0          1
+dem1066_du~e |      6,819    .1179059    .3225203          0          1
+
+. 
+. tab dem1066_duplicate dem1066, miss
+
+dem1066_du |        dem1066_duplicate
+   plicate |         0          1          . |     Total
+-----------+---------------------------------+----------
+         0 |     6,015          0          0 |     6,015 
+         1 |         0        804          0 |       804 
+         . |         0          0         14 |        14 
+-----------+---------------------------------+----------
+     Total |     6,015        804         14 |     6,833 
+
+. 
+. count if dem1066_duplicate == 1
+  804
+
+. count if cdem1066 == 1
+  760
+
+. 
+. 
+. *I want to extract a set of coefficients that I can use to predict in the CAD
+> AS dataset
+. logit cdem1066 cogscore relscore recall
+
+Iteration 0:  Log likelihood = -2380.2181  
+Iteration 1:  Log likelihood = -856.64053  
+Iteration 2:  Log likelihood = -557.88765  
+Iteration 3:  Log likelihood = -522.92338  
+Iteration 4:  Log likelihood =  -522.1613  
+Iteration 5:  Log likelihood = -522.15968  
+Iteration 6:  Log likelihood = -522.15968  
+
+Logistic regression                                    Number of obs =   6,791
+                                                       LR chi2(3)    = 3716.12
+                                                       Prob > chi2   =  0.0000
+Log likelihood = -522.15968                            Pseudo R2     =  0.7806
+
+------------------------------------------------------------------------------
+    cdem1066 | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    cogscore |  -.4001659   .0268102   -14.93   0.000     -.452713   -.3476188
+    relscore |   .5024221   .0249609    20.13   0.000     .4534998    .5513445
+      recall |  -.6997248   .0560805   -12.48   0.000    -.8096405    -.589809
+       _cons |   8.486511   .6831612    12.42   0.000     7.147539    9.825482
+------------------------------------------------------------------------------
+Note: 0 failures and 49 successes completely determined.
+
+. predict cdem1066_prob, pr
+(31 missing values generated)
+
+. summarize cdem1066_prob
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+cdem1066_p~b |      6,802    .1119603     .279024   7.42e-06          1
+
+. 
+. regress cdem1066 cogscore relscore_duplicate recall
+
+      Source |       SS           df       MS      Number of obs   =     6,805
+-------------+----------------------------------   F(3, 6801)      =   3659.02
+       Model |  416.853427         3  138.951142   Prob > F        =    0.0000
+    Residual |  258.267807     6,801  .037974975   R-squared       =    0.6174
+-------------+----------------------------------   Adj R-squared   =    0.6173
+       Total |  675.121234     6,804  .099224167   Root MSE        =    .19487
+
+------------------------------------------------------------------------------
+    cdem1066 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    cogscore |   -.019811   .0006521   -30.38   0.000    -.0210893   -.0185327
+relscore_d~e |   .0319944   .0007945    40.27   0.000     .0304369    .0335519
+      recall |  -.0196586   .0012754   -15.41   0.000    -.0221588   -.0171583
+       _cons |   .6936593   .0188327    36.83   0.000     .6567413    .7305773
+------------------------------------------------------------------------------
+
+. 
+. *if I were to convert to categoricals
+. logit cdem1066 bcogscor brelscor bdelay
+
+Iteration 0:  Log likelihood = -2381.8779  
+Iteration 1:  Log likelihood = -1120.8605  
+Iteration 2:  Log likelihood = -598.77655  
+Iteration 3:  Log likelihood = -431.38156  
+Iteration 4:  Log likelihood = -422.83956  
+Iteration 5:  Log likelihood = -422.74423  
+Iteration 6:  Log likelihood = -422.74414  
+Iteration 7:  Log likelihood = -422.74414  
+
+Logistic regression                                    Number of obs =   6,805
+                                                       LR chi2(3)    = 3918.27
+                                                       Prob > chi2   =  0.0000
+Log likelihood = -422.74414                            Pseudo R2     =  0.8225
+
+------------------------------------------------------------------------------
+    cdem1066 | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+bcogscor_d~e |    2.76109   .1495743    18.46   0.000      2.46793     3.05425
+brelscor_d~e |   1.836585   .0932322    19.70   0.000     1.653853    2.019316
+bdelay_dup~e |   2.126105   .1796039    11.84   0.000     1.774088    2.478122
+       _cons |  -17.71921   .8529549   -20.77   0.000    -19.39097   -16.04745
+------------------------------------------------------------------------------
+Note: 120 failures and 0 successes completely determined.
+
+. predict dem1066_orig_quints, pr
+(13 missing values generated)
+
+. 
+. gen dem1066_orig_quint = (dem1066_orig_quints >= .5) if !missing(dem1066_orig
+> _quints)
+(13 missing values generated)
+
+. 
+. tab cdem1066 dem1066_orig_quint
+
+ Education |
+  adjusted |
+      1066 |
+    Lancet |
+  dementia |  dem1066_orig_quint
+ diagnosis |         0          1 |     Total
+-----------+----------------------+----------
+  non-case |     5,967         78 |     6,045 
+      case |        83        677 |       760 
+-----------+----------------------+----------
+     Total |     6,050        755 |     6,805 
+
+. roctab cdem1066 dem1066_orig_quint
+
+                      ROC                     Asymptotic normal  
+           Obs       area     Std. err.      [95% conf. interval]
+     ------------------------------------------------------------
+         6,805     0.9389       0.0057        0.92776     0.95013
+
+. 
+. *quint categoricals
+. logit cdem1066 ncogscor_quint nrelscor_quint ndelay_quint
+
+Iteration 0:  Log likelihood = -2381.8779  
+Iteration 1:  Log likelihood = -1460.9973  
+Iteration 2:  Log likelihood = -906.90989  
+Iteration 3:  Log likelihood =  -730.1134  
+Iteration 4:  Log likelihood = -708.43776  
+Iteration 5:  Log likelihood = -708.31782  
+Iteration 6:  Log likelihood = -708.31778  
+
+Logistic regression                                    Number of obs =   6,805
+                                                       LR chi2(3)    = 3347.12
+                                                       Prob > chi2   =  0.0000
+Log likelihood = -708.31778                            Pseudo R2     =  0.7026
+
+------------------------------------------------------------------------------
+    cdem1066 | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ncogscor_q~t |  -2.147228   .1383888   -15.52   0.000    -2.418465   -1.875991
+nrelscor_q~t |   1.857513   .1095785    16.95   0.000     1.642743    2.072283
+ndelay_quint |  -1.312263   .1137981   -11.53   0.000    -1.535303   -1.089223
+       _cons |   -3.99328   .5368547    -7.44   0.000    -5.045496   -2.941064
+------------------------------------------------------------------------------
+Note: 354 failures and 0 successes completely determined.
+
+. 
+. *relscore binary version
+. gen rel_binary = (relscore_duplicate > 4) if relscore_duplicate != .
+(5 missing values generated)
+
+. logit cdem1066 cogscore rel_binary recall
+
+Iteration 0:  Log likelihood = -2381.8779  
+Iteration 1:  Log likelihood = -1045.7825  
+Iteration 2:  Log likelihood = -665.28786  
+Iteration 3:  Log likelihood = -577.07936  
+Iteration 4:  Log likelihood = -573.46855  
+Iteration 5:  Log likelihood =   -573.457  
+Iteration 6:  Log likelihood =   -573.457  
+
+Logistic regression                                    Number of obs =   6,805
+                                                       LR chi2(3)    = 3616.84
+                                                       Prob > chi2   =  0.0000
+Log likelihood = -573.457                              Pseudo R2     =  0.7592
+
+------------------------------------------------------------------------------
+    cdem1066 | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    cogscore |   -.426476   .0254535   -16.76   0.000    -.4763639   -.3765882
+  rel_binary |    3.41575   .1680636    20.32   0.000     3.086351    3.745149
+      recall |  -.6517573    .050729   -12.85   0.000    -.7511844   -.5523302
+       _cons |   9.736947   .6537465    14.89   0.000     8.455627    11.01827
+------------------------------------------------------------------------------
+
+. 
+. *quints from cadas data
+. logit cdem1066 ncogscore_cadas nrelscore_cadas ndelay_cadas
+
+Iteration 0:  Log likelihood = -2380.2181  
+Iteration 1:  Log likelihood = -1449.9845  
+Iteration 2:  Log likelihood = -916.35431  
+Iteration 3:  Log likelihood = -733.64031  
+Iteration 4:  Log likelihood = -700.24687  
+Iteration 5:  Log likelihood = -698.09412  
+Iteration 6:  Log likelihood = -698.08737  
+Iteration 7:  Log likelihood = -698.08737  
+
+Logistic regression                                    Number of obs =   6,791
+                                                       LR chi2(3)    = 3364.26
+                                                       Prob > chi2   =  0.0000
+Log likelihood = -698.08737                            Pseudo R2     =  0.7067
+
+------------------------------------------------------------------------------
+    cdem1066 | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ncogscore_~s |  -2.113413   .1679045   -12.59   0.000      -2.4425   -1.784326
+nrelscore_~s |   1.637074   .0859377    19.05   0.000     1.468639    1.805508
+ndelay_cadas |  -1.119034   .0825089   -13.56   0.000    -1.280749   -.9573197
+       _cons |  -3.190348   .4290643    -7.44   0.000    -4.031298   -2.349397
+------------------------------------------------------------------------------
+
+. predict dem1066_quint_prob, pr
+(31 missing values generated)
+
+. 
+. gen dem1066_quint = (dem1066_quint_prob >= .5) if !missing(dem1066_quint_prob
+> )
+(31 missing values generated)
+
+. 
+. tab cdem1066 dem1066_quint
+
+ Education |
+  adjusted |
+      1066 |
+    Lancet |
+  dementia |     dem1066_quint
+ diagnosis |         0          1 |     Total
+-----------+----------------------+----------
+  non-case |     5,858        173 |     6,031 
+      case |       116        644 |       760 
+-----------+----------------------+----------
+     Total |     5,974        817 |     6,791 
+
+. roctab cdem1066 dem1066_quint
+
+                      ROC                     Asymptotic normal  
+           Obs       area     Std. err.      [95% conf. interval]
+     ------------------------------------------------------------
+         6,791     0.9093       0.0066        0.89638     0.92231
+
+. 
+. * cog components
+. logit cdem1066 nametot count animtot wordtot1 wordtot2 papertot storytot rels
+> core_duplicate recall
+
+Iteration 0:  Log likelihood = -2381.8779  
+Iteration 1:  Log likelihood = -852.62962  
+Iteration 2:  Log likelihood = -536.85838  
+Iteration 3:  Log likelihood = -488.18535  
+Iteration 4:  Log likelihood = -486.01252  
+Iteration 5:  Log likelihood = -486.01029  
+Iteration 6:  Log likelihood = -486.01029  
+
+Logistic regression                                    Number of obs =   6,805
+                                                       LR chi2(9)    = 3791.74
+                                                       Prob > chi2   =  0.0000
+Log likelihood = -486.01029                            Pseudo R2     =  0.7960
+
+------------------------------------------------------------------------------
+    cdem1066 | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+nametot_du~e |   3.724723   .7103492     5.24   0.000     2.332464    5.116982
+       count |  -.5088708   .0348065   -14.62   0.000    -.5770903   -.4406512
+     animtot |  -1.091296   .5453344    -2.00   0.045    -2.160132   -.0224602
+    wordtot1 |   1.470641   .4875707     3.02   0.003     .5150197    2.426262
+    wordtot2 |  -1.080204   .2935826    -3.68   0.000    -1.655616    -.504793
+    papertot |   .4929788   .3342745     1.47   0.140    -.1621873    1.148145
+    storytot |   .2299829   .3737742     0.62   0.538     -.502601    .9625669
+relscore_d~e |   .5421012   .0275663    19.67   0.000     .4880723    .5961301
+      recall |  -.7007926   .0610181   -11.49   0.000    -.8203858   -.5811994
+       _cons |   3.893365   .7522743     5.18   0.000     2.418934    5.367795
+------------------------------------------------------------------------------
+Note: 0 failures and 31 successes completely determined.
+
+. predict dem1066_cog_comp_prob, pr
+(5 missing values generated)
+
+. 
+. gen dem1066_cog_comp = (dem1066_cog_comp_prob >= .5) if !missing(dem1066_cog_
+> comp_prob)
+(5 missing values generated)
+
+. 
+. tab cdem1066 dem1066_cog_comp
+
+ Education |
+  adjusted |
+      1066 |
+    Lancet |
+  dementia |   dem1066_cog_comp
+ diagnosis |         0          1 |     Total
+-----------+----------------------+----------
+  non-case |     5,976         69 |     6,045 
+      case |       134        626 |       760 
+-----------+----------------------+----------
+     Total |     6,110        695 |     6,805 
+
+. roctab cdem1066 dem1066_cog_comp
+
+                      ROC                     Asymptotic normal  
+           Obs       area     Std. err.      [95% conf. interval]
+     ------------------------------------------------------------
+         6,805     0.9061       0.0069        0.89251     0.91976
+
+. 
+. *interacting cog and relscore
+. gen cog_rel_interact = cogscore * relscore
+(31 missing values generated)
+
+. logit cdem1066 cogscore relscore recall cog_rel_interact
+
+Iteration 0:  Log likelihood = -2380.2181  
+Iteration 1:  Log likelihood = -972.12453  
+Iteration 2:  Log likelihood = -575.04078  
+Iteration 3:  Log likelihood = -505.62838  
+Iteration 4:  Log likelihood = -501.11572  
+Iteration 5:  Log likelihood = -501.09067  
+Iteration 6:  Log likelihood = -501.09067  
+
+Logistic regression                                    Number of obs =   6,791
+                                                       LR chi2(4)    = 3758.25
+                                                       Prob > chi2   =  0.0000
+Log likelihood = -501.09067                            Pseudo R2     =  0.7895
+
+------------------------------------------------------------------------------
+    cdem1066 | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    cogscore |  -.2340031   .0338086    -6.92   0.000    -.3002668   -.1677394
+    relscore |   2.067158   .2667146     7.75   0.000     1.544407    2.589909
+      recall |   -.687096   .0571855   -12.02   0.000    -.7991775   -.5750145
+cog_rel_in~t |  -.0565224    .009511    -5.94   0.000    -.0751636   -.0378811
+       _cons |   3.902774   .9072664     4.30   0.000     2.124564    5.680983
+------------------------------------------------------------------------------
+Note: 0 failures and 193 successes completely determined.
+
+. predict prob_interaction, pr
+(31 missing values generated)
+
+. roctab cdem1066 prob_interaction
+
+                      ROC                     Asymptotic normal  
+           Obs       area     Std. err.      [95% conf. interval]
+     ------------------------------------------------------------
+         6,791     0.9927       0.0008        0.99116     0.99429
+
+. 
+. *using learn1 instead of recall
+. logit cdem1066 cogscore relscore_duplicate learn1
+
+Iteration 0:  Log likelihood = -2381.8779  
+Iteration 1:  Log likelihood =  -865.3305  
+Iteration 2:  Log likelihood =  -629.4129  
+Iteration 3:  Log likelihood = -605.79908  
+Iteration 4:  Log likelihood =  -605.4909  
+Iteration 5:  Log likelihood = -605.49026  
+Iteration 6:  Log likelihood = -605.49026  
+
+Logistic regression                                    Number of obs =   6,805
+                                                       LR chi2(3)    = 3552.78
+                                                       Prob > chi2   =  0.0000
+Log likelihood = -605.49026                            Pseudo R2     =  0.7458
+
+------------------------------------------------------------------------------
+    cdem1066 | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    cogscore |  -.4859513   .0254281   -19.11   0.000    -.5357896   -.4361131
+relscore_d~e |   .4827425    .022306    21.64   0.000     .4390235    .5264615
+      learn1 |  -.3429934   .0679899    -5.04   0.000    -.4762512   -.2097356
+       _cons |   9.996802   .6400608    15.62   0.000     8.742306     11.2513
+------------------------------------------------------------------------------
+Note: 0 failures and 60 successes completely determined.
+
+. predict cdem1066_learn1_prob, pr
+(5 missing values generated)
+
+. summarize cdem1066_learn1_prob
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+cdem1066_l~b |      6,828    .1117972    .2737683   .0000856          1
+
+. 
+. regress cdem1066 cogscore relscore_duplicate learn1
+
+      Source |       SS           df       MS      Number of obs   =     6,805
+-------------+----------------------------------   F(3, 6801)      =   3478.45
+       Model |  408.736432         3  136.245477   Prob > F        =    0.0000
+    Residual |  266.384802     6,801  .039168476   R-squared       =    0.6054
+-------------+----------------------------------   Adj R-squared   =    0.6053
+       Total |  675.121234     6,804  .099224167   Root MSE        =    .19791
+
+------------------------------------------------------------------------------
+    cdem1066 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    cogscore |   -.022613   .0006526   -34.65   0.000    -.0238924   -.0213336
+relscore_d~e |   .0328992   .0008048    40.88   0.000     .0313215    .0344769
+      learn1 |  -.0087432   .0018194    -4.81   0.000    -.0123098   -.0051766
+       _cons |   .7179986   .0190515    37.69   0.000     .6806517    .7553454
+------------------------------------------------------------------------------
+
+. 
+. *using learn3 instead of recall
+. logit cdem1066 cogscore relscore_duplicate learn3
+
+Iteration 0:  Log likelihood = -2381.8779  
+Iteration 1:  Log likelihood = -862.82625  
+Iteration 2:  Log likelihood = -612.71486  
+Iteration 3:  Log likelihood = -582.98329  
+Iteration 4:  Log likelihood = -582.33405  
+Iteration 5:  Log likelihood = -582.33255  
+Iteration 6:  Log likelihood = -582.33255  
+
+Logistic regression                                    Number of obs =   6,805
+                                                       LR chi2(3)    = 3599.09
+                                                       Prob > chi2   =  0.0000
+Log likelihood = -582.33255                            Pseudo R2     =  0.7555
+
+------------------------------------------------------------------------------
+    cdem1066 | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    cogscore |  -.4458829   .0258127   -17.27   0.000     -.496475   -.3952909
+relscore_d~e |      .4776   .0227653    20.98   0.000     .4329808    .5222192
+      learn3 |   -.441638    .053494    -8.26   0.000    -.5464842   -.3367917
+       _cons |   10.01594   .6495318    15.42   0.000     8.742881      11.289
+------------------------------------------------------------------------------
+Note: 0 failures and 60 successes completely determined.
+
+. predict cdem1066_learn3_prob, pr
+(5 missing values generated)
+
+. summarize cdem1066_learn3_prob
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+cdem1~3_prob |      6,828    .1117893    .2751007   .0000957          1
+
+. 
+. regress cdem1066 cogscore relscore_duplicate learn3
+
+      Source |       SS           df       MS      Number of obs   =     6,805
+-------------+----------------------------------   F(3, 6801)      =   3533.93
+       Model |  411.284078         3  137.094693   Prob > F        =    0.0000
+    Residual |  263.837156     6,801  .038793877   R-squared       =    0.6092
+-------------+----------------------------------   Adj R-squared   =    0.6090
+       Total |  675.121234     6,804  .099224167   Root MSE        =    .19696
+
+------------------------------------------------------------------------------
+    cdem1066 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    cogscore |  -.0207633   .0006836   -30.38   0.000    -.0221033   -.0194233
+relscore_d~e |   .0324183   .0008031    40.37   0.000      .030844    .0339926
+      learn3 |  -.0140212   .0014863    -9.43   0.000    -.0169349   -.0111075
+       _cons |   .7160796   .0189583    37.77   0.000     .6789154    .7532438
+------------------------------------------------------------------------------
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/chrissoria/Documents/Research/CADAS_1066/1066/1066_algo_w1.
+> log
+  log type:  text
+ closed on:  24 Nov 2025, 12:11:31
+-------------------------------------------------------------------------------
+
+. 
+. preserve
+
+. * Define the variables as a local macro
+. local vars relscore_duplicate cogscore nametot count animals animtot wordtot1
+>  wordtot2 papertot story storytot pencil watch chair shoes knuckle elbow shou
+> ld bridge hammer pray chemist repeat town street store address month day year
+>  nod point pentag chief longmem season wordimm worddel misstot activ mental m
+> emory put kept frdname famname convers wordfind wordwrg past lastsee lastday 
+> orient lostout lostin chores hobby money change reason feed dress toilet reca
+> ll cdem1066_prob cdem1066 S
+
+. 
+. * Get mean, min, and max for each variable and save as rows in one table
+. postfile handle str32 variable mean min max using results_temp.dta, replace
+
+. foreach v of local vars {
+  2.     quietly summarize `v'
+  3.     post handle ("`v'") (r(mean)) (r(min)) (r(max))
+  4. }
+
+. postclose handle
+
+. 
+. * Use this new table and export
+. use results_temp.dta, clear
+
+. 
+. * Save to CSV file (replace "output.csv" as needed)
+. export delimited using "/Users/chrissoria/Documents/CADAS/Data/Cuba_Out/1066_
+> 1066_diagnostics.csv", replace
+file /Users/chrissoria/Documents/CADAS/Data/Cuba_Out/1066_1066_diagnostics.csv 
+> saved
+
+. 
+. restore
+
+. 
+end of do-file

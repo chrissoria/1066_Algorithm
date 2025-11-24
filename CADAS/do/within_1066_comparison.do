@@ -270,6 +270,7 @@ summarize relscore relscore_cadas
 log close
 log using "/Users/chrissoria/Documents/Research/1066/cadas_1066_comparison.log", text replace
 
+* ADAMS MODIFIED VERSION
 local num_repeats 10
 
 forvalues r = 1/`num_repeats' {
@@ -322,31 +323,67 @@ display "Predicted Prevalence for 1066 original: " ((TP+FN) / (TP + TN + FP + FN
 
 roctab cdem1066 cdem1066pred50
 
-*for this do file, I want to extract a set of coefficients that I can use to predict in the CADAS dataset
+* CADAS VERSION
 logit cdem1066 cogscore_cadas relscore_cadas recall // coefficients coming from here
 predict cdem1066_prob, pr
 summarize cdem1066_prob
 
-gen demp1066_score = exp(8.571528 -.4453795 * cogscore_cadas + .5031411 * relscore_cadas -.6978724 * recall) / (1 + exp(8.571528 -.4453795 * cogscore_cadas + .5031411 * relscore_cadas -.6978724 * recall))
-summarize demp1066_score
-/* the formula using logit:
-log(P/(1-P)) = 8.571528 -.4453795(cogscore) + .5031411(relscore) -.6978724(recall)
-or
-P/(1-P) = exp(8.571528 -.4453795(cogscore) + .5031411(relscore) -.6978724(recall))
-or
-P = exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall) / (1 + exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall))
-*/
+gen cdem1066_cadas = (cdem1066_prob >= .5) if !missing(cdem1066_prob)
+tab cdem1066 cdem1066_cadas
+roctab cdem1066 cdem1066_cadas
 
-regress cdem1066 cogscore_cadas relscore_cadas recall
+* CADAS VERSION WITH QUINTILES
+*using quintiles from cadas
+gen ncogscore_cadas = .
+replace ncogscore_cadas = 1 if cogscore <= 28.38926696777344
+replace ncogscore_cadas = 2 if cogscore > 28.38926696777344 & cogscore <= 29.75679397583008
+replace ncogscore_cadas = 3 if cogscore > 29.75679397583008 & cogscore <= 30.57880401611328
+replace ncogscore_cadas = 4 if cogscore > 30.57880401611328 & cogscore <= 31.3485050201416
+replace ncogscore_cadas = 5 if cogscore > 31.3485050201416 & cogscore != .
 
-/*the formula using LPM:
-P = 0.6946127 - 0.0212441(cogscore) + 0.0317057(relscore) - 0.0192426(recall)
-*/
+gen nrelscore_cadas = .
+replace nrelscore_cadas = 1 if relscore <= 0
+replace nrelscore_cadas = 2 if relscore > 0 & relscore <= .5
+replace nrelscore_cadas = 3 if relscore > .5 & relscore <= 1.5
+replace nrelscore_cadas = 4 if relscore > 1.5 & relscore <= 2.5
+replace nrelscore_cadas = 5 if relscore > 2.5 & relscore != .
 
-*if I were to convert to categoricals
-logit cdem1066 bcogscor brelscor bdelay
+gen ndelay_cadas = .
+replace ndelay_cadas = 1 if recall <= 2
+replace ndelay_cadas = 2 if recall > 2 & recall <= 3
+replace ndelay_cadas = 3 if recall > 3 & recall <= 4
+replace ndelay_cadas = 4 if recall > 4 & recall <= 5
+replace ndelay_cadas = 5 if recall > 5 & recall != .
+
+gen bcogscor_quint = .
+replace bcogscor_quint = 2.801  if ncogscore_cadas == 1
+replace bcogscor_quint = 1.377  if ncogscore_cadas == 2
+replace bcogscor_quint = 0.866  if ncogscore_cadas == 3
+replace bcogscor_quint = -0.231 if ncogscore_cadas == 4
+replace bcogscor_quint = 0      if ncogscore_cadas == 5 & ncogscore_cadas != .
+
+gen brelscor_quint = .
+replace brelscor_quint = 0     if nrelscore_cadas == 1
+replace brelscor_quint = 1.908 if nrelscore_cadas == 2
+replace brelscor_quint = 2.311 if nrelscore_cadas == 3
+replace brelscor_quint = 4.171 if nrelscore_cadas == 4
+replace brelscor_quint = 5.680 if nrelscore_cadas == 5 & nrelscore_cadas != .
+
+gen bdelay_quint = .
+replace bdelay_quint = 3.822 if ndelay_cadas == 1
+replace bdelay_quint = 3.349 if ndelay_cadas == 2
+replace bdelay_quint = 2.575 if ndelay_cadas == 3
+replace bdelay_quint = 2.176 if ndelay_cadas == 4
+replace bdelay_quint = 0     if ndelay_cadas == 5 & ndelay_cadas != .
+
+logit cdem1066 bcogscor_quint brelscor_quint bdelay_quint
+predict cdem1066_quint_prob, pr
+
+gen cdem1066_quint = (cdem1066_quint_prob >= .5) if !missing(cdem1066_quint_prob)
+tab cdem1066 cdem1066_quint
+roctab cdem1066 cdem1066_quint
 
 log close
 
 
-exit, clear
+*exit, clear

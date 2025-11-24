@@ -1,10 +1,11 @@
------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
        log:  /Users/chrissoria/Documents/Research/1066/cadas_1066_comparison.log
   log type:  text
- opened on:  12 Nov 2025, 21:33:45
+ opened on:  17 Nov 2025, 14:03:30
 
 . 
+. * ADAMS MODIFIED VERSION
 . local num_repeats 10
 
 . 
@@ -41,9 +42,8 @@
 (6,833 missing values generated)
 
 . 
-. gen total_pred = k_fold_dem_pred_1066_1 + k_fold_dem_pred_1066_2 + k_fold_dem_pred_1066_3 + k
-> _fold_dem_pred_1066_4 + k_fold_dem_pred_1066_5 + k_fold_dem_pred_1066_6 + k_fold_dem_pred_106
-> 6_7 + k_fold_dem_pred_1066_8 + k_fold_dem_pred_1066_9 + k_fold_dem_pred_1066_10
+. gen total_pred = k_fold_dem_pred_1066_1 + k_fold_dem_pred_1066_2 + k_fold_dem_pred_1066_3 + k_fold_dem_pred_1066_4 + k_fold_dem_pred_1066_5 + k_fold_d
+> em_pred_1066_6 + k_fold_dem_pred_1066_7 + k_fold_dem_pred_1066_8 + k_fold_dem_pred_1066_9 + k_fold_dem_pred_1066_10
 (34 missing values generated)
 
 . 
@@ -129,8 +129,7 @@ Predicted Prevalence for 1066 original: 11.196229
          6,788     0.9031       0.0070        0.88929     0.91686
 
 . 
-. *for this do file, I want to extract a set of coefficients that I can use to predict in the C
-> ADAS dataset
+. * CADAS VERSION
 . logit cdem1066 cogscore_cadas relscore_cadas recall // coefficients coming from here
 
 Iteration 0:  Log likelihood =  -2379.862  
@@ -166,113 +165,204 @@ Note: 0 failures and 52 successes completely determined.
 cdem1066_p~b |      6,799    .1120047    .2794218   6.98e-06          1
 
 . 
-. gen demp1066_score = exp(8.571528 -.4453795 * cogscore_cadas + .5031411 * relscore_cadas -.69
-> 78724 * recall) / (1 + exp(8.571528 -.4453795 * cogscore_cadas + .5031411 * relscore_cadas -.
-> 6978724 * recall))
+. gen cdem1066_cadas = (cdem1066_prob >= .5) if !missing(cdem1066_prob)
 (34 missing values generated)
 
-. summarize demp1066_score
+. tab cdem1066 cdem1066_cadas
 
-    Variable |        Obs        Mean    Std. dev.       Min        Max
--------------+---------------------------------------------------------
-demp1066_s~e |      6,799    .1120047    .2794218   6.98e-06          1
+ Education |
+  adjusted |
+      1066 |
+    Lancet |
+  dementia |    cdem1066_cadas
+ diagnosis |         0          1 |     Total
+-----------+----------------------+----------
+  non-case |     5,955         73 |     6,028 
+      case |       137        623 |       760 
+-----------+----------------------+----------
+     Total |     6,092        696 |     6,788 
 
-. /* the formula using logit:
-> log(P/(1-P)) = 8.571528 -.4453795(cogscore) + .5031411(relscore) -.6978724(recall)
-> or
-> P/(1-P) = exp(8.571528 -.4453795(cogscore) + .5031411(relscore) -.6978724(recall))
-> or
-> P = exp(8.571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall) / (1 + exp(8.
-> 571528 -.4453795 * cogscore + .5031411 * relscore -.6978724 * recall))
-> */
+. roctab cdem1066 cdem1066_cadas
+
+                      ROC                     Asymptotic normal  
+           Obs       area     Std. err.      [95% conf. interval]
+     ------------------------------------------------------------
+         6,788     0.9038       0.0070        0.89007     0.91756
+
 . 
-. regress cdem1066 cogscore_cadas relscore_cadas recall
+. * CADAS VERSION WITH QUINTILES
+. *using quintiles from cadas
+. gen ncogscore_cadas = .
+(6,833 missing values generated)
 
-      Source |       SS           df       MS      Number of obs   =     6,788
--------------+----------------------------------   F(3, 6784)      =   3663.86
-       Model |  417.331556         3  139.110519   Prob > F        =    0.0000
-    Residual |  257.577106     6,784  .037968323   R-squared       =    0.6184
--------------+----------------------------------   Adj R-squared   =    0.6182
-       Total |  674.908662     6,787  .099441382   Root MSE        =    .19485
+. replace ncogscore_cadas = 1 if cogscore <= 28.38926696777344
+(1,700 real changes made)
+
+. replace ncogscore_cadas = 2 if cogscore > 28.38926696777344 & cogscore <= 29.75679397583008
+(1,045 real changes made)
+
+. replace ncogscore_cadas = 3 if cogscore > 29.75679397583008 & cogscore <= 30.57880401611328
+(928 real changes made)
+
+. replace ncogscore_cadas = 4 if cogscore > 30.57880401611328 & cogscore <= 31.3485050201416
+(1,074 real changes made)
+
+. replace ncogscore_cadas = 5 if cogscore > 31.3485050201416 & cogscore != .
+(2,086 real changes made)
+
+. 
+. gen nrelscore_cadas = .
+(6,833 missing values generated)
+
+. replace nrelscore_cadas = 1 if relscore <= 0
+(1,968 real changes made)
+
+. replace nrelscore_cadas = 2 if relscore > 0 & relscore <= .5
+(1,063 real changes made)
+
+. replace nrelscore_cadas = 3 if relscore > .5 & relscore <= 1.5
+(1,855 real changes made)
+
+. replace nrelscore_cadas = 4 if relscore > 1.5 & relscore <= 2.5
+(640 real changes made)
+
+. replace nrelscore_cadas = 5 if relscore > 2.5 & relscore != .
+(1,276 real changes made)
+
+. 
+. gen ndelay_cadas = .
+(6,833 missing values generated)
+
+. replace ndelay_cadas = 1 if recall <= 2
+(1,460 real changes made)
+
+. replace ndelay_cadas = 2 if recall > 2 & recall <= 3
+(925 real changes made)
+
+. replace ndelay_cadas = 3 if recall > 3 & recall <= 4
+(1,206 real changes made)
+
+. replace ndelay_cadas = 4 if recall > 4 & recall <= 5
+(1,275 real changes made)
+
+. replace ndelay_cadas = 5 if recall > 5 & recall != .
+(1,967 real changes made)
+
+. 
+. gen bcogscor_quint = .
+(6,833 missing values generated)
+
+. replace bcogscor_quint = 2.801  if ncogscore_cadas == 1
+(1,700 real changes made)
+
+. replace bcogscor_quint = 1.377  if ncogscore_cadas == 2
+(1,045 real changes made)
+
+. replace bcogscor_quint = 0.866  if ncogscore_cadas == 3
+(928 real changes made)
+
+. replace bcogscor_quint = -0.231 if ncogscore_cadas == 4
+(1,074 real changes made)
+
+. replace bcogscor_quint = 0      if ncogscore_cadas == 5 & ncogscore_cadas != .
+(2,086 real changes made)
+
+. 
+. gen brelscor_quint = .
+(6,833 missing values generated)
+
+. replace brelscor_quint = 0     if nrelscore_cadas == 1
+(1,968 real changes made)
+
+. replace brelscor_quint = 1.908 if nrelscore_cadas == 2
+(1,063 real changes made)
+
+. replace brelscor_quint = 2.311 if nrelscore_cadas == 3
+(1,855 real changes made)
+
+. replace brelscor_quint = 4.171 if nrelscore_cadas == 4
+(640 real changes made)
+
+. replace brelscor_quint = 5.680 if nrelscore_cadas == 5 & nrelscore_cadas != .
+(1,276 real changes made)
+
+. 
+. gen bdelay_quint = .
+(6,833 missing values generated)
+
+. replace bdelay_quint = 3.822 if ndelay_cadas == 1
+(1,460 real changes made)
+
+. replace bdelay_quint = 3.349 if ndelay_cadas == 2
+(925 real changes made)
+
+. replace bdelay_quint = 2.575 if ndelay_cadas == 3
+(1,206 real changes made)
+
+. replace bdelay_quint = 2.176 if ndelay_cadas == 4
+(1,275 real changes made)
+
+. replace bdelay_quint = 0     if ndelay_cadas == 5 & ndelay_cadas != .
+(1,967 real changes made)
+
+. 
+. logit cdem1066 bcogscor_quint brelscor_quint bdelay_quint
+
+Iteration 0:  Log likelihood = -2380.2181  
+Iteration 1:  Log likelihood = -1463.4918  
+Iteration 2:  Log likelihood = -925.61541  
+Iteration 3:  Log likelihood = -743.15106  
+Iteration 4:  Log likelihood = -713.23346  
+Iteration 5:  Log likelihood = -711.91019  
+Iteration 6:  Log likelihood = -711.90742  
+Iteration 7:  Log likelihood = -711.90742  
+
+Logistic regression                                    Number of obs =   6,791
+                                                       LR chi2(3)    = 3336.62
+                                                       Prob > chi2   =  0.0000
+Log likelihood = -711.90742                            Pseudo R2     =  0.7009
 
 --------------------------------------------------------------------------------
-      cdem1066 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+      cdem1066 | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
 ---------------+----------------------------------------------------------------
-cogscore_cadas |  -.0219634   .0007164   -30.66   0.000    -.0233678   -.0205589
-relscore_cadas |   .0317713   .0007963    39.90   0.000     .0302102    .0333323
-        recall |  -.0195026   .0012774   -15.27   0.000    -.0220068   -.0169984
-         _cons |   .6964319   .0187625    37.12   0.000     .6596516    .7332122
+bcogscor_quint |   1.840233   .1233908    14.91   0.000     1.598391    2.082074
+brelscor_quint |    1.06126   .0533782    19.88   0.000      .956641     1.16588
+  bdelay_quint |   1.544301   .1360249    11.35   0.000     1.277697    1.810905
+         _cons |  -15.39542   .6487412   -23.73   0.000    -16.66693   -14.12391
 --------------------------------------------------------------------------------
 
-. 
-. /*the formula using LPM:
-> P = 0.6946127 - 0.0212441(cogscore) + 0.0317057(relscore) - 0.0192426(recall)
-> */
-. 
-. *if I were to convert to categoricals
-. logit cdem1066 bcogscor brelscor bdelay
-variable bcogscor not found
-r(111);
-
-end of do-file
-
-r(111);
-
-. summarize pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat tow
-> n chief street store address longmem month day year season nod point pentag
-
-    Variable |        Obs        Mean    Std. dev.       Min        Max
--------------+---------------------------------------------------------
-      pencil |      6,833    .9723401    .1640084          0          1
-       watch |      6,833    .9708766    .1681646          0          1
-       chair |      6,833    .9701449       .1702          0          1
-       shoes |      6,833    .9713157      .16693          0          1
-     knuckle |      6,833    .7115469    .4530761          0          1
--------------+---------------------------------------------------------
-       elbow |      6,833    .9566808    .2035895          0          1
-      should |      6,833    .9015074    .2980014          0          1
-      bridge |      6,833    .9585833    .1992665          0          1
-      hammer |      6,833    .9702912    .1697951          0          1
-        pray |      6,833    .9719011    .1652676          0          1
--------------+---------------------------------------------------------
-     chemist |      6,833    .9695595    .1718086          0          1
-      repeat |      6,833    .9219962    .2681972          0          1
-        town |      6,833    .9439485     .230038          0          1
-       chief |      6,833    .8150154    .3883135          0          1
-      street |      6,833    .9121908    .2830379          0          1
--------------+---------------------------------------------------------
-       store |      6,833     .923606    .2656469          0          1
-     address |      6,833    .9250695    .2632984          0          1
-     longmem |      6,833    .8716523    .3345011          0          1
-       month |      6,833    .8949217    .3066767          0          1
-         day |      6,833    .8892141    .3138898          0          1
--------------+---------------------------------------------------------
-        year |      6,833    .8507244     .356386          0          1
-      season |      6,833    .8703351    .3359589          0          1
-         nod |      6,833    .9597541    .1965497          0          1
-       point |      6,833    .9524367     .212856          0          1
-      pentag |      6,833     .517196    .4997408          0          1
-
-. do "/var/folders/89/6bdxzk2j30v5n3wstywbcpg80000gn/T//SD18651.000000"
-
-. egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemis
-> t repeat town chief street store address longmem month day year season nod point circle penta
-> g)
-variable count already defined
-r(110);
-
-end of do-file
-
-r(110);
-
-. clear
-
-. do "/var/folders/89/6bdxzk2j30v5n3wstywbcpg80000gn/T//SD18651.000000"
+. predict cdem1066_quint_prob, pr
+(31 missing values generated)
 
 . 
+. gen cdem1066_quint = (cdem1066_quint_prob >= .5) if !missing(cdem1066_quint_prob)
+(31 missing values generated)
+
+. tab cdem1066 cdem1066_quint
+
+ Education |
+  adjusted |
+      1066 |
+    Lancet |
+  dementia |    cdem1066_quint
+ diagnosis |         0          1 |     Total
+-----------+----------------------+----------
+  non-case |     5,858        173 |     6,031 
+      case |       116        644 |       760 
+-----------+----------------------+----------
+     Total |     5,974        817 |     6,791 
+
+. roctab cdem1066 cdem1066_quint
+
+                      ROC                     Asymptotic normal  
+           Obs       area     Std. err.      [95% conf. interval]
+     ------------------------------------------------------------
+         6,791     0.9093       0.0066        0.89638     0.92231
+
 . 
-. clear all
-
-. set more off
-
-. capture log close
+. log close
+      name:  <unnamed>
+       log:  /Users/chrissoria/Documents/Research/1066/cadas_1066_comparison.log
+  log type:  text
+ closed on:  17 Nov 2025, 14:03:38
+--------------------------------------------------------------------------------------------------------------------------------------------------------
