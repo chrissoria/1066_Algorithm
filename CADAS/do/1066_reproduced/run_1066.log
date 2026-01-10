@@ -447,3 +447,13 @@ STEP 1: Preparing cognitive score components...
 . * Pentagon drawing
 . rename cs_32_cleaned pentag
 variable cs_32_cleaned not found
+r(111);
+
+end of do-file
+r(111);
+
+end of do-file
+r(111);
+
+end of do-file
+r(111);

@@ -46,6 +46,7 @@ gen S = cond(missing(activ), 0, activ) + ///
 
 gen U = 30 / (30 - misstot)
 replace U = cond(missing(misstot), 0, U)
+replace U = . if misstot >= 30  // Handle division by zero
 
 *-------------------------------------------------------------------------------
 * CALCULATE RELSCORE
@@ -55,8 +56,21 @@ replace U = cond(missing(misstot), 0, U)
 
 gen relscore = U * S
 
+*-------------------------------------------------------------------------------
+* QUALITY CHECK: SET RELSCORE TO MISSING IF >50% OF ITEMS ARE MISSING
+* 24 total items (21 in miss1 + 3 in miss3), so >12 missing = unreliable
+*-------------------------------------------------------------------------------
+
+gen relscore_items_missing = miss1 + miss3
+replace relscore = . if relscore_items_missing > 12
+
+* Count how many were set to missing
+quietly count if relscore_items_missing > 12
+local n_dropped = r(N)
+
 display "RELSCORE calculated:"
 summarize relscore
+display "  Cases with >50% missing items set to missing: `n_dropped'"
 
 display "STEP 4 complete."
 display "--------------------------------------------------------------------------------"

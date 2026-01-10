@@ -18,6 +18,7 @@ capture include "C:\Users\Ty\Desktop\CADAS Data do files\CADAS_user_define.do"
 if `"`user'"' == "Chris" {
     local path = "/Users/chrissoria/Documents/CADAS/Data"
     include "/Users/chrissoria/Documents/CADAS/Do/Read/CADAS_country_define.do"
+    global country = `country'
 
     if `country' == 0 {
         global data_path "`path'/PR_out"
@@ -35,6 +36,7 @@ if `"`user'"' == "Chris" {
 else if `"`user'"' == "Ty" {
     local path = "C:\Users\Ty\Desktop\Stata_CADAS\DATA"
     include "C:\Users\Ty\Desktop\CADAS Data do files\CADAS_country_define.do"
+    global country = `country'
 
     if `country' == 0 {
         global data_path "`path'/PR_out"
@@ -57,10 +59,13 @@ display "Working directory: `current_dir'"
 * ALGORITHM OPTIONS
 *-------------------------------------------------------------------------------
 
-global wave 1
 global drop_missing_from_relscore "no"   // Drop cases with missing relscore items
-global recode_disability_to "missing"     // How to handle disability codes: "zero" or "missing"
 global impute_recall "no"                 // Impute delayed recall from immediate
+global use_strict_pentag "no"           // Pentagon scoring: "yes" = only value 2 correct, "no" = 1 and 2 both correct
+
+* NOTE: Disability vs refusal codes are now handled separately in step1:
+*   - Disability codes (6, 8, 9 = could not) → recoded to 0
+*   - Refusal codes (7 = refused) → recoded to missing
 
 *-------------------------------------------------------------------------------
 * EXECUTE STEPS
@@ -92,6 +97,12 @@ do "$script_path/1066_step5_classify.do"
 
 * Step 6: Save output
 do "$script_path/1066_step6_save.do"
+
+* Step 7: Validate against 1066 baseline (optional comparison)
+do "$script_path/1066_step7_validate_vs_baseline.do"
+
+* Step 8: Sample attrition analysis (shows where cases drop off)
+do "$script_path/1066_step8_sample_attrition.do"
 
 *-------------------------------------------------------------------------------
 * FINAL SUMMARY

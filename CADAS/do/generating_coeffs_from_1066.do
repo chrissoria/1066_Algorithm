@@ -32,6 +32,10 @@ local wave 1
 
 local drop_missing_from_relscore "no" // change to yes or no
 
+local topcode_relscore "no"           // change to "yes" to cap relscore at topcode_value
+local drop_high_relscore "no"         // change to "yes" to drop cases with relscore > topcode_value
+local topcode_value = 20              // maximum relscore value when top-coding or dropping
+
 *-------------------------------------------------------------------------------
 * DATA LOADING
 *-------------------------------------------------------------------------------
@@ -370,8 +374,21 @@ gen T = cond(missing(miss1_duplicate), 0, miss1_duplicate) + ///
 
 gen U = 30 / (30 - misstot)
 replace U = cond(missing(misstot), 0, U)
+replace U = . if misstot >= 30  // Handle division by zero
 
 gen relscore_duplicate = U * S
+
+*-------------------------------------------------------------------------------
+* QUALITY CHECK: SET RELSCORE TO MISSING IF >50% OF ITEMS ARE MISSING
+* 24 total items (21 in miss1 + 3 in miss3), so >12 missing = unreliable
+* This matches the quality check applied in CADAS
+*-------------------------------------------------------------------------------
+
+gen relscore_items_missing = miss1_duplicate + miss3_duplicate
+replace relscore_duplicate = . if relscore_items_missing > 12
+
+quietly count if relscore_items_missing > 12
+display "Cases with >50% relscore items missing (set to .): " r(N)
 
 summarize relscore_duplicate relscore_original
 
@@ -548,6 +565,43 @@ count if cdem1066 == 1
 ********************************************************************************
 
 *-------------------------------------------------------------------------------
+* USE CLEANED RELSCORE FOR COEFFICIENT EXTRACTION
+* Replace original relscore with quality-checked relscore_duplicate
+*-------------------------------------------------------------------------------
+
+drop relscore
+rename relscore_duplicate relscore
+
+display "Using cleaned relscore (cases with >50% missing set to .):"
+summarize relscore
+
+*-------------------------------------------------------------------------------
+* TOP-CODE RELSCORE (OPTIONAL)
+* For sensitivity analysis: cap extreme relscore values
+*-------------------------------------------------------------------------------
+
+if "`topcode_relscore'" == "yes" {
+    display _newline(1)
+    display "TOP-CODING RELSCORE: values > `topcode_value' set to `topcode_value'"
+    count if relscore > `topcode_value' & !missing(relscore)
+    display "  Cases affected: " r(N)
+    replace relscore = `topcode_value' if relscore > `topcode_value' & !missing(relscore)
+    display "After top-coding:"
+    summarize relscore
+}
+
+if "`drop_high_relscore'" == "yes" {
+    display _newline(1)
+    display "DROPPING CASES: relscore > `topcode_value'"
+    count if relscore > `topcode_value' & !missing(relscore)
+    display "  Cases to drop: " r(N)
+    drop if relscore > `topcode_value' & !missing(relscore)
+    display "After dropping:"
+    summarize relscore
+    display "  Remaining N: " _N
+}
+
+*-------------------------------------------------------------------------------
 * MAIN MODEL: cogscore + relscore + recall
 * These coefficients are used in CADAS 1066_step5_classify.do
 *-------------------------------------------------------------------------------
@@ -557,7 +611,7 @@ predict cdem1066_prob, pr
 summarize cdem1066_prob
 
 * Linear regression for comparison
-regress cdem1066 cogscore relscore_duplicate recall
+regress cdem1066 cogscore relscore recall
 
 ********************************************************************************
 * SENSITIVITY ANALYSES / ALTERNATIVE MODELS
@@ -585,7 +639,7 @@ logit cdem1066 ncogscor_quint nrelscor_quint ndelay_quint
 * MODEL: Binary relscore (>4 threshold)
 *-------------------------------------------------------------------------------
 
-gen rel_binary = (relscore_duplicate > 4) if relscore_duplicate != .
+gen rel_binary = (relscore > 4) if relscore != .
 logit cdem1066 cogscore rel_binary recall
 
 *-------------------------------------------------------------------------------
@@ -604,7 +658,7 @@ roctab cdem1066 dem1066_quint
 * MODEL: Individual cognitive components
 *-------------------------------------------------------------------------------
 
-logit cdem1066 nametot count animtot wordtot1 wordtot2 papertot storytot relscore_duplicate recall
+logit cdem1066 nametot count animtot wordtot1 wordtot2 papertot storytot relscore recall
 predict dem1066_cog_comp_prob, pr
 
 gen dem1066_cog_comp = (dem1066_cog_comp_prob >= .5) if !missing(dem1066_cog_comp_prob)
@@ -625,7 +679,7 @@ roctab cdem1066 prob_interaction
 * MODEL: Learn1 instead of recall
 *-------------------------------------------------------------------------------
 
-logit cdem1066 cogscore relscore_duplicate learn1
+logit cdem1066 cogscore relscore learn1
 predict cdem1066_learn1_prob, pr
 summarize cdem1066_learn1_prob
 
@@ -637,7 +691,7 @@ roctab cdem1066 cdem1066_learn1_prob
 * MODEL: Learn3 instead of recall
 *-------------------------------------------------------------------------------
 
-logit cdem1066 cogscore relscore_duplicate learn3
+logit cdem1066 cogscore relscore learn3
 predict cdem1066_learn3_prob, pr
 summarize cdem1066_learn3_prob
 
@@ -654,7 +708,7 @@ log close
 
 preserve
 
-local vars relscore_duplicate cogscore nametot count animals animtot wordtot1 wordtot2 papertot story storytot pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town street store address month day year nod point pentag chief longmem season wordimm worddel misstot activ mental memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason feed dress toilet recall cdem1066_prob cdem1066 S learn1 learn3
+local vars relscore cogscore nametot count animals animtot wordtot1 wordtot2 papertot story storytot pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town street store address month day year nod point pentag chief longmem season wordimm worddel misstot activ mental memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason feed dress toilet recall cdem1066_prob cdem1066 S learn1 learn3
 
 postfile handle str32 variable mean min max using results_temp.dta, replace
 foreach v of local vars {
@@ -668,3 +722,49 @@ use results_temp.dta, clear
 export delimited using "/Users/chrissoria/Documents/CADAS/Data/Cuba_Out/1066_1066_diagnostics.csv", replace
 
 restore
+
+*-------------------------------------------------------------------------------
+* SAVE REFERENCE DATASET FOR CADAS VALIDATION
+* This dataset contains all variables needed to compare with CADAS output
+*-------------------------------------------------------------------------------
+
+* Drop original variables and rename duplicates to match CADAS variable names
+* Note: relscore was already renamed at line 569 (quality-checked version)
+
+drop cogscore
+rename cogscore_duplicate cogscore
+
+capture drop miss1
+rename miss1_duplicate miss1
+
+capture drop miss3
+rename miss3_duplicate miss3
+
+capture drop misstot
+rename misstot_duplicate misstot
+
+* Create dem1066_score using the same formula as CADAS
+gen dem1066_score = exp(8.486511 - 0.4001659*cogscore + 0.5024221*relscore - 0.6997248*recall) / ///
+                    (1 + exp(8.486511 - 0.4001659*cogscore + 0.5024221*relscore - 0.6997248*recall))
+
+gen dem1066_calc = (dem1066_score >= 0.5) if !missing(dem1066_score)
+
+* Keep variables that match CADAS 1066 output
+keep pid countryid cogscore age relscore recall dem1066_score dem1066_calc cdem1066 ///
+     nametot count animals animtot wordimm worddel wordtot1 wordtot2 ///
+     paper papertot story storytot immed learn1 learn2 learn3 ///
+     pencil watch chair shoes knuckle elbow should bridge hammer ///
+     pray chemist repeat town chief street store address longmem ///
+     month day year season nod point circle pentag ///
+     activ mental memory put kept frdname famname convers ///
+     wordfind wordwrg past lastsee lastday orient lostout lostin ///
+     chores hobby money change reason feed dress toilet ///
+     miss1 miss3 misstot
+
+* Rename dem1066_calc to dem1066 for comparison
+rename dem1066_calc dem1066
+
+* Save reference dataset
+save "/Users/chrissoria/Documents/Research/CADAS_1066/1066/1066_reference_for_validation.dta", replace
+
+display "Reference dataset saved to: /Users/chrissoria/Documents/Research/CADAS_1066/1066/1066_reference_for_validation.dta"

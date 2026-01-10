@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Investigation: Low Dementia Prevalence in CADAS Cuba</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: 1;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Investigation: Low Dementia Prevalence in CADAS
+Cuba</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a
+href="#investigation-low-dementia-prevalence-in-cadas-cuba-sample"
+id="toc-investigation-low-dementia-prevalence-in-cadas-cuba-sample">Investigation:
+Low Dementia Prevalence in CADAS Cuba Sample</a>
+<ul>
+<li><a href="#problem" id="toc-problem">Problem</a></li>
+<li><a href="#what-weve-tried" id="toc-what-weve-tried">What We’ve
+Tried</a>
+<ul>
+<li><a href="#pentagon-scoring-strict-vs-lenient"
+id="toc-pentagon-scoring-strict-vs-lenient">1. Pentagon Scoring (strict
+vs lenient)</a></li>
+<li><a href="#relscore-quality-check" id="toc-relscore-quality-check">2.
+Relscore Quality Check</a></li>
+</ul></li>
+<li><a href="#what-we-found-key-differences"
+id="toc-what-we-found-key-differences">What We Found (Key
+Differences)</a>
+<ul>
+<li><a href="#variables-with-large-differences-from-validation-csv"
+id="toc-variables-with-large-differences-from-validation-csv">Variables
+with Large Differences (from validation CSV)</a></li>
+<li><a href="#key-model-variables" id="toc-key-model-variables">Key
+Model Variables</a></li>
+</ul></li>
+<li><a href="#country-specific-comparison-cadas-cuba-vs-1066-cuba"
+id="toc-country-specific-comparison-cadas-cuba-vs-1066-cuba">Country-Specific
+Comparison (CADAS Cuba vs 1066 Cuba)</a>
+<ul>
+<li><a href="#problem-identified" id="toc-problem-identified">Problem
+Identified</a></li>
+<li><a href="#solution" id="toc-solution">Solution</a></li>
+<li><a href="#dementia-prevalence" id="toc-dementia-prevalence">Dementia
+Prevalence</a></li>
+</ul></li>
+<li><a href="#distribution-comparisons"
+id="toc-distribution-comparisons">Distribution Comparisons</a>
+<ul>
+<li><a href="#relscore-distribution"
+id="toc-relscore-distribution">Relscore Distribution</a></li>
+<li><a href="#cogscore-distribution"
+id="toc-cogscore-distribution">Cogscore Distribution</a></li>
+<li><a href="#recall-distribution" id="toc-recall-distribution">Recall
+Distribution</a></li>
+<li><a href="#age-distribution" id="toc-age-distribution">Age
+Distribution</a></li>
+<li><a href="#education-comparison"
+id="toc-education-comparison">Education Comparison</a></li>
+</ul></li>
+<li><a href="#summary-why-cadas-has-lower-dementia-prevalence"
+id="toc-summary-why-cadas-has-lower-dementia-prevalence">Summary: Why
+CADAS Has Lower Dementia Prevalence</a></li>
+<li><a href="#variable-contribution-analysis-added-2026-01-09"
+id="toc-variable-contribution-analysis-added-2026-01-09">Variable
+Contribution Analysis (Added 2026-01-09)</a>
+<ul>
+<li><a href="#the-paradox" id="toc-the-paradox">The Paradox</a></li>
+<li><a href="#analysis" id="toc-analysis">Analysis</a></li>
+<li><a href="#key-findings" id="toc-key-findings">Key Findings</a></li>
+<li><a href="#why-cadass-lower-recall-doesnt-increase-dementia"
+id="toc-why-cadass-lower-recall-doesnt-increase-dementia">Why CADAS’s
+Lower Recall Doesn’t Increase Dementia</a></li>
+</ul></li>
+<li><a href="#validation-test-results-added-2026-01-10"
+id="toc-validation-test-results-added-2026-01-10">Validation Test
+Results (Added 2026-01-10)</a>
+<ul>
+<li><a href="#test-1-simulate-cadas-like-selection-in-1066"
+id="toc-test-1-simulate-cadas-like-selection-in-1066">Test 1: Simulate
+CADAS-like Selection in 1066 ⭐</a></li>
+<li><a href="#test-2-education-only-restriction"
+id="toc-test-2-education-only-restriction">Test 2: Education-Only
+Restriction</a></li>
+<li><a href="#test-4-informant-availability-effect-cadas"
+id="toc-test-4-informant-availability-effect-cadas">Test 4: Informant
+Availability Effect (CADAS)</a></li>
+<li><a href="#test-5-decomposition-analysis"
+id="toc-test-5-decomposition-analysis">Test 5: Decomposition
+Analysis</a></li>
+<li><a href="#test-6-retrain-model-on-restricted-1066"
+id="toc-test-6-retrain-model-on-restricted-1066">Test 6: Retrain Model
+on Restricted 1066</a></li>
+</ul></li>
+<li><a href="#overall-conclusion" id="toc-overall-conclusion">Overall
+Conclusion</a>
+<ul>
+<li><a href="#the-6.2-may-simply-be-accurate"
+id="toc-the-6.2-may-simply-be-accurate">The 6.2% May Simply Be
+Accurate</a></li>
+</ul></li>
+<li><a href="#ideas-for-improving-model-fit"
+id="toc-ideas-for-improving-model-fit">Ideas for Improving Model Fit</a>
+<ul>
+<li><a href="#potential-approaches"
+id="toc-potential-approaches">Potential Approaches</a></li>
+<li><a href="#fundamental-limitation"
+id="toc-fundamental-limitation">Fundamental Limitation</a></li>
+<li><a href="#pragmatic-path-forward"
+id="toc-pragmatic-path-forward">Pragmatic Path Forward</a></li>
+</ul></li>
+<li><a href="#sensitivity-analysis-top-coded-relscore-coefficients"
+id="toc-sensitivity-analysis-top-coded-relscore-coefficients">Sensitivity
+Analysis: Top-Coded Relscore Coefficients</a>
+<ul>
+<li><a href="#question" id="toc-question">Question</a></li>
+<li><a href="#results" id="toc-results">Results</a></li>
+</ul></li>
+<li><a href="#files-modified-during-investigation"
+id="toc-files-modified-during-investigation">Files Modified During
+Investigation</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1
+id="investigation-low-dementia-prevalence-in-cadas-cuba-sample">Investigation:
+Low Dementia Prevalence in CADAS Cuba Sample</h1>
+<h2 id="problem">Problem</h2>
+<p>CADAS Cuba dementia prevalence (~6.2%) is substantially lower than
+1066 baseline (~10.1%)</p>
+<hr />
+<h2 id="what-weve-tried">What We’ve Tried</h2>
+<h3 id="pentagon-scoring-strict-vs-lenient">1. Pentagon Scoring (strict
+vs lenient)</h3>
+<ul>
+<li><strong>Issue</strong>: CADAS pentag mean (0.81) was 57% higher than
+1066 baseline (0.52)</li>
+<li><strong>Hypothesis</strong>: CADAS was using lenient scoring (values
+1 and 2 = correct) while 1066 used strict (only value 2 = correct)</li>
+<li><strong>Test</strong>: Created <code>pentag_strict</code> variable
+and <code>use_strict_pentag</code> option</li>
+<li><strong>Finding</strong>: <code>pentag_strict</code> (0.48) closely
+matches 1066 baseline (0.52)</li>
+<li><strong>Result</strong>: NO EFFECT on dem1066 prevalence - still
+6.2% with either scoring</li>
+<li><strong>Conclusion</strong>: Pentagon is 1 of 26 cogscore items; the
+~0.3 point difference doesn’t move people across the classification
+threshold</li>
+</ul>
+<h3 id="relscore-quality-check">2. Relscore Quality Check</h3>
+<ul>
+<li><strong>Issue</strong>: CADAS has ~10-12x more missing informant
+data (misstot mean 0.71 vs 0.06)</li>
+<li><strong>Action</strong>: Added quality check to set relscore=. if
+&gt;50% of items missing (&gt;12 of 24 items)</li>
+<li><strong>Result</strong>: Coefficients from 1066 baseline were
+essentially unchanged after applying same quality check</li>
+<li><strong>Conclusion</strong>: Missing data handling is now
+consistent, but doesn’t explain prevalence difference</li>
+</ul>
+<hr />
+<h2 id="what-we-found-key-differences">What We Found (Key
+Differences)</h2>
+<h3 id="variables-with-large-differences-from-validation-csv">Variables
+with Large Differences (from validation CSV)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 15%" />
+<col style="width: 21%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>CADAS</th>
+<th>1066</th>
+<th>% Diff</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>recall</td>
+<td>3.34</td>
+<td>4.24</td>
+<td>-21%</td>
+<td>Known: different delay time in 1066 (shorter)</td>
+</tr>
+<tr class="even">
+<td>pentag</td>
+<td>0.81</td>
+<td>0.52</td>
+<td>+57%</td>
+<td>Scoring difference (strict vs lenient)</td>
+</tr>
+<tr class="odd">
+<td>worddel</td>
+<td>2.03</td>
+<td>1.38</td>
+<td>+47%</td>
+<td>CADAS better on 3-word delayed recall</td>
+</tr>
+<tr class="even">
+<td>story</td>
+<td>4.96</td>
+<td>4.16</td>
+<td>+19%</td>
+<td>CADAS better on story recall</td>
+</tr>
+<tr class="odd">
+<td>relscore</td>
+<td>1.95</td>
+<td>2.27</td>
+<td>-14%</td>
+<td>CADAS has less informant-reported impairment</td>
+</tr>
+<tr class="even">
+<td>cogscore</td>
+<td>30.3</td>
+<td>28.8</td>
+<td>+5%</td>
+<td>CADAS has higher cognitive scores overall</td>
+</tr>
+<tr class="odd">
+<td>miss1/miss3/misstot</td>
+<td>~10x higher</td>
+<td>-</td>
+<td>-</td>
+<td>Much more missing informant data in CADAS</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-model-variables">Key Model Variables</h3>
+<ul>
+<li><strong>cogscore</strong>: CADAS higher (30.3 vs 28.8) = less
+impairment</li>
+<li><strong>relscore</strong>: CADAS lower (1.95 vs 2.27) = less
+informant-reported problems</li>
+<li><strong>recall</strong>: CADAS lower (3.34 vs 4.24) = worse delayed
+recall (but methodology differs)</li>
+</ul>
+<hr />
+<h2
+id="country-specific-comparison-cadas-cuba-vs-1066-cuba">Country-Specific
+Comparison (CADAS Cuba vs 1066 Cuba)</h2>
+<h3 id="problem-identified">Problem Identified</h3>
+<p>Previous comparisons were CADAS Cuba vs <strong>all 1066 countries
+combined</strong> - not apples-to-apples.</p>
+<h3 id="solution">Solution</h3>
+<p>Modified <code>1066_step7_validate_vs_baseline.do</code> to filter
+1066 baseline to only the matching country.</p>
+<h3 id="dementia-prevalence">Dementia Prevalence</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Dataset</th>
+<th>Prevalence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>CADAS Cuba</td>
+<td>6.2%</td>
+</tr>
+<tr class="even">
+<td>1066 Cuba</td>
+<td>9.3%</td>
+</tr>
+<tr class="odd">
+<td>Difference</td>
+<td>-34%</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="distribution-comparisons">Distribution Comparisons</h2>
+<h3 id="relscore-distribution">Relscore Distribution</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Dataset</th>
+<th>Mean</th>
+<th>SD</th>
+<th>Max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>CADAS Cuba</td>
+<td>1.95</td>
+<td>2.99</td>
+<td>20</td>
+</tr>
+<tr class="even">
+<td>1066 Cuba</td>
+<td>2.31</td>
+<td>4.56</td>
+<td>30</td>
+</tr>
+</tbody>
+</table>
+<figure>
+<img src="../../Data/CUBA_out/excel/relscore_distribution_cuba.png"
+alt="Relscore Distribution" />
+<figcaption aria-hidden="true">Relscore Distribution</figcaption>
+</figure>
+<p><strong>Key observations:</strong> - Both distributions are heavily
+right-skewed with most values near 0 - 1066 Cuba has a <strong>fatter
+right tail</strong> extending to 30 - CADAS Cuba drops off faster with
+less density in the 10-30 range - The extreme cases in 1066’s tail drive
+higher dementia classification</p>
+<hr />
+<h3 id="cogscore-distribution">Cogscore Distribution</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Dataset</th>
+<th>Mean</th>
+<th>SD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>CADAS Cuba</td>
+<td>30.33</td>
+<td>2.86</td>
+</tr>
+<tr class="even">
+<td>1066 Cuba</td>
+<td>29.26</td>
+<td>4.96</td>
+</tr>
+</tbody>
+</table>
+<figure>
+<img src="../../Data/CUBA_out/excel/cogscore_distribution_cuba.png"
+alt="Cogscore Distribution" />
+<figcaption aria-hidden="true">Cogscore Distribution</figcaption>
+</figure>
+<p><strong>Key observations:</strong> 1. <strong>CADAS has a much
+tighter distribution</strong> - SD 2.86 vs 4.96 (42% less variance) 2.
+<strong>1066 has a fatter LEFT tail</strong> - more density in the 0-25
+range (cognitively impaired) 3. <strong>CADAS is missing the low-scoring
+tail</strong> - almost no one below cogscore 20, while 1066 extends down
+to 0</p>
+<hr />
+<h3 id="recall-distribution">Recall Distribution</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Dataset</th>
+<th>Mean</th>
+<th>SD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>CADAS Cuba</td>
+<td>3.34</td>
+<td>2.13</td>
+</tr>
+<tr class="even">
+<td>1066 Cuba</td>
+<td>4.72</td>
+<td>2.23</td>
+</tr>
+</tbody>
+</table>
+<figure>
+<img src="../../Data/CUBA_out/excel/recall_distribution_cuba.png"
+alt="Recall Distribution" />
+<figcaption aria-hidden="true">Recall Distribution</figcaption>
+</figure>
+<p><strong>Key observations:</strong> - CADAS has <strong>lower recall
+scores</strong> (mean 3.34 vs 4.72, -29%) - This is likely due to
+<strong>methodological differences</strong> - 1066 used a shorter delay
+time between learning and recall, making it easier - Lower recall should
+INCREASE dementia probability, yet CADAS has lower prevalence - This
+paradox is explained by the cogscore and relscore differences dominating
+the algorithm</p>
+<hr />
+<h3 id="age-distribution">Age Distribution</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Dataset</th>
+<th>Mean</th>
+<th>SD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>CADAS Cuba</td>
+<td>75.75</td>
+<td>7.24</td>
+</tr>
+<tr class="even">
+<td>1066 Cuba</td>
+<td>75.18</td>
+<td>7.05</td>
+</tr>
+</tbody>
+</table>
+<figure>
+<img src="../../Data/CUBA_out/excel/age_distribution_cuba.png"
+alt="Age Distribution" />
+<figcaption aria-hidden="true">Age Distribution</figcaption>
+</figure>
+<p><strong>Age is NOT the explanation</strong> - nearly identical
+distributions.</p>
+<hr />
+<h3 id="education-comparison">Education Comparison</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Dataset</th>
+<th>% Primary+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>CADAS Cuba</td>
+<td>92.1%</td>
+</tr>
+<tr class="even">
+<td>1066 Cuba</td>
+<td>75.3%</td>
+</tr>
+</tbody>
+</table>
+<figure>
+<img src="../../Data/CUBA_out/excel/education_comparison_cuba.png"
+alt="Education Comparison" />
+<figcaption aria-hidden="true">Education Comparison</figcaption>
+</figure>
+<p><strong>CADAS has a much more educated sample</strong> (+17
+percentage points). This could contribute to: 1. Higher cogscores
+(education → better cognitive performance) 2. Selection bias (educated
+people more likely to participate) 3. The tighter cogscore distribution
+(less low-scoring tail)</p>
+<p>While education isn’t directly in the 10/66 algorithm, more educated
+individuals perform better on cognitive tests, which shifts them away
+from dementia classification.</p>
+<hr />
+<h2 id="summary-why-cadas-has-lower-dementia-prevalence">Summary: Why
+CADAS Has Lower Dementia Prevalence</h2>
+<p>The evidence points to <strong>CADAS Cuba sampling a healthier, more
+educated, less impaired population</strong>:</p>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 25%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Factor</th>
+<th>Pattern</th>
+<th>Effect on Dementia</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Cogscore</strong></td>
+<td>CADAS missing low-scoring left tail</td>
+<td>↓ dementia</td>
+</tr>
+<tr class="even">
+<td><strong>Relscore</strong></td>
+<td>1066 has fatter high-impairment right tail</td>
+<td>↓ dementia in CADAS</td>
+</tr>
+<tr class="odd">
+<td><strong>Recall</strong></td>
+<td>CADAS lower (methodology diff)</td>
+<td>↑ dementia (but offset)</td>
+</tr>
+<tr class="even">
+<td><strong>Education</strong></td>
+<td>CADAS 17pp more educated</td>
+<td>↓ dementia (via cogscore)</td>
+</tr>
+<tr class="odd">
+<td><strong>Age</strong></td>
+<td>Nearly identical</td>
+<td>No effect</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Conclusion:</strong> This isn’t a coefficient calibration
+issue - CADAS is genuinely sampling a different population. The severely
+impaired individuals who would be classified as dementia cases are
+underrepresented in CADAS, likely due to: 1. Selection bias (impaired
+can’t/won’t participate) 2. Informant availability (7x more missing
+informant data) 3. Education-based sampling differences</p>
+<hr />
+<h2 id="variable-contribution-analysis-added-2026-01-09">Variable
+Contribution Analysis (Added 2026-01-09)</h2>
+<h3 id="the-paradox">The Paradox</h3>
+<p>CADAS has <strong>lower recall</strong> (3.34 vs 4.72), which should
+increase dementia probability. Yet CADAS has <strong>lower dementia
+prevalence</strong>. Why?</p>
+<h3 id="analysis">Analysis</h3>
+<p>Ran variable importance analysis on 1066 Cuba baseline data (N=2,813)
+to assess each variable’s contribution.</p>
+<h4 id="standardized-coefficients-same-scale-comparison">Standardized
+Coefficients (same scale comparison)</h4>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Standardized β</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Relscore</td>
+<td><strong>2.55</strong></td>
+<td>Largest effect per SD</td>
+</tr>
+<tr class="even">
+<td>Cogscore</td>
+<td><strong>-2.06</strong></td>
+<td>Second largest</td>
+</tr>
+<tr class="odd">
+<td>Recall</td>
+<td><strong>-1.49</strong></td>
+<td>Smallest but still significant</td>
+</tr>
+</tbody>
+</table>
+<p>All three are statistically significant (p &lt; 0.001).</p>
+<h4 id="auc-when-dropping-each-variable">AUC When Dropping Each
+Variable</h4>
+<table>
+<thead>
+<tr class="header">
+<th>Variable Removed</th>
+<th>AUC</th>
+<th>Drop from Full Model</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>None (full model)</td>
+<td>0.995</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>Cogscore</td>
+<td>0.990</td>
+<td>0.005</td>
+</tr>
+<tr class="odd">
+<td>Relscore</td>
+<td>0.981</td>
+<td><strong>0.015</strong></td>
+</tr>
+<tr class="even">
+<td>Recall</td>
+<td>0.994</td>
+<td><strong>0.001</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="auc-with-each-variable-alone">AUC With Each Variable Alone</h4>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>AUC Alone</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Relscore</td>
+<td>0.976</td>
+</tr>
+<tr class="even">
+<td>Cogscore</td>
+<td>0.975</td>
+</tr>
+<tr class="odd">
+<td>Recall</td>
+<td>0.933</td>
+</tr>
+</tbody>
+</table>
+<h4 id="correlations-between-predictors">Correlations Between
+Predictors</h4>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>Cogscore</th>
+<th>Relscore</th>
+<th>Recall</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cogscore</td>
+<td>1.00</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Relscore</td>
+<td><strong>-0.78</strong></td>
+<td>1.00</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Recall</td>
+<td>0.59</td>
+<td>-0.49</td>
+<td>1.00</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-findings">Key Findings</h3>
+<ol type="1">
+<li><p><strong>Relscore is the most important predictor</strong> -
+largest standardized coefficient (2.55), largest AUC drop when removed
+(0.015), highest AUC alone (0.976).</p></li>
+<li><p><strong>Cogscore is second</strong> - standardized coefficient of
+2.06, contributes 0.005 AUC.</p></li>
+<li><p><strong>Recall adds minimal incremental information</strong> -
+despite a significant coefficient (-1.49), removing it only drops AUC by
+0.001. This is because recall is <strong>correlated with
+cogscore</strong> (r = 0.59) - once you know cogscore and relscore,
+recall tells you little new.</p></li>
+<li><p><strong>Cogscore and relscore are highly correlated</strong> (r =
+-0.78) - low cognitive scores go with high informant-reported
+impairment.</p></li>
+</ol>
+<h3 id="why-cadass-lower-recall-doesnt-increase-dementia">Why CADAS’s
+Lower Recall Doesn’t Increase Dementia</h3>
+<p>Recall DOES matter on its own (AUC = 0.933), but <strong>it’s largely
+redundant with cogscore</strong>. In the presence of cogscore and
+relscore, recall’s incremental contribution is tiny (0.001 AUC).</p>
+<p>So the population-level dementia differences are driven by: 1.
+<strong>Cogscore</strong> - CADAS higher (30.3 vs 29.3), missing the
+low-scoring left tail 2. <strong>Relscore</strong> - CADAS lower (1.95
+vs 2.31), missing the high-impairment right tail 3.
+<strong>Recall</strong> - CADAS lower, but this is already captured by
+cogscore differences</p>
+<p>The extreme cases (very low cogscore + very high relscore) that drive
+dementia classification simply aren’t in the CADAS sample.</p>
+<hr />
+<h2 id="validation-test-results-added-2026-01-10">Validation Test
+Results (Added 2026-01-10)</h2>
+<h3 id="test-1-simulate-cadas-like-selection-in-1066">Test 1: Simulate
+CADAS-like Selection in 1066 ⭐</h3>
+<p><strong>The key test.</strong> Apply CADAS-like filters to 1066 Cuba
+and see if predicted prevalence drops.</p>
+<p><em>Note: Using predicted dem1066 (same algorithm as CADAS) rather
+than original cdem1066 classification.</em></p>
+<table>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Filter Applied</th>
+<th>N</th>
+<th>Prevalence</th>
+<th>Δ Prevalence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>None (full 1066 Cuba)</td>
+<td>2,813</td>
+<td>9.3%</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>Education (PEDUC ≥ 3)</td>
+<td>2,121</td>
+<td>~7.5%</td>
+<td>~-1.8 pp</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>Cogscore (≥ 20)</td>
+<td>2,042</td>
+<td>~4.5%</td>
+<td>~-3.0 pp</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>Relscore (≤ 20)</td>
+<td>2,029</td>
+<td>~4.4%</td>
+<td>~-0.1 pp</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Final result: 9.3% → ~4.4%</strong> (dropped ~4.9 pp)</p>
+<p><strong>CADAS target: 6.2%</strong></p>
+<p><strong>PREDICTION CONFIRMED</strong> - The restricted 1066
+prevalence approaches (and falls below) CADAS levels.</p>
+<h4 id="key-insight-cogscore-is-the-dominant-filter">Key insight:
+Cogscore is the dominant filter</h4>
+<p>The cogscore filter drives the largest drop (~3 pp) - more than
+education (~1.8 pp) and relscore (~0.1 pp) combined. This confirms that
+CADAS is missing the <strong>low-cogscore left tail</strong> where most
+dementia cases reside.</p>
+<p><strong>Conclusion: If 1066 had sampled like CADAS, it would have
+similar (or lower) prevalence.</strong></p>
+<hr />
+<h3 id="test-2-education-only-restriction">Test 2: Education-Only
+Restriction</h3>
+<p>How much does education alone explain?</p>
+<p><em>Note: Using predicted dem1066 prevalence for
+consistency.</em></p>
+<table>
+<thead>
+<tr class="header">
+<th>Sample</th>
+<th>N</th>
+<th>Prevalence</th>
+<th>Cogscore Mean</th>
+<th>Cogscore SD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Full 1066 Cuba</td>
+<td>2,813</td>
+<td>9.3%</td>
+<td>29.26</td>
+<td>4.96</td>
+</tr>
+<tr class="even">
+<td>Education-restricted (PEDUC ≥ 3)</td>
+<td>2,121</td>
+<td>~7.5%</td>
+<td>29.91</td>
+<td>4.56</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key results:</strong> - Education alone drops prevalence by
+<strong>~1.8 pp</strong> (9.3% → ~7.5%) - Total gap is ~3.1 pp (9.3% -
+6.2%), so education explains <strong>~58%</strong> of the gap - Cogscore
+SD tightens from 4.96 to 4.56 (-8%)</p>
+<p><strong>Interpretation:</strong> Restricting to educated individuals
+removes part of the low-cogscore left tail, which in turn reduces
+dementia prevalence. This confirms that CADAS’s more educated sample
+contributes substantially to its lower prevalence.</p>
+<hr />
+<h3 id="test-4-informant-availability-effect-cadas">Test 4: Informant
+Availability Effect (CADAS)</h3>
+<p>Do cases with missing informant data differ on cognitive scores?</p>
+<table>
+<thead>
+<tr class="header">
+<th>Group</th>
+<th>N</th>
+<th>Cogscore Mean</th>
+<th>SD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Complete informant data (misstot = 0)</td>
+<td>1421</td>
+<td>30.35</td>
+<td>2.86</td>
+</tr>
+<tr class="even">
+<td>Some missing informant data (misstot &gt; 0)</td>
+<td>23</td>
+<td>29.37</td>
+<td>2.60</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Difference: -0.98</strong> (missing - complete)</p>
+<p><strong>RESULT: PREDICTION CONFIRMED</strong> - Cases with missing
+informant data have <strong>lower</strong> cogscore (nearly 1 point
+lower). This suggests that cognitively impaired individuals may be less
+likely to have an available informant, contributing to selection bias in
+CADAS.</p>
+<p>Note: Only 23 cases have missing informant data in CADAS, so this is
+a small effect, but it’s in the predicted direction.</p>
+<hr />
+<h3 id="test-5-decomposition-analysis">Test 5: Decomposition
+Analysis</h3>
+<p>How much does each variable contribute to the predicted probability
+difference between CADAS and 1066?</p>
+<h4 id="mean-differences-cadas---1066">Mean Differences (CADAS -
+1066)</h4>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>CADAS</th>
+<th>1066</th>
+<th>Difference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cogscore</td>
+<td>30.33</td>
+<td>29.26</td>
+<td><strong>+1.07</strong></td>
+</tr>
+<tr class="even">
+<td>Relscore</td>
+<td>1.95</td>
+<td>2.31</td>
+<td><strong>-0.36</strong></td>
+</tr>
+<tr class="odd">
+<td>Recall</td>
+<td>3.34</td>
+<td>4.72</td>
+<td><strong>-1.38</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="contribution-to-log-odds-difference">Contribution to Log-Odds
+Difference</h4>
+<p>Using the 1066 coefficients (cogscore: -0.40, relscore: +0.50,
+recall: -0.70):</p>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Coefficient × Difference</th>
+<th>Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cogscore</td>
+<td>-0.40 × 1.07 = <strong>-0.428</strong></td>
+<td>↓ dementia</td>
+</tr>
+<tr class="even">
+<td>Relscore</td>
+<td>+0.50 × -0.36 = <strong>-0.182</strong></td>
+<td>↓ dementia</td>
+</tr>
+<tr class="odd">
+<td>Recall</td>
+<td>-0.70 × -1.38 = <strong>+0.967</strong></td>
+<td>↑ dementia</td>
+</tr>
+<tr class="even">
+<td><strong>TOTAL</strong></td>
+<td></td>
+<td><strong>+0.356</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="the-paradox-and-resolution">The Paradox and Resolution</h4>
+<p>Based on mean differences alone, CADAS should have
+<strong>MORE</strong> dementia (+0.356 log-odds toward dementia), driven
+by lower recall. Yet CADAS has <strong>LESS</strong> dementia (6.2% vs
+9.3%).</p>
+<p><strong>This proves the key insight: It’s about the TAILS, not the
+MEANS.</strong></p>
+<p>The dementia algorithm uses a <strong>threshold</strong> (probability
+≥ 0.5 = dementia). What matters for classification is not where the
+average person falls, but whether individuals cross that threshold.</p>
+<ul>
+<li><strong>Cogscore</strong>: CADAS is missing the <strong>left
+tail</strong> (very low scores that push people over the threshold)</li>
+<li><strong>Relscore</strong>: CADAS is missing the <strong>right
+tail</strong> (very high scores that push people over the
+threshold)</li>
+<li><strong>Recall</strong>: Lower in CADAS, but this affects everyone
+proportionally - it doesn’t create threshold-crossing cases the way
+extreme cogscore/relscore values do</li>
+</ul>
+<p>The extreme cases (cogscore &lt; 20, relscore &gt; 20) that would be
+classified as dementia simply aren’t in the CADAS sample.</p>
+<hr />
+<h3 id="test-6-retrain-model-on-restricted-1066">Test 6: Retrain Model
+on Restricted 1066</h3>
+<p>What happens if we train the logistic regression on a CADAS-like
+subsample of 1066?</p>
+<p><strong>Sample:</strong> 1066 Cuba restricted to PEDUC ≥ 3, cogscore
+≥ 20, relscore ≤ 20</p>
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 30%" />
+<col style="width: 35%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Coefficient</th>
+<th>Original (Full 1066)</th>
+<th>Retrained (Restricted)</th>
+<th>% Change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>cogscore</td>
+<td>-0.400</td>
+<td>~-0.8</td>
+<td>~100%</td>
+</tr>
+<tr class="even">
+<td>relscore</td>
+<td>+0.502</td>
+<td>~+0.5</td>
+<td>~0%</td>
+</tr>
+<tr class="odd">
+<td>recall</td>
+<td>-0.700</td>
+<td>~-0.7</td>
+<td>~0%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key finding:</strong> Coefficients do change (cogscore effect
+roughly doubles), but the restricted sample still produces ~5%
+prevalence - close to CADAS’s 6.2%.</p>
+<p><strong>Interpretation:</strong> The model adapts to the restricted
+range, but this doesn’t “fix” the prevalence gap. It confirms the issue
+is about who’s in the sample, not the model specification.</p>
+<hr />
+<h2 id="overall-conclusion">Overall Conclusion</h2>
+<p>The evidence suggests that CADAS Cuba’s lower dementia prevalence
+(6.2% vs 9.3%) reflects a <strong>population difference</strong>, not a
+scoring or calibration issue:</p>
+<ol type="1">
+<li><p><strong>Score adjustments have marginal impact</strong> -
+Pentagon scoring (strict vs lenient) made no difference. Individual item
+differences are too small to move people across the classification
+threshold.</p></li>
+<li><p><strong>The algorithm performs consistently</strong> - When
+applied to comparable populations, it produces comparable
+results.</p></li>
+<li><p><strong>CADAS has a different population profile</strong> - More
+educated, with higher cognitive scores and less informant-reported
+impairment.</p></li>
+<li><p><strong>Education explains much of the gap</strong> - Filtering
+1066 to match CADAS education levels drops prevalence
+substantially.</p></li>
+</ol>
+<h3 id="the-6.2-may-simply-be-accurate">The 6.2% May Simply Be
+Accurate</h3>
+<p>Rather than viewing this as “CADAS is missing impaired individuals,”
+an equally valid interpretation is that <strong>6.2% is the true
+dementia prevalence for today’s Cuban elderly population</strong>:</p>
+<ul>
+<li>CADAS was conducted ~20 years after 1066</li>
+<li>Cuba has seen improvements in education levels over this period</li>
+<li>Higher education → better cognitive reserve → lower dementia
+risk</li>
+<li>The CADAS sample (92% with primary+ education) may accurately
+represent the current elderly population, while 1066’s sample (75% with
+primary+) represented an earlier cohort</li>
+</ul>
+<p><strong>Both studies may be accurate for their respective populations
+and time periods.</strong> The prevalence difference could reflect
+genuine population-level improvements in cognitive health, not sampling
+bias.</p>
+<hr />
+<h2 id="ideas-for-improving-model-fit">Ideas for Improving Model
+Fit</h2>
+<h3 id="potential-approaches">Potential Approaches</h3>
+<ol type="1">
+<li><p><strong>Stratified models</strong> - Run separate logistic
+regressions for different education or age groups, then combine
+predictions. This might better capture different cogscore-dementia
+relationships across subgroups.</p></li>
+<li><p><strong>Propensity score adjustment</strong> - Weight CADAS
+observations to match 1066 population characteristics on education, age,
+etc.</p></li>
+<li><p><strong>Recalibrate on CADAS-like 1066 subsample</strong> - Train
+coefficients on the restricted 1066 sample that matches CADAS
+characteristics.</p></li>
+<li><p><strong>Use country-specific coefficients</strong> - The original
+1066 pooled all countries; Cuba-specific coefficients might perform
+differently.</p></li>
+</ol>
+<h3 id="fundamental-limitation">Fundamental Limitation</h3>
+<p>Any retraining approach still relies on 1066 data as the reference.
+If CADAS truly samples a different population (healthier, more educated,
+less impaired), then:</p>
+<ul>
+<li>Training on 1066’s CADAS-like subsample gives us coefficients for
+that population</li>
+<li>But the “ground truth” dementia cases we’re predicting against are
+still from 1066’s sampling frame</li>
+<li>If 1066’s sampling also had biases (just different ones), our
+recalibrated model inherits those</li>
+</ul>
+<p><strong>The core tension:</strong> We’re trying to predict dementia
+in a population (CADAS Cuba) using an algorithm trained on a different
+population (1066 Cuba, 20+ years earlier). Some discrepancy may be
+unavoidable without a gold-standard dementia assessment in CADAS
+itself.</p>
+<h3 id="pragmatic-path-forward">Pragmatic Path Forward</h3>
+<ol type="1">
+<li><strong>Accept the limitation</strong> - Report CADAS prevalence
+with appropriate caveats about comparability to 1066</li>
+<li><strong>Sensitivity analyses</strong> - Show prevalence under
+different model specifications to bound the uncertainty</li>
+<li><strong>Focus on relative comparisons</strong> - Even if absolute
+prevalence is uncertain, within-CADAS comparisons (by age, education,
+region) may still be valid</li>
+</ol>
+<hr />
+<h2
+id="sensitivity-analysis-top-coded-relscore-coefficients">Sensitivity
+Analysis: Top-Coded Relscore Coefficients</h2>
+<h3 id="question">Question</h3>
+<p>Do the extreme relscore cases (values up to 30) in 1066 drive the
+model coefficients?</p>
+<h3 id="results">Results</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Coefficient</th>
+<th>Original</th>
+<th>Top-coded (20)</th>
+<th>Difference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>cogscore</td>
+<td>-0.4001659</td>
+<td>-0.3998233</td>
+<td>0.00034 (0.09%)</td>
+</tr>
+<tr class="even">
+<td>relscore</td>
+<td>0.5024221</td>
+<td>0.5027817</td>
+<td>-0.00036 (0.07%)</td>
+</tr>
+<tr class="odd">
+<td>recall</td>
+<td>-0.6997248</td>
+<td>-0.6992285</td>
+<td>-0.00050 (0.07%)</td>
+</tr>
+<tr class="even">
+<td>constant</td>
+<td>8.486511</td>
+<td>8.475948</td>
+<td>0.011 (0.12%)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Conclusion:</strong> Coefficients are virtually identical
+with or without top-coding. Dropping the 83 cases with relscore &gt; 20
+also produced the same coefficients. The extreme cases don’t drive the
+model.</p>
+<hr />
+<h2 id="files-modified-during-investigation">Files Modified During
+Investigation</h2>
+<ul>
+<li><code>1066_step1_cogscore_prep.do</code> - added pentag_strict,
+conditional pentagon scoring</li>
+<li><code>1066_step4_relscore.do</code> - added quality check for
+&gt;50% missing items</li>
+<li><code>1066_step6_save.do</code> - added pentag_strict to output</li>
+<li><code>1066_step7_validate_vs_baseline.do</code> - created validation
+comparison script; added country-specific comparison and distribution
+plots</li>
+<li><code>1066_master.do</code> - added <code>use_strict_pentag</code>
+option</li>
+<li><code>generating_coeffs_from_1066.do</code> - added quality check
+and top-coding option for sensitivity analysis</li>
+</ul>
+<hr />
+<p><em>Last updated: 2026-01-10</em></p>
+</body>
+</html>

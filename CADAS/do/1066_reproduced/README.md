@@ -70,7 +70,6 @@ $$
 Set these globals in `1066_master.do`:
 
 ```stata
-global wave 1                              // Data wave (1 or 2)
 global drop_missing_from_relscore "no"     // Drop cases with missing relscore items
 global recode_disability_to "missing"      // How to handle disability codes: "zero" or "missing"
 global impute_recall "no"                  // Impute delayed recall from immediate

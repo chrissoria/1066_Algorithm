@@ -9,7 +9,7 @@ display "STEP 1: Preparing cognitive score components..."
 display "--------------------------------------------------------------------------------"
 
 *-------------------------------------------------------------------------------
-* BINARY COGNITIVE TEST ITEMS (28 items for 'count' variable)
+* BINARY COGNITIVE TEST ITEMS (26 items for 'count' variable)
 *-------------------------------------------------------------------------------
 
 * Object naming
@@ -31,29 +31,44 @@ rename c_26 repeat
 * Orientation - place
 rename c_8 town
 
-* Chief/president naming (Cuba and DR use c_70_d_c)
+* Chief/president naming (PR uses c_70_p; Cuba and DR use c_70_d_c)
 gen chief = .
-replace chief = cond(missing(c_70_d_c), 0, c_70_d_c)
+if $country == 0 {
+    replace chief = cond(missing(c_70_p), 0, c_70_p)
+}
+else {
+    replace chief = cond(missing(c_70_d_c), 0, c_70_d_c)
+}
 
 * Informant-reported memory items
 rename i_a2 street
 rename i_a3 store
 rename i_a4 address
 
-* Long-term memory (Cuba and DR) - cap at 1 for binary
+* Long-term memory (PR uses c_69_p; Cuba and DR use c_69_c + c_69_d)
 gen longmem = .
-replace longmem = cond(missing(c_69_c),0,c_69_c) + cond(missing(c_69_d),0,c_69_d)
-replace longmem = 1 if longmem > 1 & !missing(longmem)
+if $country == 0 {
+    replace longmem = cond(missing(c_69_p), 0, c_69_p)
+}
+else {
+    replace longmem = cond(missing(c_69_c),0,c_69_c) + cond(missing(c_69_d),0,c_69_d)
+    replace longmem = 1 if longmem > 1 & !missing(longmem)
+}
 
 * Orientation - time
 rename c_3 month
 rename c_5 day
 rename c_1 year
 
-* Season (Cuba and DR) - cap at 1 for binary
+* Season (PR uses c_2_p_c; Cuba and DR use c_2_p_c + c_2_d)
 gen season = .
-replace season = cond(missing(c_2_p_c),0,c_2_p_c) + cond(missing(c_2_d),0,c_2_d)
-replace season = 1 if season > 1 & !missing(season)
+if $country == 0 {
+    replace season = cond(missing(c_2_p_c), 0, c_2_p_c)
+}
+else {
+    replace season = cond(missing(c_2_p_c),0,c_2_p_c) + cond(missing(c_2_d),0,c_2_d)
+    replace season = 1 if season > 1 & !missing(season)
+}
 
 * Motor commands
 rename c_61 nod
@@ -62,11 +77,15 @@ rename c_62 point
 * Circle drawing - recode to binary
 rename cs_72_2 circle
 rename c_72_2 circle_diss
-replace circle = . if circle_diss == 6 | circle_diss == 7
-replace circle = 0 if circle == 7 | circle == 8 | circle == 9
+* Disability codes handled below in conditional block
 replace circle = 1 if circle > 1 & circle != .
 
-* Pentagon drawing
+* Pentagon drawing (requires Ty's cleaned scoring)
+capture confirm variable cs_32_cleaned
+if _rc != 0 {
+    display as error "ERROR: cs_32_cleaned not found. Re-run Cog_Scoring_Read.do to generate this variable."
+    error 111
+}
 rename cs_32_cleaned pentag
 rename c_32 pentag_diss
 
@@ -93,9 +112,10 @@ gen worddel = c_21 + c_22 + c_23
 * PAPER FOLDING
 *-------------------------------------------------------------------------------
 
-* Recode refusals to 0
+* Recode disability (6 = could not) to 0, refusal (7) to missing
 foreach var in c_27 c_28 c_29 {
-    replace `var' = 0 if `var' == 6 | `var' == 7
+    replace `var' = 0 if `var' == 6
+    replace `var' = . if `var' == 7
 }
 
 gen paper = cond(missing(c_27),0,c_27) + cond(missing(c_28),0,c_28) + cond(missing(c_29),0,c_29)
@@ -144,24 +164,28 @@ foreach var in story learn1 learn2 learn3 recall {
 }
 
 *-------------------------------------------------------------------------------
-* HANDLE PHYSICAL DISABILITY CODES
-* Options: "zero" = recode to 0, "missing" = recode to missing
+* HANDLE PHYSICAL DISABILITY vs REFUSAL CODES
+* Disability (6, 8, 9 = could not due to physical limitation) → recode to 0
+* Refusal (7 = refused) → recode to missing
 *-------------------------------------------------------------------------------
 
-if "$recode_disability_to" == "missing" {
-    foreach var in pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat street store address nod point {
-        replace `var' = . if `var' == 6 | `var' == 7 | `var' == 8 | `var' == 9
-    }
-    replace pentag = . if pentag_diss == 6 | pentag_diss == 7
-    display "Disability codes recoded to MISSING"
+* Binary cognitive items: disability → 0, refusal → missing
+foreach var in pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat street store address nod point {
+    replace `var' = 0 if `var' == 6 | `var' == 8 | `var' == 9
+    replace `var' = . if `var' == 7
 }
-else {
-    foreach var in pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat street store address nod point {
-        replace `var' = 0 if `var' == 6 | `var' == 7 | `var' == 8 | `var' == 9
-    }
-    replace pentag = 0 if pentag_diss == 6 | pentag_diss == 7
-    display "Disability codes recoded to ZERO"
-}
+
+* Pentagon: disability → 0, refusal → missing
+replace pentag = 0 if pentag_diss == 6
+replace pentag = . if pentag_diss == 7
+
+* Circle: disability → 0, refusal → missing
+replace circle = 0 if circle_diss == 6
+replace circle = . if circle_diss == 7
+replace circle = 0 if circle == 8 | circle == 9
+replace circle = . if circle == 7
+
+display "Disability codes (6, 8, 9) recoded to ZERO; Refusal codes (7) recoded to MISSING"
 
 * Informant items: recode 2 to 0
 recode street (2 = 0)
@@ -169,7 +193,21 @@ recode store (2 = 0)
 recode address (2 = 0)
 
 * Pentagon: ensure binary
-replace pentag = 1 if pentag == 2
+* Create strict version for reference (only value 2 = correct)
+gen pentag_strict = (pentag == 2) if !missing(pentag)
+
+* Apply scoring based on option
+if "$use_strict_pentag" == "yes" {
+    * Strict scoring: only value 2 counts as correct (matches 1066 baseline)
+    replace pentag = 0 if pentag == 1
+    replace pentag = 1 if pentag == 2
+    display "Pentagon scoring: STRICT (only value 2 = correct)"
+}
+else {
+    * Lenient scoring: both 1 and 2 count as correct
+    replace pentag = 1 if pentag == 2
+    display "Pentagon scoring: LENIENT (values 1 and 2 = correct)"
+}
 
 * Animals: handle out of range values
 replace animals = . if animals == 777
@@ -193,12 +231,12 @@ foreach var in animals wordimm worddel paper story learn1 learn2 learn3 recall p
 }
 
 *-------------------------------------------------------------------------------
-* COUNT VARIABLE (sum of 28 binary cognitive items)
+* COUNT VARIABLE (sum of 26 binary cognitive items)
 *-------------------------------------------------------------------------------
 
 egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point circle pentag)
 
-display "Count variable created (max should be 28):"
+display "Count variable created (max should be 26):"
 summarize count
 
 *-------------------------------------------------------------------------------
