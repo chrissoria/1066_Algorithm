@@ -534,10 +534,20 @@ logit cdem1066 cogscore relscore_duplicate learn1
 predict cdem1066_learn1_prob, pr
 summarize cdem1066_learn1_prob
 
+gen dem1066_learn1 = (cdem1066_learn1_prob >= .5) if !missing(cdem1066_learn1_prob)
+
+
+roctab cdem1066 cdem1066_learn1_prob
+
 *using learn3 instead of recall
 logit cdem1066 cogscore relscore_duplicate learn3
 predict cdem1066_learn3_prob, pr
 summarize cdem1066_learn3_prob
+
+gen dem1066_learn3 = (cdem1066_learn3_prob >= .5) if !missing(cdem1066_learn3_prob)
+
+
+roctab cdem1066 cdem1066_learn3_prob
 
 log close
 

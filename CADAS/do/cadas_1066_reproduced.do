@@ -107,7 +107,14 @@ else {
 }
 rename c_61 nod
 rename c_62 point
-rename cs_32 pentag
+* Circle variable - recode to binary (0 or 1), set missing for disability/refusal
+rename cs_72_2 circle
+rename c_72_2 circle_diss
+replace circle = . if circle_diss == 6 | circle_diss == 7
+replace circle = 0 if circle == 7 | circle == 8 | circle == 9
+replace circle = 1 if circle > 1 & circle != .
+
+rename cs_32_cleaned pentag
 rename c_32 pentag_diss
 rename cs_40 animals
 rename c_40 animals_diss
@@ -182,21 +189,21 @@ recode address (2 = 0)
 replace pentag = 1 if pentag == 2
 
 replace animals = . if animals == 777
-* copying from original algo
 replace animals = . if animals > 45
+replace animals = . if animals_diss == 777
 
 gen nametot = 0
 replace nametot = 1 if name > 0 & !missing(name)
 replace nametot = 1 if nrecall > 0 & !missing(nrecall)
 
 *both types of skips (valid and invalid) will be removed
-foreach var in animals wordimm worddel paper story learn1 learn2 learn3 recall pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point  pentag nametot nrecall {
+foreach var in animals wordimm worddel paper story learn1 learn2 learn3 recall pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point circle pentag nametot nrecall {
     replace `var' = . if `var' == .v | `var' == .i
 }
 
-egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point pentag)
+egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief street store address longmem month day year season nod point circle pentag)
 
-*max should be 27
+*max should be 28 (added circle)
 summarize count
 
 *this is only if we want to impute recall (which I don't think we want to)
@@ -340,18 +347,11 @@ if `wave' == 2 {
 replace chores = chores_original
 }
 
-*this whole chunk of code produces no changes
-* Backup original 'dress' variable and recode if 'dressdis' is 1
-replace dress = 0 if dressdis == 1
-
-* Backup original 'chores' variable and recode if 'choredis' is 1
+* Recode if disability
+replace dress = 0 if dressdiss == 1
 replace chores = 0 if choredis == 1
-
-* Backup original 'feed' variable and recode if 'feeddis' is 1
-replace feed = 0 if feeddis == 1
-
-* Backup original 'toilet' variable and recode if 'toildis' is 1
-replace toilet = 0 if toildis == 1
+replace feed = 0 if feeddiss == 1
+replace toilet = 0 if toildiss == 1
 
 *replace misstot_duplicate = 0 if misstot_duplicate == .
 

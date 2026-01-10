@@ -1,0 +1,670 @@
+------------------------------------------------------------------------------------------------------------------------
+      name:  step0
+       log:  /Users/chrissoria/Documents/Research/1066/CADAS/do/cadas_within/logs/step0_setup.log
+  log type:  text
+ opened on:  28 Dec 2025, 23:49:02
+
+. 
+. display _newline(2)
+
+
+
+
+. display "================================================================================"
+================================================================================
+
+. display "STEP 0: DATA SETUP"
+STEP 0: DATA SETUP
+
+. display "================================================================================"
+================================================================================
+
+. display _newline(1)
+
+
+
+. 
+. local cu_path "/Users/chrissoria/Documents/CADAS/Data/CUBA_out"
+
+. local dr_path "/Users/chrissoria/Documents/CADAS/Data/DR_out"
+
+. 
+. *-------------------------------------------------------------------------------
+. * LOAD AND MERGE CUBA DATA
+. *-------------------------------------------------------------------------------
+. display "Loading Cuba data..."
+Loading Cuba data...
+
+. 
+. use "`cu_path'/Cog.dta", clear
+
+. 
+. * Handle duplicates
+. duplicates report pid
+
+Duplicates in terms of pid
+
+--------------------------------------
+   Copies | Observations       Surplus
+----------+---------------------------
+        1 |         1501             0
+        2 |           20            10
+        3 |            3             2
+        4 |            4             3
+--------------------------------------
+
+. sort pid
+
+. by pid: gen dup = _n == 1
+
+. drop if dup == 0
+(15 observations deleted)
+
+. drop dup
+
+. 
+. * Merge with informant data
+. merge 1:m pid using "`cu_path'/Infor.dta", force
+(label country_label already defined)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                            33
+        from master                        19  (_merge==1)
+        from using                         14  (_merge==2)
+
+    Matched                             1,518  (_merge==3)
+    -----------------------------------------
+
+. duplicates report pid
+
+Duplicates in terms of pid
+
+--------------------------------------
+   Copies | Observations       Surplus
+----------+---------------------------
+        1 |         1505             0
+        2 |           36            18
+        3 |            6             4
+        4 |            4             3
+--------------------------------------
+
+. sort pid
+
+. by pid: gen dup = _n == 1
+
+. drop if dup == 0
+(25 observations deleted)
+
+. drop dup
+
+. rename _merge merge1
+
+. 
+. * Merge with cognitive scoring data
+. merge 1:m pid using "`cu_path'/Cog_Scoring.dta", force
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                            38
+        from master                        35  (_merge==1)
+        from using                          3  (_merge==2)
+
+    Matched                             1,500  (_merge==3)
+    -----------------------------------------
+
+. duplicates report pid
+
+Duplicates in terms of pid
+
+--------------------------------------
+   Copies | Observations       Surplus
+----------+---------------------------
+        1 |         1520             0
+        2 |           18             9
+--------------------------------------
+
+. sort pid
+
+. by pid: gen dup = _n == 1
+
+. drop if dup == 0
+(9 observations deleted)
+
+. drop dup
+
+. 
+. duplicates report pid
+
+Duplicates in terms of pid
+
+--------------------------------------
+   Copies | Observations       Surplus
+----------+---------------------------
+        1 |         1529             0
+--------------------------------------
+
+. 
+. gen country = "CU"
+
+. 
+. * Save Cuba data temporarily
+. tempfile cuba_data
+
+. save `cuba_data'
+file /var/folders/89/6bdxzk2j30v5n3wstywbcpg80000gn/T//S_18351.000001 saved as .dta format
+
+. 
+. display "Cuba data loaded. N = " _N " observations."
+Cuba data loaded. N = 1529 observations.
+
+. 
+. *-------------------------------------------------------------------------------
+. * LOAD AND MERGE DR DATA
+. *-------------------------------------------------------------------------------
+. display "Loading DR data..."
+Loading DR data...
+
+. 
+. use "`dr_path'/Cog.dta", clear
+
+. 
+. * Handle duplicates
+. duplicates report pid
+
+Duplicates in terms of pid
+
+--------------------------------------
+   Copies | Observations       Surplus
+----------+---------------------------
+        1 |         1537             0
+        2 |            4             2
+        3 |            3             2
+--------------------------------------
+
+. sort pid
+
+. by pid: gen dup = _n == 1
+
+. drop if dup == 0
+(4 observations deleted)
+
+. drop dup
+
+. 
+. * Merge with informant data
+. merge 1:m pid using "`dr_path'/Infor.dta", force
+(variable pid_parent was str8, now str10 to accommodate using data's values)
+(variable pid was str9, now str10 to accommodate using data's values)
+(variable hhid was str7, now str8 to accommodate using data's values)
+(label country_label already defined)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                            87
+        from master                        57  (_merge==1)
+        from using                         30  (_merge==2)
+
+    Matched                             1,500  (_merge==3)
+    -----------------------------------------
+
+. duplicates report pid
+
+Duplicates in terms of pid
+
+--------------------------------------
+   Copies | Observations       Surplus
+----------+---------------------------
+        1 |         1552             0
+        2 |           26            13
+        3 |            9             6
+--------------------------------------
+
+. sort pid
+
+. by pid: gen dup = _n == 1
+
+. drop if dup == 0
+(19 observations deleted)
+
+. drop dup
+
+. rename _merge merge1
+
+. 
+. * Merge with cognitive scoring data
+. merge 1:m pid using "`dr_path'/Cog_Scoring.dta", force
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                            68
+        from master                        64  (_merge==1)
+        from using                          4  (_merge==2)
+
+    Matched                             1,521  (_merge==3)
+    -----------------------------------------
+
+. duplicates report pid
+
+Duplicates in terms of pid
+
+--------------------------------------
+   Copies | Observations       Surplus
+----------+---------------------------
+        1 |         1556             0
+        2 |           30            15
+        3 |            3             2
+--------------------------------------
+
+. sort pid
+
+. by pid: gen dup = _n == 1
+
+. drop if dup == 0
+(17 observations deleted)
+
+. drop dup
+
+. 
+. duplicates report pid
+
+Duplicates in terms of pid
+
+--------------------------------------
+   Copies | Observations       Surplus
+----------+---------------------------
+        1 |         1572             0
+--------------------------------------
+
+. 
+. gen country = "DR"
+
+. 
+. display "DR data loaded. N = " _N " observations."
+DR data loaded. N = 1572 observations.
+
+. 
+. *-------------------------------------------------------------------------------
+. * APPEND CUBA AND DR DATA
+. *-------------------------------------------------------------------------------
+. display "Appending Cuba and DR data..."
+Appending Cuba and DR data...
+
+. 
+. append using `cuba_data', force
+(variable c_interid was byte, now float to accommodate using data's values)
+(variable c_date was str12, now str13 to accommodate using data's values)
+(variable c_date_end was str12, now str13 to accommodate using data's values)
+(variable i_date was str12, now str13 to accommodate using data's values)
+(variable i_date_end was str12, now str13 to accommodate using data's values)
+(variable cs_interid was byte, now int to accommodate using data's values)
+(variable cs_32 was byte, now float to accommodate using data's values)
+(label C_82 already defined)
+(label C_81 already defined)
+(label C_80C already defined)
+(label C_80B already defined)
+(label C_80A already defined)
+(label C_79_4 already defined)
+(label C_79_3 already defined)
+(label C_79_2 already defined)
+(label C_79_1 already defined)
+(label C_78_25 already defined)
+(label C_78_24 already defined)
+(label C_78_23 already defined)
+(label C_78_22 already defined)
+(label C_78_21 already defined)
+(label C_78_20 already defined)
+(label C_78_19 already defined)
+(label C_78_18 already defined)
+(label C_78_17 already defined)
+(label C_78_16 already defined)
+(label C_78_15 already defined)
+(label C_78_14 already defined)
+(label C_78_13 already defined)
+(label C_78_12 already defined)
+(label C_78_11 already defined)
+(label C_78_10 already defined)
+(label C_78_09 already defined)
+(label C_78_08 already defined)
+(label C_78_07 already defined)
+(label C_78_06 already defined)
+(label C_78_05 already defined)
+(label C_78_04 already defined)
+(label C_78_03 already defined)
+(label C_78_02 already defined)
+(label C_78_01 already defined)
+(label checkbox_label already defined)
+(label C_77F already defined)
+(label C_77E already defined)
+(label C_77D already defined)
+(label C_77C already defined)
+(label C_77B already defined)
+(label C_77A already defined)
+(label C_72_4 already defined)
+(label C_72_3 already defined)
+(label C_72_2 already defined)
+(label C_72_1 already defined)
+(label C_71_D already defined)
+(label C_71_P already defined)
+(label C_71_C already defined)
+(label C_70_P already defined)
+(label C_70_D_C already defined)
+(label C_69_P already defined)
+(label C_69_D already defined)
+(label C_69_C already defined)
+(label C_68_20 already defined)
+(label C_68_19 already defined)
+(label C_68_18 already defined)
+(label C_68_17 already defined)
+(label C_68_16 already defined)
+(label C_68_15 already defined)
+(label C_68_14 already defined)
+(label C_68_13 already defined)
+(label C_68_12 already defined)
+(label C_68_11 already defined)
+(label C_68_10 already defined)
+(label C_68_09 already defined)
+(label C_68_08 already defined)
+(label C_68_07 already defined)
+(label C_68_06 already defined)
+(label C_68_05 already defined)
+(label C_68_04 already defined)
+(label C_68_03 already defined)
+(label C_68_02 already defined)
+(label C_68_01 already defined)
+(label C_67_25 already defined)
+(label C_67_24 already defined)
+(label C_67_23 already defined)
+(label C_67_22 already defined)
+(label C_67_21 already defined)
+(label C_67_20 already defined)
+(label C_67_19 already defined)
+(label C_67_18 already defined)
+(label C_67_17 already defined)
+(label C_67_16 already defined)
+(label C_67_15 already defined)
+(label C_67_14 already defined)
+(label C_67_13_P already defined)
+(label C_67_13_D already defined)
+(label C_67_13_C already defined)
+(label C_67_12 already defined)
+(label C_67_11 already defined)
+(label C_67_10 already defined)
+(label C_67_09 already defined)
+(label C_67_08 already defined)
+(label C_67_07 already defined)
+(label C_67_06 already defined)
+(label C_67_05 already defined)
+(label C_67_04 already defined)
+(label C_67_03 already defined)
+(label C_67_02 already defined)
+(label C_67_01 already defined)
+(label C_66F already defined)
+(label C_66E already defined)
+(label C_66D already defined)
+(label C_66C already defined)
+(label C_66B already defined)
+(label C_66A already defined)
+(label G_2 already defined)
+(label C_65 already defined)
+(label C_62 already defined)
+(label C_61 already defined)
+(label C_60 already defined)
+(label C_59 already defined)
+(label C_58 already defined)
+(label C_56 already defined)
+(label C_55 already defined)
+(label C_54 already defined)
+(label C_53 already defined)
+(label C_52 already defined)
+(label C_51 already defined)
+(label C_50 already defined)
+(label C_49 already defined)
+(label C_48 already defined)
+(label C_46 already defined)
+(label C_45 already defined)
+(label C_43 already defined)
+(label C_40 already defined)
+(label G_1 already defined)
+(label C_32 already defined)
+(label C_31 already defined)
+(label C_30 already defined)
+(label C_29 already defined)
+(label C_28 already defined)
+(label C_27 already defined)
+(label C_26 already defined)
+(label C_25 already defined)
+(label C_24 already defined)
+(label C_23 already defined)
+(label C_22 already defined)
+(label C_21 already defined)
+(label C_13 already defined)
+(label C_12 already defined)
+(label C_11 already defined)
+(label C_10 already defined)
+(label C_9 already defined)
+(label C_8 already defined)
+(label C_7_P already defined)
+(label C_7_D_C already defined)
+(label C_6 already defined)
+(label C_5 already defined)
+(label C_4 already defined)
+(label C_3 already defined)
+(label C_2_D already defined)
+(label C_2_P_C already defined)
+(label C_1 already defined)
+(label C_0 already defined)
+(label country_label already defined)
+(label I_LHAS_54 already defined)
+(label I_K_ACT_17 already defined)
+(label I_K_ACT_16 already defined)
+(label I_K_ACT_15 already defined)
+(label I_K_ACT_14 already defined)
+(label I_K_ACT_13 already defined)
+(label I_K_ACT_10 already defined)
+(label I_K_ACT_8 already defined)
+(label I_K_ACT_7 already defined)
+(label I_K_ACT_5 already defined)
+(label I_K_ACT_2 already defined)
+(label I_K_ACT_1 already defined)
+(label I_J3 already defined)
+(label I_J2 already defined)
+(label I_J1 already defined)
+(label I_H_NPI_12_2 already defined)
+(label I_H_NPI_12_1 already defined)
+(label I_H_NPI_12 already defined)
+(label I_H_NPI_11_2 already defined)
+(label I_H_NPI_11_1 already defined)
+(label I_H_NPI_11 already defined)
+(label I_H_NPI_10_2 already defined)
+(label I_H_NPI_10_1 already defined)
+(label I_H_NPI_10 already defined)
+(label I_H_NPI_9_2 already defined)
+(label I_H_NPI_9_1 already defined)
+(label I_H_NPI_9 already defined)
+(label I_H_NPI_8_2 already defined)
+(label I_H_NPI_8_1 already defined)
+(label I_H_NPI_8 already defined)
+(label I_H_NPI_7_2 already defined)
+(label I_H_NPI_7_1 already defined)
+(label I_H_NPI_7 already defined)
+(label I_H_NPI_6_2 already defined)
+(label I_H_NPI_6_1 already defined)
+(label I_H_NPI_6 already defined)
+(label I_H_NPI_5_2 already defined)
+(label I_H_NPI_5_1 already defined)
+(label I_H_NPI_5 already defined)
+(label I_H_NPI_4_2 already defined)
+(label I_H_NPI_4_1 already defined)
+(label I_H_NPI_4 already defined)
+(label I_H_NPI_3_2 already defined)
+(label I_H_NPI_3_1 already defined)
+(label I_H_NPI_3 already defined)
+(label I_H_NPI_2_2 already defined)
+(label I_H_NPI_2_1 already defined)
+(label I_H_NPI_2 already defined)
+(label I_H_NPI_1_2 already defined)
+(label I_H_NPI_1_1 already defined)
+(label I_H_NPI_1 already defined)
+(label I_G_HAS_52 already defined)
+(label I_G_HAS_50 already defined)
+(label I_G_HAS_49 already defined)
+(label I_G_HAS_48 already defined)
+(label I_G_HAS_47 already defined)
+(label I_G_HAS_18 already defined)
+(label I_G_HAS_17 already defined)
+(label I_G_HAS_15 already defined)
+(label I_G_HAS_14_1 already defined)
+(label I_G_HAS_13 already defined)
+(label I_G_HAS_12 already defined)
+(label I_G_HAS_11 already defined)
+(label I_G_HAS_10 already defined)
+(label I_G_HAS_7_1 already defined)
+(label I_G_HAS_6 already defined)
+(label I_G_HAS_5_1 already defined)
+(label I_G_HAS_4 already defined)
+(label I_G_HAS_3_22 already defined)
+(label I_G_HAS_3_16 already defined)
+(label I_G_HAS_3_14 already defined)
+(label I_G_HAS_3_13 already defined)
+(label I_G_HAS_3_11 already defined)
+(label I_G_HAS_3_1 already defined)
+(label I_G_HAS_2 already defined)
+(label I_G1_5 already defined)
+(label I_G1_4 already defined)
+(label I_G1_3 already defined)
+(label I_G1_2 already defined)
+(label I_G1 already defined)
+(label I_F_CSID_28 already defined)
+(label I_F_CSID_27 already defined)
+(label I_F_CSID_26 already defined)
+(label I_F_CSID_25 already defined)
+(label I_F_CSID_24_2 already defined)
+(label I_F_CSID_24_1 already defined)
+(label I_F_CSID_23_2 already defined)
+(label I_F_CSID_23_1 already defined)
+(label I_F_CSID_22_2 already defined)
+(label I_F_CSID_22_1 already defined)
+(label I_F_CSID_21 already defined)
+(label I_F_CSID_20 already defined)
+(label I_F_CSID_19 already defined)
+(label I_F_CSID_18 already defined)
+(label I_F_CSID_17A already defined)
+(label I_F_CSID_17 already defined)
+(label I_F_CSID_16 already defined)
+(label I_F_CSID_15 already defined)
+(label I_F_CSID_14 already defined)
+(label I_F_CSID_13 already defined)
+(label I_F_CSID_12 already defined)
+(label I_F_CSID_11 already defined)
+(label I_F_CSID_10 already defined)
+(label I_F_CSID_9 already defined)
+(label I_F_CSID_8 already defined)
+(label I_F_CSID_7 already defined)
+(label I_F_CSID_6 already defined)
+(label I_F_BSE_7 already defined)
+(label I_F_BSE_3 already defined)
+(label I_F_CSID_5 already defined)
+(label I_F_CSID_4 already defined)
+(label I_F_CSID_3 already defined)
+(label I_F_CSID_2 already defined)
+(label I_F_CSID_1 already defined)
+(label I_E16 already defined)
+(label I_E15 already defined)
+(label I_E14 already defined)
+(label I_E13 already defined)
+(label I_E12 already defined)
+(label I_E11 already defined)
+(label I_E10 already defined)
+(label I_E9 already defined)
+(label I_E8 already defined)
+(label I_E7 already defined)
+(label I_E6 already defined)
+(label I_E5 already defined)
+(label I_E4 already defined)
+(label I_E3 already defined)
+(label I_E2 already defined)
+(label I_E1 already defined)
+(label I_D21 already defined)
+(label I_D20 already defined)
+(label I_D19 already defined)
+(label I_D17 already defined)
+(label I_D12 already defined)
+(label I_D11 already defined)
+(label I_D10 already defined)
+(label I_D9 already defined)
+(label I_D6 already defined)
+(label I_D5 already defined)
+(label I_D3 already defined)
+(label I_D2 already defined)
+(label I_C27A already defined)
+(label I_C26A already defined)
+(label I_C25 already defined)
+(label I_C23 already defined)
+(label I_C11 already defined)
+(label I_C9 already defined)
+(label I_C8A_ already defined)
+(label I_C7_1_ already defined)
+(label I_C5 already defined)
+(label I_C4 already defined)
+(label I_C3 already defined)
+(label I_C2 already defined)
+(label I_C1 already defined)
+(label I_B7_ already defined)
+(label I_B5 already defined)
+(label I_B4 already defined)
+(label I_B1 already defined)
+(label I_A4 already defined)
+(label I_A3 already defined)
+(label I_A2 already defined)
+(label _merge already defined)
+
+. 
+. * Handle any duplicates across countries
+. duplicates report pid
+
+Duplicates in terms of pid
+
+--------------------------------------
+   Copies | Observations       Surplus
+----------+---------------------------
+        1 |         3101             0
+--------------------------------------
+
+. sort pid
+
+. by pid: gen dup = _n == 1
+
+. drop if dup == 0
+(0 observations deleted)
+
+. drop dup
+
+. 
+. display "Data setup complete. Total N = " _N " observations (Cuba + DR)."
+Data setup complete. Total N = 3101 observations (Cuba + DR).
+
+. tab country
+
+    country |      Freq.     Percent        Cum.
+------------+-----------------------------------
+         CU |      1,529       49.31       49.31
+         DR |      1,572       50.69      100.00
+------------+-----------------------------------
+      Total |      3,101      100.00
+
+. display "--------------------------------------------------------------------------------"
+--------------------------------------------------------------------------------
+
+. 
+. * Save intermediate dataset
+. save "$within_path/cadas_within_data.dta", replace
+file /Users/chrissoria/Documents/Research/1066/CADAS/do/cadas_within/cadas_within_data.dta saved
+
+. 
+. log close step0
+      name:  step0
+       log:  /Users/chrissoria/Documents/Research/1066/CADAS/do/cadas_within/logs/step0_setup.log
+  log type:  text
+ closed on:  28 Dec 2025, 23:49:02
+------------------------------------------------------------------------------------------------------------------------

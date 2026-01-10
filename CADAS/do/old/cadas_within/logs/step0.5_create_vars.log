@@ -1,0 +1,603 @@
+------------------------------------------------------------------------------------------------------------------------
+      name:  step05
+       log:  /Users/chrissoria/Documents/Research/1066/CADAS/do/cadas_within/logs/step0.5_create_vars.log
+  log type:  text
+ opened on:  28 Dec 2025, 23:49:02
+
+. 
+. * Load data from previous step
+. use "$within_path/cadas_within_data.dta", clear
+
+. 
+. display _newline(2)
+
+
+
+
+. display "================================================================================"
+================================================================================
+
+. display "STEP 0.5: CREATE ALL VARIABLES NEEDED FOR ANALYSIS"
+STEP 0.5: CREATE ALL VARIABLES NEEDED FOR ANALYSIS
+
+. display "================================================================================"
+================================================================================
+
+. display _newline(1)
+
+
+
+. 
+. *-------------------------------------------------------------------------------
+. * COGNITIVE VARIABLES - Renaming and recoding
+. *-------------------------------------------------------------------------------
+. 
+. rename c_24 pencil
+
+. rename c_25 watch
+
+. rename c_48 chair
+
+. rename c_49 shoes
+
+. rename c_50 knuckle
+
+. rename c_51 elbow
+
+. rename c_52 should
+
+. rename c_53 bridge
+
+. rename c_54 hammer
+
+. rename c_55 pray
+
+. rename c_56 chemist
+
+. rename c_26 repeat
+
+. rename c_8 town
+
+. 
+. * Chief variable - country-specific
+. gen chief = .
+(3,101 missing values generated)
+
+. replace chief = cond(missing(c_70_d_c), 0, c_70_d_c)
+(3,101 real changes made)
+
+. 
+. rename i_a2 street
+
+. rename i_a3 store
+
+. rename i_a4 address
+
+. 
+. * Longmem - country-specific
+. gen longmom = .
+(3,101 missing values generated)
+
+. replace longmom = cond(missing(c_69_c),0,c_69_c) + cond(missing(c_69_d),0,c_69_d)
+(3,101 real changes made)
+
+. 
+. rename c_3 month
+
+. rename c_5 day
+
+. rename c_1 year
+
+. 
+. * Season - country-specific
+. gen season = .
+(3,101 missing values generated)
+
+. replace season = cond(missing(c_2_p_c),0,c_2_p_c) + cond(missing(c_2_d),0,c_2_d)
+(3,101 real changes made)
+
+. 
+. rename c_61 nod
+
+. rename c_62 point
+
+. 
+. * Circle variable - recode to binary (0 or 1), 7/8/9 to 0
+. rename c_72_1 circle
+
+. replace circle = 0 if circle == 7 | circle == 8 | circle == 9
+(26 real changes made)
+
+. replace circle = 1 if circle > 1 & circle != .
+(196 real changes made)
+
+. 
+. rename cs_32 pentag
+
+. rename c_32 pentag_diss
+
+. rename cs_40 animals
+
+. rename c_40 animals_diss
+
+. 
+. * Word immediate and delayed recall
+. foreach var in c_11 c_12 c_13 c_21 c_22 c_23 {
+  2.     replace `var' = 0 if `var' ==.i
+  3. }
+(38 real changes made)
+(47 real changes made)
+(44 real changes made)
+(25 real changes made)
+(30 real changes made)
+(32 real changes made)
+
+. 
+. gen wordimm = c_11 + c_12 + c_13
+(48 missing values generated)
+
+. gen worddel = c_21 + c_22 + c_23
+(48 missing values generated)
+
+. 
+. * Paper folding - recode refusals to 0
+. foreach var in c_27 c_28 c_29 {
+  2.     replace `var' = 0 if `var' == 6 | `var' == 7
+  3. }
+(59 real changes made)
+(65 real changes made)
+(62 real changes made)
+
+. gen paper = cond(missing(c_27),0,c_27) + cond(missing(c_28),0,c_28) + cond(missing(c_29),0,c_29)
+
+. 
+. * Story recall
+. foreach var in c_66a c_66b c_66c c_66d c_66e c_66f {
+  2.     replace `var' = 1 if `var' == 0 | `var' == 1
+  3.     replace `var' = 0 if `var' == 2
+  4.     replace `var' = 0 if `var' == .i
+  5. }
+(2,167 real changes made)
+(246 real changes made)
+(44 real changes made)
+(1,829 real changes made)
+(275 real changes made)
+(49 real changes made)
+(1,192 real changes made)
+(437 real changes made)
+(57 real changes made)
+(1,484 real changes made)
+(439 real changes made)
+(57 real changes made)
+(733 real changes made)
+(1,436 real changes made)
+(77 real changes made)
+(765 real changes made)
+(1,423 real changes made)
+(78 real changes made)
+
+. gen story = c_66a + c_66b + c_66c + c_66d + c_66e + c_66f
+(103 missing values generated)
+
+. 
+. rename c_66_a story_refuse
+
+. 
+. * Learning trials and recall
+. gen learn1 = c_33_1 + c_33_2 + c_33_3 + c_33_4 + c_33_5 + c_33_6 + c_33_7 + c_33_8 + c_33_9 + c_33_10
+(81 missing values generated)
+
+. rename c_33_a learn1_refuse
+
+. gen learn2 = c_34_1 + c_34_2 + c_34_3 + c_34_4 + c_34_5 + c_34_6 + c_34_7 + c_34_8 + c_34_9 + c_34_10
+(85 missing values generated)
+
+. rename c_34_a learn2_refuse
+
+. gen learn3 = c_35_1 + c_35_2 + c_35_3 + c_35_4 + c_35_5 + c_35_6 + c_35_7 + c_35_8 + c_35_9 + c_35_10
+(86 missing values generated)
+
+. rename c_35_a learn3_refuse
+
+. gen recall = c_63_1 + c_63_2 + c_63_3 + c_63_4 + c_63_5 + c_63_6 + c_63_7 + c_63_8 + c_63_9 + c_63_10
+(105 missing values generated)
+
+. rename c_63_a recall_refuse
+
+. rename c_0 name
+
+. rename c_65 nrecall
+
+. 
+. * Set to missing if refused
+. foreach var in story learn1 learn2 learn3 recall {
+  2.     replace `var' = . if `var'_refuse == 7
+  3. }
+(7 real changes made, 7 to missing)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. * Handle physical disability codes (6, 7, 8, 9) - recode to 0
+. foreach var in pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat street store address no
+> d point {
+  2.     replace `var' = 0 if `var' == 6 | `var' == 7 | `var' == 8 | `var' == 9
+  3. }
+(47 real changes made)
+(50 real changes made)
+(39 real changes made)
+(42 real changes made)
+(55 real changes made)
+(47 real changes made)
+(49 real changes made)
+(30 real changes made)
+(25 real changes made)
+(23 real changes made)
+(26 real changes made)
+(52 real changes made)
+(39 real changes made)
+(40 real changes made)
+(37 real changes made)
+(42 real changes made)
+(58 real changes made)
+
+. 
+. replace pentag = 0 if pentag_diss == 6 | pentag_diss == 7
+(23 real changes made)
+
+. 
+. * Street, store, address come from informant - recode 2 to 0
+. recode street (2 = 0)
+(297 changes made to street)
+
+. recode store (2 = 0)
+(255 changes made to store)
+
+. recode address (2 = 0)
+(246 changes made to address)
+
+. 
+. replace pentag = 1 if pentag == 2
+(21 real changes made)
+
+. 
+. replace animals = . if animals == 777
+(0 real changes made)
+
+. replace animals = . if animals > 45
+(1 real change made, 1 to missing)
+
+. 
+. * Name total
+. gen nametot = 0
+
+. replace nametot = 1 if name > 0 & !missing(name)
+(2,979 real changes made)
+
+. replace nametot = 1 if nrecall > 0 & !missing(nrecall)
+(8 real changes made)
+
+. 
+. * Remove valid and invalid skips
+. foreach var in animals wordimm worddel paper story learn1 learn2 learn3 recall pencil watch chair shoes knuckle elbow 
+> should bridge hammer pray chemist repeat town chief street store address longmom month day year season nod point penta
+> g nametot nrecall {
+  2.     capture replace `var' = . if `var' == .v | `var' == .i
+  3. }
+
+. 
+. * Count variable (sum of binary items)
+. egen count = rowtotal(pencil watch chair shoes knuckle elbow should bridge hammer pray chemist repeat town chief stree
+> t store address longmom month day year season nod point pentag)
+
+. 
+. * Immediate recall total (for imputation)
+. gen immed = cond(missing(learn1),0,learn1) + cond(missing(learn2),0,learn2) + cond(missing(learn3),0,learn3)
+
+. 
+. * Create proportion scores
+. local divide_var "animals wordimm worddel paper story"
+
+. local divisor "23 3 3 3 6"
+
+. local new_column "animtot wordtot1 wordtot2 papertot storytot"
+
+. 
+. local n : word count `divide_var'
+
+. 
+. forval i = 1/`n' {
+  2.     local col : word `i' of `divide_var'
+  3.     local num : word `i' of `divisor'
+  4.     local new : word `i' of `new_column'
+  5. 
+.     capture gen `new' = `col'/`num'
+  6. 
+.     if _rc capture replace `new' = `col'/`num'
+  7. }
+
+. 
+. * Generate cogscore
+. gen cogscore = 1.03125 * (nametot + count + animtot + wordtot1 + wordtot2 + papertot + storytot)
+(190 missing values generated)
+
+. 
+. display "COGSCORE created:"
+COGSCORE created:
+
+. summarize cogscore
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+    cogscore |      2,911    28.08998    4.139816          0   37.57337
+
+. 
+. *-------------------------------------------------------------------------------
+. * RELSCORE VARIABLES - Renaming and recoding
+. *-------------------------------------------------------------------------------
+. 
+. rename i_f_csid_1 activ
+
+. rename i_f_csid_2 mental
+
+. rename i_f_csid_3 memory
+
+. rename i_f_csid_4 put
+
+. rename i_f_csid_5 kept
+
+. rename i_f_csid_6 frdname
+
+. rename i_f_csid_7 famname
+
+. rename i_f_csid_8 convers
+
+. rename i_f_csid_9 wordfind
+
+. rename i_f_csid_10 wordwrg
+
+. rename i_f_csid_11 past
+
+. rename i_f_csid_12 lastsee
+
+. rename i_f_csid_13 lastday
+
+. rename i_f_csid_14 orient
+
+. rename i_f_csid_15 lostout
+
+. rename i_f_csid_16 lostin
+
+. rename i_f_csid_17 chores
+
+. rename i_f_csid_17a choredis
+
+. rename i_f_csid_18 hobby
+
+. rename i_f_csid_19 money
+
+. rename i_f_csid_20 change
+
+. rename i_f_csid_21 reason
+
+. rename i_f_csid_22_1 feed
+
+. rename i_f_csid_22_2 feeddiss
+
+. rename i_f_csid_23_1 dress
+
+. rename i_f_csid_23_2 dressdiss
+
+. rename i_f_csid_24_1 toilet
+
+. rename i_f_csid_24_2 toildiss
+
+. 
+. * Create missing indicators for miss1 variables
+. local miss1_variables "mental activ memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orie
+> nt lostout lostin chores hobby money change reason"
+
+. 
+. foreach var of local miss1_variables {
+  2.     gen missing_`var' = missing(`var')
+  3. }
+
+. 
+. egen miss1 = rowtotal(missing_mental missing_activ missing_memory /*
+>     */ missing_put missing_kept missing_frdname missing_famname /*
+>     */ missing_convers missing_wordfind missing_wordwrg missing_past /*
+>     */ missing_lastsee missing_lastday missing_orient missing_lostout /*
+>     */ missing_lostin missing_chores missing_hobby missing_money /*
+>     */ missing_change missing_reason)
+
+. 
+. * Create missing indicators for miss3 variables
+. local miss3_variables "feed dress toilet"
+
+. 
+. gen miss3 = 0
+
+. 
+. foreach var of local miss3_variables {
+  2.     replace miss3 = miss3 + missing(`var')
+  3. }
+(108 real changes made)
+(108 real changes made)
+(108 real changes made)
+
+. 
+. foreach var in feed dress toilet {
+  2.     gen missing_`var' = missing(`var')
+  3. }
+
+. 
+. egen all_miss = rowtotal(missing_mental missing_activ missing_memory /*
+>     */ missing_put missing_kept missing_frdname missing_famname /*
+>     */ missing_convers missing_wordfind missing_wordwrg missing_past /*
+>     */ missing_lastsee missing_lastday missing_orient missing_lostout /*
+>     */ missing_lostin missing_chores missing_hobby missing_money /*
+>     */ missing_change missing_reason missing_feed missing_dress missing_toilet)
+
+. 
+. replace miss1 = . if (all_miss == 24 & miss3 == .)
+(0 real changes made)
+
+. 
+. gen misstot = (miss3 * 3) + miss1
+
+. 
+. * Divide by 2 for specific variables
+. foreach var in put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores cha
+> nge money reason {
+  2.     replace `var'= `var'/2
+  3. }
+variable put was long now double
+(1,627 real changes made, 22 to missing)
+variable kept was long now double
+(1,032 real changes made, 22 to missing)
+variable frdname was long now double
+(593 real changes made, 23 to missing)
+variable famname was long now double
+(320 real changes made, 23 to missing)
+variable convers was long now double
+(727 real changes made, 23 to missing)
+variable wordfind was long now double
+(439 real changes made, 23 to missing)
+variable wordwrg was long now double
+(361 real changes made, 23 to missing)
+variable past was long now double
+(1,034 real changes made, 24 to missing)
+variable lastsee was long now double
+(222 real changes made, 24 to missing)
+variable lastday was long now double
+(374 real changes made, 24 to missing)
+variable orient was long now double
+(211 real changes made, 24 to missing)
+variable lostout was long now double
+(190 real changes made, 24 to missing)
+variable lostin was long now double
+(142 real changes made, 24 to missing)
+variable chores was long now double
+(509 real changes made, 24 to missing)
+variable change was long now double
+(396 real changes made, 24 to missing)
+variable money was long now double
+(407 real changes made, 24 to missing)
+variable reason was long now double
+(630 real changes made, 24 to missing)
+
+. 
+. * Recode if disability
+. replace dress = 0 if dressdiss == 1
+(120 real changes made)
+
+. replace chores = 0 if choredis == 1
+(277 real changes made)
+
+. replace feed = 0 if feeddiss == 1
+(85 real changes made)
+
+. replace toilet = 0 if toildiss == 1
+(83 real changes made)
+
+. 
+. * Calculate S (sum of relscore components)
+. gen S = cond(missing(activ), 0, activ) +  ///
+>             cond(missing(mental), 0, mental) + ///
+>             cond(missing(memory), 0, memory) + ///
+>             cond(missing(put), 0, put) + ///
+>             cond(missing(kept), 0, kept) + ///
+>             cond(missing(frdname), 0, frdname) + ///
+>             cond(missing(famname), 0, famname) + ///
+>             cond(missing(convers), 0, convers) + ///
+>             cond(missing(wordfind), 0, wordfind) + ///
+>             cond(missing(wordwrg), 0, wordwrg) + ///
+>             cond(missing(past), 0, past) + ///
+>             cond(missing(lastsee), 0, lastsee) + ///
+>             cond(missing(lastday), 0, lastday) + ///
+>             cond(missing(orient), 0, orient) + ///
+>             cond(missing(lostout), 0, lostout) + ///
+>             cond(missing(lostin), 0, lostin) + ///
+>             cond(missing(chores), 0, chores) + ///
+>             cond(missing(hobby), 0, hobby) + ///
+>             cond(missing(money), 0, money) + ///
+>             cond(missing(change), 0, change) + ///
+>             cond(missing(reason), 0, reason) + ///
+>             cond(missing(feed), 0, feed) + ///
+>             cond(missing(dress), 0, dress) + ///
+>             cond(missing(toilet), 0, toilet)
+
+. 
+. * Calculate U (weighting factor)
+. gen U = 30 / (30 - misstot)
+(105 missing values generated)
+
+. replace U = cond(missing(misstot), 0, U)
+(0 real changes made)
+
+. 
+. * Calculate relscore
+. gen relscore = U * S
+(105 missing values generated)
+
+. 
+. display "RELSCORE created:"
+RELSCORE created:
+
+. summarize relscore
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+    relscore |      2,996    2.682243    4.190756          0         29
+
+. 
+. *-------------------------------------------------------------------------------
+. * RECALL IMPUTATION (optional)
+. *-------------------------------------------------------------------------------
+. 
+. * Impute recall from immediate if requested
+. * Note: This uses the impute_recall global from master file
+. if "$impute_recall" == "yes" {
+.     gen recall_original = recall
+(105 missing values generated)
+.     gen pred_recall = (0.344 * immed) - 0.339
+.     replace recall = pred_recall if recall == 0
+(584 real changes made)
+.     display "Recall imputed from immediate recall"
+Recall imputed from immediate recall
+. }
+
+. 
+. display _newline(1)
+
+
+
+. display "STEP 0.5 complete. Variables created:"
+STEP 0.5 complete. Variables created:
+
+. display "  - Cognitive: cogscore, nametot, count, animtot, wordtot1, wordtot2, papertot, storytot"
+  - Cognitive: cogscore, nametot, count, animtot, wordtot1, wordtot2, papertot, storytot
+
+. display "  - Relscore: relscore, S, U, misstot, miss1, miss3"
+  - Relscore: relscore, S, U, misstot, miss1, miss3
+
+. display "  - Learning: learn1, learn2, learn3, recall, immed"
+  - Learning: learn1, learn2, learn3, recall, immed
+
+. display "--------------------------------------------------------------------------------"
+--------------------------------------------------------------------------------
+
+. 
+. * Save dataset with all variables created
+. save "$within_path/cadas_within_data.dta", replace
+file /Users/chrissoria/Documents/Research/1066/CADAS/do/cadas_within/cadas_within_data.dta saved
+
+. 
+. log close step05
+      name:  step05
+       log:  /Users/chrissoria/Documents/Research/1066/CADAS/do/cadas_within/logs/step0.5_create_vars.log
+  log type:  text
+ closed on:  28 Dec 2025, 23:49:02
+------------------------------------------------------------------------------------------------------------------------

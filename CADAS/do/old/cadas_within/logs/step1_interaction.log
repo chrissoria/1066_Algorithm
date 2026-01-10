@@ -1,0 +1,336 @@
+------------------------------------------------------------------------------------------------------------------------
+      name:  step1
+       log:  /Users/chrissoria/Documents/Research/1066/CADAS/do/cadas_within/logs/step1_interaction.log
+  log type:  text
+ opened on:  28 Dec 2025, 23:49:02
+
+. 
+. * Load data from previous step
+. use "$within_path/cadas_within_data.dta", clear
+
+. 
+. display _newline(2)
+
+
+
+
+. display "================================================================================"
+================================================================================
+
+. display "STEP 1: JUSTIFY THE INTERACTION BETWEEN COG AND RELSCORE"
+STEP 1: JUSTIFY THE INTERACTION BETWEEN COG AND RELSCORE
+
+. display "================================================================================"
+================================================================================
+
+. display _newline(1)
+
+
+
+. 
+. * Filter to CDR cases for analysis
+. keep if cuba_CDR_binary != .
+(2,799 observations deleted)
+
+. display "Filtered to CDR cases. N = " _N
+Filtered to CDR cases. N = 302
+
+. 
+. * 1a. Simple crosstabs: percent of cases with bad scores in both cog and relscore
+. * Thresholds: bottom quintile for cog (≤23.699), >5.0 for relscore
+. gen low_cog = (cogscore <= 23.699) if !missing(cogscore)
+(4 missing values generated)
+
+. gen high_relscore = (relscore > 5.0) if !missing(relscore)
+
+. 
+. display _newline(1)
+
+
+
+. display "1a. Cross-tabulation of low cognitive score and high informant score"
+1a. Cross-tabulation of low cognitive score and high informant score
+
+. display "    low_cog: cogscore <= 23.699 (bottom quintile from 10/66)"
+    low_cog: cogscore <= 23.699 (bottom quintile from 10/66)
+
+. display "    high_relscore: relscore > 5.0 (indicates functional decline)"
+    high_relscore: relscore > 5.0 (indicates functional decline)
+
+. display _newline(1)
+
+
+
+. 
+. * Overall distribution
+. display "Overall distribution:"
+Overall distribution:
+
+. tab low_cog high_relscore
+
+           |     high_relscore
+   low_cog |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       257         15 |       272 
+         1 |         7         19 |        26 
+-----------+----------------------+----------
+     Total |       264         34 |       298 
+
+. 
+. * Among dementia cases
+. display _newline(1)
+
+
+
+. display "Among dementia cases (cuba_CDR_binary == 1):"
+Among dementia cases (cuba_CDR_binary == 1):
+
+. tab low_cog high_relscore if cuba_CDR_binary == 1
+
+           |     high_relscore
+   low_cog |         0          1 |     Total
+-----------+----------------------+----------
+         0 |        36         11 |        47 
+         1 |         4         16 |        20 
+-----------+----------------------+----------
+     Total |        40         27 |        67 
+
+. 
+. * Among non-dementia cases
+. display _newline(1)
+
+
+
+. display "Among non-dementia cases (cuba_CDR_binary == 0):"
+Among non-dementia cases (cuba_CDR_binary == 0):
+
+. tab low_cog high_relscore if cuba_CDR_binary == 0
+
+           |     high_relscore
+   low_cog |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       221          4 |       225 
+         1 |         3          3 |         6 
+-----------+----------------------+----------
+     Total |       224          7 |       231 
+
+. 
+. * 1b. Show correlation between cog and relscore
+. display _newline(2)
+
+
+
+
+. display "1b. Correlations between cogscore, relscore, and recall"
+1b. Correlations between cogscore, relscore, and recall
+
+. correlate cogscore relscore recall
+(obs=297)
+
+             | cogscore relscore   recall
+-------------+---------------------------
+    cogscore |   1.0000
+    relscore |  -0.6255   1.0000
+      recall |   0.3806  -0.2711   1.0000
+
+
+. 
+. * 1c. Demonstrate that each doesn't always lead to dementia on its own
+. display _newline(2)
+
+
+
+
+. display "1c. Each predictor's relationship with dementia (chi-square tests)"
+1c. Each predictor's relationship with dementia (chi-square tests)
+
+. 
+. *-------------------------------------------------------------------------------
+. * Calculate sensitivity, specificity, PPV, NPV for each predictor
+. *-------------------------------------------------------------------------------
+. 
+. * Program to calculate and display classification metrics
+. capture program drop calc_metrics
+
+. program define calc_metrics
+  1.     args predictor outcome label
+  2. 
+.     * Get counts from crosstab
+.     quietly tab `outcome' `predictor', matcell(freq)
+  3. 
+.     * freq[1,1] = TN (outcome=0, predictor=0)
+.     * freq[1,2] = FP (outcome=0, predictor=1)
+.     * freq[2,1] = FN (outcome=1, predictor=0)
+.     * freq[2,2] = TP (outcome=1, predictor=1)
+. 
+.     local TN = freq[1,1]
+  4.     local FP = freq[1,2]
+  5.     local FN = freq[2,1]
+  6.     local TP = freq[2,2]
+  7. 
+.     * Calculate metrics
+.     local sensitivity = `TP' / (`TP' + `FN') * 100
+  8.     local specificity = `TN' / (`TN' + `FP') * 100
+  9.     local PPV = `TP' / (`TP' + `FP') * 100
+ 10.     local NPV = `TN' / (`TN' + `FN') * 100
+ 11. 
+.     * Get chi2
+.     quietly tab `outcome' `predictor', chi2
+ 12.     local chi2 = r(chi2)
+ 13. 
+.     * Display results
+.     display _newline(1)
+ 14.     display "`label' vs dementia:"
+ 15.     tab `outcome' `predictor', chi2 row col
+ 16.     display _newline(1)
+ 17.     display "  Chi2 = " %6.2f `chi2'
+ 18.     display "  Sensitivity = " %5.1f `sensitivity' "%"
+ 19.     display "  Specificity = " %5.1f `specificity' "%"
+ 20.     display "  PPV = " %5.1f `PPV' "%"
+ 21.     display "  NPV = " %5.1f `NPV' "%"
+ 22. end
+
+. 
+. * Calculate metrics for low_cog
+. calc_metrics low_cog cuba_CDR_binary "low_cog"
+
+
+low_cog vs dementia:
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+|  row percentage   |
+| column percentage |
++-------------------+
+
+cuba_CDR_b |        low_cog
+     inary |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       225          6 |       231 
+           |     97.40       2.60 |    100.00 
+           |     82.72      23.08 |     77.52 
+-----------+----------------------+----------
+         1 |        47         20 |        67 
+           |     70.15      29.85 |    100.00 
+           |     17.28      76.92 |     22.48 
+-----------+----------------------+----------
+     Total |       272         26 |       298 
+           |     91.28       8.72 |    100.00 
+           |    100.00     100.00 |    100.00 
+
+          Pearson chi2(1) =  48.4396   Pr = 0.000
+
+
+  Chi2 =  48.44
+  Sensitivity =  29.9%
+  Specificity =  97.4%
+  PPV =  76.9%
+  NPV =  82.7%
+
+. 
+. * Calculate metrics for high_relscore
+. calc_metrics high_relscore cuba_CDR_binary "high_relscore"
+
+
+high_relscore vs dementia:
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+|  row percentage   |
+| column percentage |
++-------------------+
+
+cuba_CDR_b |     high_relscore
+     inary |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       224          7 |       231 
+           |     96.97       3.03 |    100.00 
+           |     84.21      19.44 |     76.49 
+-----------+----------------------+----------
+         1 |        42         29 |        71 
+           |     59.15      40.85 |    100.00 
+           |     15.79      80.56 |     23.51 
+-----------+----------------------+----------
+     Total |       266         36 |       302 
+           |     88.08      11.92 |    100.00 
+           |    100.00     100.00 |    100.00 
+
+          Pearson chi2(1) =  73.9633   Pr = 0.000
+
+
+  Chi2 =  73.96
+  Sensitivity =  40.8%
+  Specificity =  97.0%
+  PPV =  80.6%
+  NPV =  84.2%
+
+. 
+. * Create combined predictor
+. gen both_bad = (low_cog == 1 & high_relscore == 1) if !missing(low_cog) & !missing(high_relscore)
+(4 missing values generated)
+
+. 
+. * Calculate metrics for both_bad
+. calc_metrics both_bad cuba_CDR_binary "both_bad (low_cog AND high_relscore)"
+
+
+both_bad (low_cog AND high_relscore) vs dementia:
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+|  row percentage   |
+| column percentage |
++-------------------+
+
+cuba_CDR_b |       both_bad
+     inary |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       228          3 |       231 
+           |     98.70       1.30 |    100.00 
+           |     81.72      15.79 |     77.52 
+-----------+----------------------+----------
+         1 |        51         16 |        67 
+           |     76.12      23.88 |    100.00 
+           |     18.28      84.21 |     22.48 
+-----------+----------------------+----------
+     Total |       279         19 |       298 
+           |     93.62       6.38 |    100.00 
+           |    100.00     100.00 |    100.00 
+
+          Pearson chi2(1) =  44.3676   Pr = 0.000
+
+
+  Chi2 =  44.37
+  Sensitivity =  23.9%
+  Specificity =  98.7%
+  PPV =  84.2%
+  NPV =  81.7%
+
+. 
+. display _newline(2)
+
+
+
+
+. display "--------------------------------------------------------------------------------"
+--------------------------------------------------------------------------------
+
+. display "STEP 1 COMPLETE"
+STEP 1 COMPLETE
+
+. display "--------------------------------------------------------------------------------"
+--------------------------------------------------------------------------------
+
+. 
+. log close step1
+      name:  step1
+       log:  /Users/chrissoria/Documents/Research/1066/CADAS/do/cadas_within/logs/step1_interaction.log
+  log type:  text
+ closed on:  28 Dec 2025, 23:49:02
+------------------------------------------------------------------------------------------------------------------------

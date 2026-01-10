@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/chrissoria/Documents/Research/1066/CADAS/logs/compare_versions.log
+  log type:  text
+ opened on:   9 Jan 2026, 14:31:26
+
+. 
+. display _newline(2)
+
+
+
+
+. display "================================================================================"
+================================================================================
+
+. display "COMPARISON: Original vs Refactored 10/66 Algorithm"
+COMPARISON: Original vs Refactored 10/66 Algorithm
+
+. display "================================================================================"
+================================================================================
+
+. display _newline(1)
+
+
+
+. 
+. *-------------------------------------------------------------------------------
+. * PART 1: Run the ORIGINAL script and save results
+. *-------------------------------------------------------------------------------
+. 
+. display "RUNNING ORIGINAL SCRIPT..."
+RUNNING ORIGINAL SCRIPT...
+
+. display "--------------------------------------------------------------------------------"
+--------------------------------------------------------------------------------
+
+. 
+. capture noisily do "/Users/chrissoria/Documents/CADAS/do/cadas_1066_reproduced.do"
+
+. clear all 
+
+. set more off
+
+. capture log close

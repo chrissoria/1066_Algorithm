@@ -1,0 +1,449 @@
+
+  ___  ____  ____  ____  ____ ®
+ /__    /   ____/   /   ____/      StataNow 19.5
+___/   /   /___/   /   /___/       SE—Standard Edition
+
+ Statistics and Data Science       Copyright 1985-2025 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-782-8272        https://www.stata.com
+                                   979-696-4600        service@stata.com
+
+Stata license: Single-user , expiring  6 Aug 2026
+Serial number: 401909206182
+  Licensed to: Chris Soria
+               UC Berkeley
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. Maximum number of variables is set to 5,000 but can be increased; see help set_maxvar.
+
+. do /tmp/run_1066.do 
+
+. 
+. do "1066_master.do"
+
+. ********************************************************************************
+. * 10/66 DEMENTIA ALGORITHM - MASTER FILE
+. * Orchestrates all steps for computing the 10/66 dementia classification
+. ********************************************************************************
+. 
+. clear all
+
+. set more off
+
+. capture log close
+
+. cls
+
+. 
+. *-------------------------------------------------------------------------------
+. * USER AND COUNTRY CONFIGURATION (uses CADAS include files)
+. *-------------------------------------------------------------------------------
+. 
+. capture include "/Users/chrissoria/Documents/CADAS/Do/Read/CADAS_user_define.do"
+
+. capture include "C:\Users\Ty\Desktop\CADAS Data do files\CADAS_user_define.do"
+
+. 
+. if `"`user'"' == "Chris" {
+.     local path = "/Users/chrissoria/Documents/CADAS/Data"
+.     include "/Users/chrissoria/Documents/CADAS/Do/Read/CADAS_country_define.do"
+
+. display "CADAS_country_define.do is being executed"
+CADAS_country_define.do is being executed
+
+. 
+. * Only set country if not already defined by master.do
+. * This allows standalone script execution while respecting master.do settings
+. if "$country" == "" {
+.     global country = 0
+.     *PR = 0
+.     *DR = 1
+.     *CUBA = 2
+. }
+
+. 
+. * Set local from global for use in scripts
+. local country = $country
+
+. 
+. display "Country is `country'"
+Country is 0
+
+. . 
+.     if `country' == 0 {
+.         global data_path "`path'/PR_out"
+.     }
+.     else if `country' == 1 {
+.         global data_path "`path'/DR_out"
+.     }
+.     else if `country' == 2 {
+.         global data_path "`path'/CUBA_out"
+.     }
+. 
+.     global script_path "/Users/chrissoria/Documents/CADAS/do/1066_reproduced"
+. }
+
+. 
+. else if `"`user'"' == "Ty" {
+.     local path = "C:\Users\Ty\Desktop\Stata_CADAS\DATA"
+.     include "C:\Users\Ty\Desktop\CADAS Data do files\CADAS_country_define.do"
+. 
+.     if `country' == 0 {
+.         global data_path "`path'/PR_out"
+.     }
+.     else if `country' == 1 {
+.         global data_path "`path'/DR_out"
+.     }
+.     else if `country' == 2 {
+.         global data_path "`path'/CUBA_out"
+.     }
+. 
+.     global script_path "C:\Users\Ty\Desktop\CADAS Data do files\1066_reproduced"
+. }
+
+. 
+. cd "$data_path"
+/Users/chrissoria/Documents/CADAS/Data/PR_out
+
+. local current_dir : pwd
+
+. display "Working directory: `current_dir'"
+Working directory: /Users/chrissoria/Documents/CADAS/Data/PR_out
+
+. 
+. *-------------------------------------------------------------------------------
+. * ALGORITHM OPTIONS
+. *-------------------------------------------------------------------------------
+. 
+. global wave 1
+
+. global drop_missing_from_relscore "no"   // Drop cases with missing relscore items
+
+. global recode_disability_to "missing"     // How to handle disability codes: "zero" or "missing"
+
+. global impute_recall "no"                 // Impute delayed recall from immediate
+
+. 
+. *-------------------------------------------------------------------------------
+. * EXECUTE STEPS
+. *-------------------------------------------------------------------------------
+. 
+. display _newline(2)
+
+
+
+
+. display "================================================================================"
+================================================================================
+
+. display "10/66 DEMENTIA ALGORITHM"
+10/66 DEMENTIA ALGORITHM
+
+. display "================================================================================"
+================================================================================
+
+. display _newline(1)
+
+
+
+. 
+. * Step 0: Load and merge data
+. do "$script_path/1066_step0_data_load.do"
+
+. ********************************************************************************
+. * STEP 0: DATA LOADING
+. * Load and merge Cog, Infor, and Cog_Scoring datasets
+. ********************************************************************************
+. 
+. display _newline(1)
+
+
+
+. display "--------------------------------------------------------------------------------"
+--------------------------------------------------------------------------------
+
+. display "STEP 0: Loading and merging data..."
+STEP 0: Loading and merging data...
+
+. display "--------------------------------------------------------------------------------"
+--------------------------------------------------------------------------------
+
+. 
+. *-------------------------------------------------------------------------------
+. * LOAD COGNITIVE DATA
+. *-------------------------------------------------------------------------------
+. 
+. use Cog, clear
+
+. 
+. * Handle duplicates by keeping first occurrence
+. duplicates report pid
+
+Duplicates in terms of pid
+
+--------------------------------------
+   Copies | Observations       Surplus
+----------+---------------------------
+        1 |          675             0
+        2 |           66            33
+        3 |            3             2
+       11 |           11            10
+       62 |           62            61
+--------------------------------------
+
+. sort pid
+
+. by pid: gen dup = _n == 1
+
+. drop if dup == 0
+(106 observations deleted)
+
+. drop dup
+
+. 
+. display "Loaded Cog.dta: " _N " observations"
+Loaded Cog.dta: 711 observations
+
+. 
+. *-------------------------------------------------------------------------------
+. * MERGE INFORMANT DATA
+. *-------------------------------------------------------------------------------
+. 
+. merge 1:m pid using Infor, force
+(label country_label already defined)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                           309
+        from master                       253  (_merge==1)
+        from using                         56  (_merge==2)
+
+    Matched                               485  (_merge==3)
+    -----------------------------------------
+
+. 
+. * Handle duplicates after merge
+. duplicates report pid
+
+Duplicates in terms of pid
+
+--------------------------------------
+   Copies | Observations       Surplus
+----------+---------------------------
+        1 |          742             0
+        2 |           46            23
+        3 |            6             4
+--------------------------------------
+
+. sort pid
+
+. by pid: gen dup = _n == 1
+
+. drop if dup == 0
+(27 observations deleted)
+
+. drop dup
+
+. rename _merge merge1
+
+. 
+. display "After merging Infor.dta: " _N " observations"
+After merging Infor.dta: 767 observations
+
+. 
+. *-------------------------------------------------------------------------------
+. * MERGE COGNITIVE SCORING DATA
+. *-------------------------------------------------------------------------------
+. 
+. merge 1:m pid using Cog_Scoring, force
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                           186
+        from master                        97  (_merge==1)
+        from using                         89  (_merge==2)
+
+    Matched                               710  (_merge==3)
+    -----------------------------------------
+
+. 
+. * Handle duplicates after merge
+. duplicates report pid
+
+Duplicates in terms of pid
+
+--------------------------------------
+   Copies | Observations       Surplus
+----------+---------------------------
+        1 |          816             0
+        2 |           74            37
+        3 |            6             4
+--------------------------------------
+
+. sort pid
+
+. by pid: gen dup = _n == 1
+
+. drop if dup == 0
+(41 observations deleted)
+
+. drop dup
+
+. 
+. display "After merging Cog_Scoring.dta: " _N " observations"
+After merging Cog_Scoring.dta: 855 observations
+
+. 
+. duplicates report pid
+
+Duplicates in terms of pid
+
+--------------------------------------
+   Copies | Observations       Surplus
+----------+---------------------------
+        1 |          855             0
+--------------------------------------
+
+. 
+. display "STEP 0 complete: Data loaded and merged."
+STEP 0 complete: Data loaded and merged.
+
+. display "--------------------------------------------------------------------------------"
+--------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. 
+. * Step 1: Prepare cognitive score components (variable renaming and recoding)
+. do "$script_path/1066_step1_cogscore_prep.do"
+
+. ********************************************************************************
+. * STEP 1: COGSCORE PREPARATION
+. * Rename and recode all cognitive test variables needed for COGSCORE
+. ********************************************************************************
+. 
+. display _newline(1)
+
+
+
+. display "--------------------------------------------------------------------------------"
+--------------------------------------------------------------------------------
+
+. display "STEP 1: Preparing cognitive score components..."
+STEP 1: Preparing cognitive score components...
+
+. display "--------------------------------------------------------------------------------"
+--------------------------------------------------------------------------------
+
+. 
+. *-------------------------------------------------------------------------------
+. * BINARY COGNITIVE TEST ITEMS (28 items for 'count' variable)
+. *-------------------------------------------------------------------------------
+. 
+. * Object naming
+. rename c_24 pencil
+
+. rename c_25 watch
+
+. rename c_48 chair
+
+. rename c_49 shoes
+
+. rename c_50 knuckle
+
+. rename c_51 elbow
+
+. rename c_52 should
+
+. rename c_53 bridge
+
+. rename c_54 hammer
+
+. rename c_55 pray
+
+. rename c_56 chemist
+
+. 
+. * Repetition
+. rename c_26 repeat
+
+. 
+. * Orientation - place
+. rename c_8 town
+
+. 
+. * Chief/president naming (Cuba and DR use c_70_d_c)
+. gen chief = .
+(855 missing values generated)
+
+. replace chief = cond(missing(c_70_d_c), 0, c_70_d_c)
+(855 real changes made)
+
+. 
+. * Informant-reported memory items
+. rename i_a2 street
+
+. rename i_a3 store
+
+. rename i_a4 address
+
+. 
+. * Long-term memory (Cuba and DR) - cap at 1 for binary
+. gen longmem = .
+(855 missing values generated)
+
+. replace longmem = cond(missing(c_69_c),0,c_69_c) + cond(missing(c_69_d),0,c_69_d)
+(855 real changes made)
+
+. replace longmem = 1 if longmem > 1 & !missing(longmem)
+(2 real changes made)
+
+. 
+. * Orientation - time
+. rename c_3 month
+
+. rename c_5 day
+
+. rename c_1 year
+
+. 
+. * Season (Cuba and DR) - cap at 1 for binary
+. gen season = .
+(855 missing values generated)
+
+. replace season = cond(missing(c_2_p_c),0,c_2_p_c) + cond(missing(c_2_d),0,c_2_d)
+(855 real changes made)
+
+. replace season = 1 if season > 1 & !missing(season)
+(25 real changes made)
+
+. 
+. * Motor commands
+. rename c_61 nod
+
+. rename c_62 point
+
+. 
+. * Circle drawing - recode to binary
+. rename cs_72_2 circle
+
+. rename c_72_2 circle_diss
+
+. replace circle = . if circle_diss == 6 | circle_diss == 7
+(35 real changes made, 35 to missing)
+
+. replace circle = 0 if circle == 7 | circle == 8 | circle == 9
+(0 real changes made)
+
+. replace circle = 1 if circle > 1 & circle != .
+(621 real changes made)
+
+. 
+. * Pentagon drawing
+. rename cs_32_cleaned pentag
+variable cs_32_cleaned not found

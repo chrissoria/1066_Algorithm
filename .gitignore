@@ -1,1 +1,8 @@
 ADAMS/data/
+
+# Intermediate data files from cadas_within analysis
+CADAS/do/cadas_within/*.dta
+
+# R analysis folder (entire folder ignored)
+CADAS/R/
+.Rproj.user
