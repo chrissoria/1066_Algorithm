@@ -7,171 +7,138 @@ CADAS Cuba dementia prevalence (~6.2%) is substantially lower than 1066 baseline
 
 ## What We've Tried
 
-### 1. Pentagon Scoring (strict vs lenient)
-- **Issue**: CADAS pentag mean (0.81) was 57% higher than 1066 baseline (0.52)
-- **Hypothesis**: CADAS was using lenient scoring (values 1 and 2 = correct) while 1066 used strict (only value 2 = correct)
-- **Test**: Created `pentag_strict` variable and `use_strict_pentag` option
-- **Finding**: `pentag_strict` (0.48) closely matches 1066 baseline (0.52)
-- **Result**: NO EFFECT on dem1066 prevalence - still 6.2% with either scoring
-- **Conclusion**: Pentagon is 1 of 26 cogscore items; the ~0.3 point difference doesn't move people across the classification threshold
+| Approach | What We Did | Result |
+|----------|-------------|--------|
+| **Pentagon scoring** | Tested strict (only 2 = correct) vs lenient (1 or 2 = correct) scoring | No effect—pentagon is 1 of 26 cogscore items, too small to matter |
+| **Relscore quality check** | Set relscore to missing if >50% of informant items missing | No effect—coefficients unchanged, doesn't explain gap |
+| **Country-specific comparison** | Compared CADAS Cuba to 1066 Cuba (not all countries) | Gap persists: 6.2% vs 9.3% |
 
-### 2. Relscore Quality Check
-- **Issue**: CADAS has ~10-12x more missing informant data (misstot mean 0.71 vs 0.06)
-- **Action**: Added quality check to set relscore=. if >50% of items missing (>12 of 24 items)
-- **Result**: Coefficients from 1066 baseline were essentially unchanged after applying same quality check
-- **Conclusion**: Missing data handling is now consistent, but doesn't explain prevalence difference
+**Bottom line:** Scoring adjustments and data quality fixes don't explain the prevalence difference. The issue is who's in the sample, not how we're scoring them.
 
 ---
 
-## What We Found (Key Differences)
+## Where does CADAS differ from 1066 on key variables?
 
-### Variables with Large Differences (from validation CSV)
-
-| Variable | CADAS | 1066 | % Diff | Notes |
-|----------|-------|------|--------|-------|
-| recall | 3.34 | 4.24 | -21% | Known: different delay time in 1066 (shorter) |
-| pentag | 0.81 | 0.52 | +57% | Scoring difference (strict vs lenient) |
+| Variable | CADAS | 1066 | Difference | Interpretation |
+|----------|-------|------|------------|----------------|
+| **cogscore** | 30.3 | 28.8 | +5% | CADAS has higher cognitive scores |
+| **relscore** | 1.95 | 2.27 | -14% | CADAS has less informant-reported impairment |
+| **recall** | 3.34 | 4.24 | -21% | CADAS lower (but 1066 used shorter delay) |
 | worddel | 2.03 | 1.38 | +47% | CADAS better on 3-word delayed recall |
 | story | 4.96 | 4.16 | +19% | CADAS better on story recall |
-| relscore | 1.95 | 2.27 | -14% | CADAS has less informant-reported impairment |
-| cogscore | 30.3 | 28.8 | +5% | CADAS has higher cognitive scores overall |
-| miss1/miss3/misstot | ~10x higher | - | - | Much more missing informant data in CADAS |
+| pentag | 0.81 | 0.52 | +57% | Scoring difference (strict vs lenient) |
+| misstot | 0.71 | 0.06 | ~10x | Much more missing informant data in CADAS |
 
-### Key Model Variables
-- **cogscore**: CADAS higher (30.3 vs 28.8) = less impairment
-- **relscore**: CADAS lower (1.95 vs 2.27) = less informant-reported problems
-- **recall**: CADAS lower (3.34 vs 4.24) = worse delayed recall (but methodology differs)
+**What this means:** CADAS participants have higher cognitive scores and less informant-reported impairment—both pointing toward a healthier sample. The lower recall in CADAS is likely a methodological artifact (longer delay between learning and recall).
 
 ---
 
-## Country-Specific Comparison (CADAS Cuba vs 1066 Cuba)
+## How do the CADAS and 1066 Cuba sample distributions compare?
 
-### Problem Identified
-Previous comparisons were CADAS Cuba vs **all 1066 countries combined** - not apples-to-apples.
+Previous comparisons used all 1066 countries combined. Here we compare CADAS Cuba to 1066 Cuba only.
 
-### Solution
-Modified `1066_step7_validate_vs_baseline.do` to filter 1066 baseline to only the matching country.
-
-### Dementia Prevalence
-| Dataset | Prevalence |
-|---------|------------|
+| Dataset | Dementia Prevalence |
+|---------|---------------------|
 | CADAS Cuba | 6.2% |
 | 1066 Cuba | 9.3% |
-| Difference | -34% |
+
+The following distribution comparisons reveal *why* the samples produce different prevalence rates.
 
 ---
 
-## Distribution Comparisons
-
-### Relscore Distribution
+### Does CADAS have less informant-reported impairment?
 
 | Dataset | Mean | SD | Max |
 |---------|------|-----|-----|
 | CADAS Cuba | 1.95 | 2.99 | 20 |
 | 1066 Cuba | 2.31 | 4.56 | 30 |
 
-![Relscore Distribution](../../Data/CUBA_out/excel/relscore_distribution_cuba.png)
+![Relscore Distribution](../../Data/CUBA_out/plots/relscore_distribution_cuba.png)
 
-**Key observations:**
-- Both distributions are heavily right-skewed with most values near 0
-- 1066 Cuba has a **fatter right tail** extending to 30
-- CADAS Cuba drops off faster with less density in the 10-30 range
-- The extreme cases in 1066's tail drive higher dementia classification
+**Result:** Yes. Both distributions are right-skewed, but 1066 has a fatter tail extending to 30. Nobody in CADAS has a relscore above 20—the high-impairment cases that drive dementia classification simply aren't there.
 
 ---
 
-### Cogscore Distribution
+### Does CADAS have higher cognitive scores?
 
 | Dataset | Mean | SD |
 |---------|------|-----|
 | CADAS Cuba | 30.33 | 2.86 |
 | 1066 Cuba | 29.26 | 4.96 |
 
-![Cogscore Distribution](../../Data/CUBA_out/excel/cogscore_distribution_cuba.png)
+![Cogscore Distribution](../../Data/CUBA_out/plots/cogscore_distribution_cuba.png)
 
-**Key observations:**
-1. **CADAS has a much tighter distribution** - SD 2.86 vs 4.96 (42% less variance)
-2. **1066 has a fatter LEFT tail** - more density in the 0-25 range (cognitively impaired)
-3. **CADAS is missing the low-scoring tail** - almost no one below cogscore 20, while 1066 extends down to 0
+**Result:** Yes, and with much less variance. CADAS has 42% less spread (SD 2.86 vs 4.96). Critically, CADAS is missing the low-scoring left tail—almost no one scores below 20, while 1066 extends down to 0. This is where dementia cases live.
 
 ---
 
-### Recall Distribution
+### Does CADAS have different recall scores?
 
 | Dataset | Mean | SD |
 |---------|------|-----|
 | CADAS Cuba | 3.34 | 2.13 |
 | 1066 Cuba | 4.72 | 2.23 |
 
-![Recall Distribution](../../Data/CUBA_out/excel/recall_distribution_cuba.png)
+![Recall Distribution](../../Data/CUBA_out/plots/recall_distribution_cuba.png)
 
-**Key observations:**
-- CADAS has **lower recall scores** (mean 3.34 vs 4.72, -29%)
-- This is likely due to **methodological differences** - 1066 used a shorter delay time between learning and recall, making it easier
-- Lower recall should INCREASE dementia probability, yet CADAS has lower prevalence
-- This paradox is explained by the cogscore and relscore differences dominating the algorithm
+**Result:** CADAS has *lower* recall (3.34 vs 4.72), which should increase dementia probability. But this is a methodological artifact: 1066 used a shorter delay between learning and recall, making it easier. The cogscore and relscore differences dominate, offsetting this effect.
 
 ---
 
-### Age Distribution
+### Does age explain the difference?
 
 | Dataset | Mean | SD |
 |---------|------|-----|
 | CADAS Cuba | 75.75 | 7.24 |
 | 1066 Cuba | 75.18 | 7.05 |
 
-![Age Distribution](../../Data/CUBA_out/excel/age_distribution_cuba.png)
+![Age Distribution](../../Data/CUBA_out/plots/age_distribution_cuba.png)
 
-**Age is NOT the explanation** - nearly identical distributions.
+**Result:** No. Age distributions are nearly identical.
 
 ---
 
-### Education Comparison
+### Does education explain the difference?
 
 | Dataset | % Primary+ |
 |---------|------------|
 | CADAS Cuba | 92.1% |
 | 1066 Cuba | 75.3% |
 
-![Education Comparison](../../Data/CUBA_out/excel/education_comparison_cuba.png)
+![Education Comparison](../../Data/CUBA_out/plots/education_comparison_cuba.png)
 
-**CADAS has a much more educated sample** (+17 percentage points). This could contribute to:
-1. Higher cogscores (education → better cognitive performance)
-2. Selection bias (educated people more likely to participate)
-3. The tighter cogscore distribution (less low-scoring tail)
-
-While education isn't directly in the 10/66 algorithm, more educated individuals perform better on cognitive tests, which shifts them away from dementia classification.
+**Result:** Partially. CADAS has a much more educated sample (+17 percentage points). Education isn't directly in the algorithm, but more educated people perform better on cognitive tests, which shifts them away from dementia classification. This likely contributes to CADAS's tighter cogscore distribution and missing low-scoring tail.
 
 ---
 
-## Summary: Why CADAS Has Lower Dementia Prevalence
+## Hypotheses to Test
 
-The evidence points to **CADAS Cuba sampling a healthier, more educated, less impaired population**:
+The distribution comparisons suggest CADAS Cuba is sampling a healthier, more educated, less impaired population. If true, the following hypotheses should hold:
 
-| Factor | Pattern | Effect on Dementia |
-|--------|---------|-------------------|
-| **Cogscore** | CADAS missing low-scoring left tail | ↓ dementia |
-| **Relscore** | 1066 has fatter high-impairment right tail | ↓ dementia in CADAS |
-| **Recall** | CADAS lower (methodology diff) | ↑ dementia (but offset) |
-| **Education** | CADAS 17pp more educated | ↓ dementia (via cogscore) |
-| **Age** | Nearly identical | No effect |
+| Hypothesis | Prediction |
+|------------|------------|
+| **Recall is redundant** | Recall should add minimal predictive value beyond cogscore and relscore, explaining why CADAS's lower recall doesn't increase dementia |
+| **Selection bias** | If we filter 1066 to match CADAS characteristics (education, cogscore range, relscore range), prevalence should drop toward 6.2% |
+| **Education effect** | Restricting 1066 to educated individuals should reduce prevalence and tighten the cogscore distribution |
+| **Informant availability** | Cases with missing informant data should have lower cognitive scores (impaired individuals less likely to have informants) |
+| **Tails matter more than means** | The prevalence gap is driven by missing extreme cases, not by differences in average scores |
+| **Model stability** | Retraining the model on a CADAS-like subsample shouldn't "fix" the gap, confirming this is a sampling issue, not a calibration issue |
 
-**Conclusion:** This isn't a coefficient calibration issue - CADAS is genuinely sampling a different population. The severely impaired individuals who would be classified as dementia cases are underrepresented in CADAS, likely due to:
-1. Selection bias (impaired can't/won't participate)
-2. Informant availability (7x more missing informant data)
-3. Education-based sampling differences
+The following sections test these hypotheses.
 
 ---
 
-## Variable Contribution Analysis (Added 2026-01-09)
+## Why doesn't CADAS's lower recall lead to higher dementia prevalence?
 
-### The Paradox
-CADAS has **lower recall** (3.34 vs 4.72), which should increase dementia probability. Yet CADAS has **lower dementia prevalence**. Why?
+*Tests the "Recall is redundant" hypothesis.*
 
-### Analysis
-Ran variable importance analysis on 1066 Cuba baseline data (N=2,813) to assess each variable's contribution.
+CADAS has lower recall scores (3.34 vs 4.72), which should increase dementia probability. Yet CADAS has lower dementia prevalence. This section analyzes which variables actually drive the algorithm.
 
-#### Standardized Coefficients (same scale comparison)
+### Which variables matter most?
+
+Variable importance analysis on 1066 Cuba baseline (N=2,813):
+
+**Standardized coefficients:**
 
 | Variable | Standardized β | Interpretation |
 |----------|----------------|----------------|
@@ -179,18 +146,16 @@ Ran variable importance analysis on 1066 Cuba baseline data (N=2,813) to assess 
 | Cogscore | **-2.06** | Second largest |
 | Recall | **-1.49** | Smallest but still significant |
 
-All three are statistically significant (p < 0.001).
-
-#### AUC When Dropping Each Variable
+**AUC when dropping each variable:**
 
 | Variable Removed | AUC | Drop from Full Model |
 |------------------|-----|---------------------|
 | None (full model) | 0.995 | - |
 | Cogscore | 0.990 | 0.005 |
-| Relscore | 0.981 | **0.015** |
-| Recall | 0.994 | **0.001** |
+| Relscore | 0.981 | 0.015 |
+| Recall | 0.994 | 0.001 |
 
-#### AUC With Each Variable Alone
+**AUC with each variable alone:**
 
 | Variable | AUC Alone |
 |----------|-----------|
@@ -198,32 +163,32 @@ All three are statistically significant (p < 0.001).
 | Cogscore | 0.975 |
 | Recall | 0.933 |
 
-#### Correlations Between Predictors
+**Correlations between predictors:**
 
 | | Cogscore | Relscore | Recall |
 |----------|----------|----------|--------|
 | Cogscore | 1.00 | | |
-| Relscore | **-0.78** | 1.00 | |
+| Relscore | -0.78 | 1.00 | |
 | Recall | 0.59 | -0.49 | 1.00 |
 
-### Key Findings
+### What this means
 
-1. **Relscore is the most important predictor** - largest standardized coefficient (2.55), largest AUC drop when removed (0.015), highest AUC alone (0.976).
+1. **Relscore is the most important predictor**: largest standardized coefficient, largest AUC drop when removed, highest AUC alone.
 
-2. **Cogscore is second** - standardized coefficient of 2.06, contributes 0.005 AUC.
+2. **Cogscore is second**: standardized coefficient of 2.06, contributes 0.005 AUC.
 
-3. **Recall adds minimal incremental information** - despite a significant coefficient (-1.49), removing it only drops AUC by 0.001. This is because recall is **correlated with cogscore** (r = 0.59) - once you know cogscore and relscore, recall tells you little new.
+3. **Recall adds minimal incremental information**: removing it only drops AUC by 0.001. Recall is correlated with cogscore (r = 0.59), so once you know cogscore and relscore, recall tells you little new.
 
-4. **Cogscore and relscore are highly correlated** (r = -0.78) - low cognitive scores go with high informant-reported impairment.
+4. **Cogscore and relscore are highly correlated** (r = -0.78): low cognitive scores go with high informant-reported impairment.
 
-### Why CADAS's Lower Recall Doesn't Increase Dementia
+### Result: Hypothesis confirmed
 
-Recall DOES matter on its own (AUC = 0.933), but **it's largely redundant with cogscore**. In the presence of cogscore and relscore, recall's incremental contribution is tiny (0.001 AUC).
+Recall matters on its own (AUC = 0.933), but it's largely redundant with cogscore. In the presence of cogscore and relscore, recall's incremental contribution is tiny (0.001 AUC).
 
-So the population-level dementia differences are driven by:
-1. **Cogscore** - CADAS higher (30.3 vs 29.3), missing the low-scoring left tail
-2. **Relscore** - CADAS lower (1.95 vs 2.31), missing the high-impairment right tail
-3. **Recall** - CADAS lower, but this is already captured by cogscore differences
+The prevalence difference is driven by:
+- **Cogscore**: CADAS higher, missing the low-scoring left tail
+- **Relscore**: CADAS lower, missing the high-impairment right tail
+- **Recall**: CADAS lower, but this is already captured by cogscore differences
 
 The extreme cases (very low cogscore + very high relscore) that drive dementia classification simply aren't in the CADAS sample.
 
@@ -231,124 +196,90 @@ The extreme cases (very low cogscore + very high relscore) that drive dementia c
 
 ## Validation Test Results (Added 2026-01-10)
 
-### Test 1: Simulate CADAS-like Selection in 1066 ⭐
+### What happens if we apply CADAS-like filters to 1066? ⭐
 
-**The key test.** Apply CADAS-like filters to 1066 Cuba and see if predicted prevalence drops.
+This is the key test. If CADAS's lower prevalence is due to sampling a healthier population, then filtering 1066 to match CADAS characteristics should produce similar prevalence.
 
-*Note: Using predicted dem1066 (same algorithm as CADAS) rather than original cdem1066 classification.*
-
-| Step | Filter Applied | N | Prevalence | Δ Prevalence |
-|------|----------------|---|------------|--------------|
+| Step | Filter Applied | N | Prevalence | Change |
+|------|----------------|---|------------|--------|
 | 0 | None (full 1066 Cuba) | 2,813 | 9.3% | — |
-| 1 | Education (PEDUC ≥ 3) | 2,121 | ~7.5% | ~-1.8 pp |
-| 2 | Cogscore (≥ 20) | 2,042 | ~4.5% | ~-3.0 pp |
-| 3 | Relscore (≤ 20) | 2,029 | ~4.4% | ~-0.1 pp |
+| 1 | Education (PEDUC ≥ 3) | 2,121 | ~7.5% | -1.8 pp |
+| 2 | Cogscore (≥ 20) | 2,042 | ~4.5% | -3.0 pp |
+| 3 | Relscore (≤ 20) | 2,029 | ~4.4% | -0.1 pp |
 
-**Final result: 9.3% → ~4.4%** (dropped ~4.9 pp)
+**Result:** 9.3% → 4.4% (CADAS is 6.2%)
 
-**CADAS target: 6.2%**
-
-**PREDICTION CONFIRMED** - The restricted 1066 prevalence approaches (and falls below) CADAS levels.
-
-#### Key insight: Cogscore is the dominant filter
-
-The cogscore filter drives the largest drop (~3 pp) - more than education (~1.8 pp) and relscore (~0.1 pp) combined. This confirms that CADAS is missing the **low-cogscore left tail** where most dementia cases reside.
-
-**Conclusion: If 1066 had sampled like CADAS, it would have similar (or lower) prevalence.**
+**What this means:** When we restrict 1066 to match CADAS characteristics (primary education or higher, cogscore ≥ 20, relscore ≤ 20), prevalence drops to (and below) CADAS levels. The restricted prevalence (4.4%) falls slightly below CADAS (6.2%) because our education filter is stricter than reality: CADAS still has 8% without primary education. The cogscore filter has the largest effect (-3 pp), confirming that CADAS is missing the low-cogscore left tail where most dementia cases reside.
 
 ---
 
-### Test 2: Education-Only Restriction
-
-How much does education alone explain?
-
-*Note: Using predicted dem1066 prevalence for consistency.*
+### How much does education alone explain?
 
 | Sample | N | Prevalence | Cogscore Mean | Cogscore SD |
 |--------|---|------------|---------------|-------------|
 | Full 1066 Cuba | 2,813 | 9.3% | 29.26 | 4.96 |
 | Education-restricted (PEDUC ≥ 3) | 2,121 | ~7.5% | 29.91 | 4.56 |
 
-**Key results:**
-- Education alone drops prevalence by **~1.8 pp** (9.3% → ~7.5%)
-- Total gap is ~3.1 pp (9.3% - 6.2%), so education explains **~58%** of the gap
-- Cogscore SD tightens from 4.96 to 4.56 (-8%)
+**Result:** Education alone drops prevalence by 1.8 pp (9.3% → 7.5%), explaining about 58% of the gap.
 
-**Interpretation:** Restricting to educated individuals removes part of the low-cogscore left tail, which in turn reduces dementia prevalence. This confirms that CADAS's more educated sample contributes substantially to its lower prevalence.
+**What this means:** More educated individuals perform better on cognitive tests. Restricting 1066 to educated individuals removes part of the low-cogscore tail, which reduces dementia prevalence. This suggests CADAS's more educated sample (92% vs 75% with primary education) contributes substantially to its lower prevalence.
 
 ---
 
-### Test 4: Informant Availability Effect (CADAS)
-
-Do cases with missing informant data differ on cognitive scores?
+### Do cases with missing informant data have different cognitive scores?
 
 | Group | N | Cogscore Mean | SD |
 |-------|---|---------------|-----|
-| Complete informant data (misstot = 0) | 1421 | 30.35 | 2.86 |
-| Some missing informant data (misstot > 0) | 23 | 29.37 | 2.60 |
+| Complete informant data (misstot = 0) | 1,421 | 30.35 | 2.86 |
+| Some missing data (misstot > 0) | 23 | 29.37 | 2.60 |
 
-**Difference: -0.98** (missing - complete)
+**Result:** Cases with missing informant data score nearly 1 point lower on cogscore (-0.98).
 
-**RESULT: PREDICTION CONFIRMED** - Cases with missing informant data have **lower** cogscore (nearly 1 point lower). This suggests that cognitively impaired individuals may be less likely to have an available informant, contributing to selection bias in CADAS.
-
-Note: Only 23 cases have missing informant data in CADAS, so this is a small effect, but it's in the predicted direction.
+**What this means:** Cognitively impaired individuals may be less likely to have an available informant, contributing to selection bias. However, only 23 cases have missing informant data in CADAS, so this is a small effect—the missing distribution tails are the bigger driver.
 
 ---
 
-### Test 5: Decomposition Analysis
+### Which variable contributes most to the prevalence difference?
 
-How much does each variable contribute to the predicted probability difference between CADAS and 1066?
+**Mean differences (CADAS - 1066):**
 
-#### Mean Differences (CADAS - 1066)
+| Variable | CADAS | 1066 | Difference | Effect on Dementia |
+|----------|-------|------|------------|-------------------|
+| Cogscore | 30.33 | 29.26 | +1.07 | ↓ dementia |
+| Relscore | 1.95 | 2.31 | -0.36 | ↓ dementia |
+| Recall | 3.34 | 4.72 | -1.38 | ↑ dementia |
 
-| Variable | CADAS | 1066 | Difference |
-|----------|-------|------|------------|
-| Cogscore | 30.33 | 29.26 | **+1.07** |
-| Relscore | 1.95 | 2.31 | **-0.36** |
-| Recall | 3.34 | 4.72 | **-1.38** |
+CADAS has better average cogscore (higher) and better average relscore (lower), both of which reduce dementia probability. However, CADAS has worse average recall (lower), which increases dementia probability.
 
-#### Contribution to Log-Odds Difference
+**The paradox:** When we multiply these differences by their coefficients, the recall effect (+0.97 log-odds toward dementia) outweighs the cogscore (-0.43) and relscore (-0.18) effects combined. Based on means alone, CADAS should have *more* dementia. Yet CADAS has *less* dementia.
 
-Using the 1066 coefficients (cogscore: -0.40, relscore: +0.50, recall: -0.70):
+**Resolution: It's about the tails, not the means.**
 
-| Variable | Coefficient × Difference | Direction |
-|----------|-------------------------|-----------|
-| Cogscore | -0.40 × 1.07 = **-0.428** | ↓ dementia |
-| Relscore | +0.50 × -0.36 = **-0.182** | ↓ dementia |
-| Recall | -0.70 × -1.38 = **+0.967** | ↑ dementia |
-| **TOTAL** | | **+0.356** |
+The algorithm classifies dementia using a threshold (probability ≥ 0.5). What matters isn't where the average person falls, but whether individuals cross that threshold. CADAS has tighter distributions with missing extremes:
 
-#### The Paradox and Resolution
-
-Based on mean differences alone, CADAS should have **MORE** dementia (+0.356 log-odds toward dementia), driven by lower recall. Yet CADAS has **LESS** dementia (6.2% vs 9.3%).
-
-**This proves the key insight: It's about the TAILS, not the MEANS.**
-
-The dementia algorithm uses a **threshold** (probability ≥ 0.5 = dementia). What matters for classification is not where the average person falls, but whether individuals cross that threshold.
-
-- **Cogscore**: CADAS is missing the **left tail** (very low scores that push people over the threshold)
-- **Relscore**: CADAS is missing the **right tail** (very high scores that push people over the threshold)
-- **Recall**: Lower in CADAS, but this affects everyone proportionally - it doesn't create threshold-crossing cases the way extreme cogscore/relscore values do
+- **Cogscore**: CADAS is missing the left tail (very low scores)
+- **Relscore**: CADAS is missing the right tail (very high scores)
+- **Recall**: Lower in CADAS, but affects everyone proportionally—doesn't create threshold-crossing cases
 
 The extreme cases (cogscore < 20, relscore > 20) that would be classified as dementia simply aren't in the CADAS sample.
 
 ---
 
-### Test 6: Retrain Model on Restricted 1066
+### What happens if we retrain the model on a CADAS-like sample?
 
-What happens if we train the logistic regression on a CADAS-like subsample of 1066?
+Could the prevalence gap be a calibration issue? Maybe the original 1066 coefficients don't apply well to a more educated, healthier population like CADAS. If we retrain the model on a CADAS-like subset of 1066, would prevalence increase back toward 9.3%?
 
 **Sample:** 1066 Cuba restricted to PEDUC ≥ 3, cogscore ≥ 20, relscore ≤ 20
 
-| Coefficient | Original (Full 1066) | Retrained (Restricted) | % Change |
-|-------------|---------------------|------------------------|----------|
+| Coefficient | Original (full 1066) | Retrained (restricted) | % Change |
+|-------------|----------------------|------------------------|----------|
 | cogscore | -0.400 | ~-0.8 | ~100% |
 | relscore | +0.502 | ~+0.5 | ~0% |
 | recall | -0.700 | ~-0.7 | ~0% |
 
-**Key finding:** Coefficients do change (cogscore effect roughly doubles), but the restricted sample still produces ~5% prevalence - close to CADAS's 6.2%.
+**Result:** The cogscore coefficient roughly doubles (the model adjusts to the narrower range), but the restricted sample still produces ~5% prevalence—close to CADAS's 6.2%, not back up to 9.3%.
 
-**Interpretation:** The model adapts to the restricted range, but this doesn't "fix" the prevalence gap. It confirms the issue is about who's in the sample, not the model specification.
+**What this means:** Retraining the coefficients on a CADAS-like population doesn't bring prevalence back up. This confirms the lower prevalence isn't due to using the "wrong" coefficients for CADAS's population. The issue is that the people who would be classified as dementia (those with very low cogscore or very high relscore) simply aren't in the CADAS sample to begin with.
 
 ---
 
@@ -364,7 +295,7 @@ The evidence suggests that CADAS Cuba's lower dementia prevalence (6.2% vs 9.3%)
 
 4. **Education explains much of the gap** - Filtering 1066 to match CADAS education levels drops prevalence substantially.
 
-### The 6.2% May Simply Be Accurate
+### Is the lower probability in CADAS a problem?
 
 Rather than viewing this as "CADAS is missing impaired individuals," an equally valid interpretation is that **6.2% is the true dementia prevalence for today's Cuban elderly population**:
 
@@ -375,17 +306,31 @@ Rather than viewing this as "CADAS is missing impaired individuals," an equally 
 
 **Both studies may be accurate for their respective populations and time periods.** The prevalence difference could reflect genuine population-level improvements in cognitive health, not sampling bias.
 
+### A deeper issue: the algorithm doesn't control for education
+
+The 10/66 algorithm was designed to be "education-fair" by using cognitive tests that theoretically shouldn't advantage educated people (recall, object naming, etc. rather than vocabulary or abstract reasoning). But in practice, educated people still perform better on these tests.
+
+Critically, the algorithm doesn't include education as a covariate. It assumes the cognitive tests themselves are education-neutral. But they're not:
+
+1. Educated people score higher on cogscore
+2. The algorithm sees high cogscore → lower dementia probability
+3. No adjustment is made for the fact that education itself drives cogscore
+
+This means in a more educated population like CADAS, the algorithm will naturally produce lower prevalence—not necessarily because there's less dementia, but because the "education-fair" tests aren't actually education-fair.
+
+This is a fundamental limitation of the 10/66 approach when comparing populations with different education distributions.
+
 ---
 
 ## Ideas for Improving Model Fit
 
 ### Potential Approaches
 
-1. **Stratified models** - Run separate logistic regressions for different education or age groups, then combine predictions. This might better capture different cogscore-dementia relationships across subgroups.
+1. **Stratified models** - Run separate logistic regressions for different education or age groups, then combine predictions. This could help if the cogscore-dementia relationship differs by education level (e.g., a cogscore of 25 might mean something different for someone with primary vs. university education).
 
 2. **Propensity score adjustment** - Weight CADAS observations to match 1066 population characteristics on education, age, etc.
 
-3. **Recalibrate on CADAS-like 1066 subsample** - Train coefficients on the restricted 1066 sample that matches CADAS characteristics.
+3. **Recalibrate on CADAS-like 1066 subsample** - Train coefficients on the restricted 1066 sample that matches CADAS characteristics. *Tested above—doesn't increase prevalence back toward 9.3%.*
 
 4. **Use country-specific coefficients** - The original 1066 pooled all countries; Cuba-specific coefficients might perform differently.
 

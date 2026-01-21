@@ -182,7 +182,22 @@ capture mkdir "$data_path/1066_diagnostics"
 export delimited using "$data_path/1066_diagnostics/validation_cadas_vs_1066.csv", replace
 
 * Also copy to Google Drive
-local gdrive_path "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/cuba/latest_data/1066_DIAGNOSTIC_EXCELS"
+if $country == 1 {
+    if `"$language"' == "E" {
+        local gdrive_path "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/Rep Dom/latest_data/TRANSLATED/1066_DIAGNOSTIC_EXCELS"
+    }
+    else {
+        local gdrive_path "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/Rep Dom/latest_data/1066_DIAGNOSTIC_EXCELS"
+    }
+}
+else if $country == 2 {
+    if `"$language"' == "E" {
+        local gdrive_path "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/cuba/latest_data/TRANSLATED/1066_DIAGNOSTIC_EXCELS"
+    }
+    else {
+        local gdrive_path "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/cuba/latest_data/1066_DIAGNOSTIC_EXCELS"
+    }
+}
 capture mkdir "`gdrive_path'"
 capture export delimited using "`gdrive_path'/validation_cadas_vs_1066.csv", replace
 
@@ -315,7 +330,22 @@ display "Country-specific validation saved to: 1066_diagnostics/validation_cadas
 
 display _newline(1)
 capture mkdir "$data_path/plots"
-local gdrive_plots "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/cuba/latest_data/plots"
+if $country == 1 {
+    if `"$language"' == "E" {
+        local gdrive_plots "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/Rep Dom/latest_data/TRANSLATED/plots"
+    }
+    else {
+        local gdrive_plots "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/Rep Dom/latest_data/plots"
+    }
+}
+else if $country == 2 {
+    if `"$language"' == "E" {
+        local gdrive_plots "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/cuba/latest_data/TRANSLATED/plots"
+    }
+    else {
+        local gdrive_plots "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/cuba/latest_data/plots"
+    }
+}
 capture mkdir "`gdrive_plots'"
 display "Creating relscore distribution comparison plot..."
 

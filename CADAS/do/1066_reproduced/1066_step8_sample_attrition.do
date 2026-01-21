@@ -396,7 +396,22 @@ capture mkdir "1066_diagnostics"
 export delimited using "1066_diagnostics/1066_algo_sample_attrition.csv", replace
 
 * Also copy to Google Drive
-local gdrive_path "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/cuba/latest_data/1066_DIAGNOSTIC_EXCELS"
+if $country == 1 {
+    if `"$language"' == "E" {
+        local gdrive_path "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/Rep Dom/latest_data/TRANSLATED/1066_DIAGNOSTIC_EXCELS"
+    }
+    else {
+        local gdrive_path "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/Rep Dom/latest_data/1066_DIAGNOSTIC_EXCELS"
+    }
+}
+else if $country == 2 {
+    if `"$language"' == "E" {
+        local gdrive_path "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/cuba/latest_data/TRANSLATED/1066_DIAGNOSTIC_EXCELS"
+    }
+    else {
+        local gdrive_path "/Users/chrissoria/Google Drive/other computers/My Laptop (1)/documents/cadas/data/CADAS data upload/cuba/latest_data/1066_DIAGNOSTIC_EXCELS"
+    }
+}
 capture mkdir "`gdrive_path'"
 capture export delimited using "`gdrive_path'/1066_algo_sample_attrition.csv", replace
 

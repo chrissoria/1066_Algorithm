@@ -75,8 +75,8 @@ rename c_61 nod
 rename c_62 point
 
 * Circle drawing - recode to binary
-rename cs_72_2 circle
-rename c_72_2 circle_diss
+rename cs_72_1 circle
+rename c_72_1 circle_diss
 * Disability codes handled below in conditional block
 replace circle = 1 if circle > 1 & circle != .
 
