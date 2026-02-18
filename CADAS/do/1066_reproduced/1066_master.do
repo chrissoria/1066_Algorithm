@@ -6,7 +6,7 @@
 clear all
 set more off
 capture log close
-cls
+capture cls
 
 *-------------------------------------------------------------------------------
 * USER AND COUNTRY CONFIGURATION (uses CADAS include files)
@@ -60,8 +60,9 @@ display "Working directory: `current_dir'"
 *-------------------------------------------------------------------------------
 
 global drop_missing_from_relscore "no"   // Drop cases with missing relscore items
-global impute_recall "no"                 // Impute delayed recall from immediate
-global use_strict_pentag "no"           // Pentagon scoring: "yes" = only value 2 correct, "no" = 1 and 2 both correct
+global impute_recall "yes"                 // Impute delayed recall from immediate
+global use_strict_pentag "no"            // Pentagon scoring: "yes" = only value 2 correct, "no" = 1 and 2 both correct
+global run_pre_prep "yes"                // Run step 0.5 pre-preparation (recode missing/refusal to 0)
 
 * NOTE: Disability vs refusal codes are now handled separately in step1:
 *   - Disability codes (6, 8, 9 = could not) → recoded to 0
@@ -79,6 +80,11 @@ display _newline(1)
 
 * Step 0: Load and merge data
 do "$script_path/1066_step0_data_load.do"
+
+* Step 0.5: Pre-preparation - create _recoded versions of cog vars (missing/refusal → 0)
+if "$run_pre_prep" == "yes" {
+    do "$script_path/1066_step05_pre_prep_cog_vars.do"
+}
 
 * Step 1: Prepare cognitive score components (variable renaming and recoding)
 do "$script_path/1066_step1_cogscore_prep.do"

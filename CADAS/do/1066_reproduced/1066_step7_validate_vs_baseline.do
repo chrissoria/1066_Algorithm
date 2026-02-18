@@ -526,6 +526,7 @@ display "Creating age distribution comparison plot..."
 use "$data_path/socio.dta", clear
 rename s_2_3 age
 replace age = . if age > 120  // Filter out 888/999 missing codes
+replace age = . if age < 65
 keep age
 gen source = 1
 label define source_lbl3 1 "CADAS `country_name'" 2 "1066 `country_name'"

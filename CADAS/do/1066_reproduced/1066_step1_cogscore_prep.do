@@ -13,72 +13,144 @@ display "-----------------------------------------------------------------------
 *-------------------------------------------------------------------------------
 
 * Object naming
-rename c_24 pencil
-rename c_25 watch
-rename c_48 chair
-rename c_49 shoes
-rename c_50 knuckle
-rename c_51 elbow
-rename c_52 should
-rename c_53 bridge
-rename c_54 hammer
-rename c_55 pray
-rename c_56 chemist
-
-* Repetition
-rename c_26 repeat
-
-* Orientation - place
-rename c_8 town
+if "$run_pre_prep" == "yes" {
+    rename c_24_recoded pencil
+    rename c_25_recoded watch
+    rename c_48_recoded chair
+    rename c_49_recoded shoes
+    rename c_50_recoded knuckle
+    rename c_51_recoded elbow
+    rename c_52_recoded should
+    rename c_53_recoded bridge
+    rename c_54_recoded hammer
+    rename c_55_recoded pray
+    rename c_56_recoded chemist
+    rename c_26_recoded repeat
+    rename c_8_recoded town
+}
+else {
+    rename c_24 pencil
+    rename c_25 watch
+    rename c_48 chair
+    rename c_49 shoes
+    rename c_50 knuckle
+    rename c_51 elbow
+    rename c_52 should
+    rename c_53 bridge
+    rename c_54 hammer
+    rename c_55 pray
+    rename c_56 chemist
+    rename c_26 repeat
+    rename c_8 town
+}
 
 * Chief/president naming (PR uses c_70_p; Cuba and DR use c_70_d_c)
 gen chief = .
-if $country == 0 {
-    replace chief = cond(missing(c_70_p), 0, c_70_p)
+if "$run_pre_prep" == "yes" {
+    if $country == 0 {
+        replace chief = c_70_p_recoded
+    }
+    else {
+        replace chief = c_70_d_c_recoded
+    }
 }
 else {
-    replace chief = cond(missing(c_70_d_c), 0, c_70_d_c)
+    if $country == 0 {
+        replace chief = cond(missing(c_70_p), 0, c_70_p)
+    }
+    else {
+        replace chief = cond(missing(c_70_d_c), 0, c_70_d_c)
+    }
 }
 
 * Informant-reported memory items
-rename i_a2 street
-rename i_a3 store
-rename i_a4 address
+if "$run_pre_prep" == "yes" {
+    rename i_a2_recoded street
+    rename i_a3_recoded store
+    rename i_a4_recoded address
+}
+else {
+    rename i_a2 street
+    rename i_a3 store
+    rename i_a4 address
+}
 
 * Long-term memory (PR uses c_69_p; Cuba and DR use c_69_c + c_69_d)
 gen longmem = .
-if $country == 0 {
-    replace longmem = cond(missing(c_69_p), 0, c_69_p)
+if "$run_pre_prep" == "yes" {
+    if $country == 0 {
+        replace longmem = c_69_p_recoded
+    }
+    else {
+        replace longmem = c_69_c_recoded + c_69_d_recoded
+        replace longmem = 1 if longmem > 1 & !missing(longmem)
+    }
 }
 else {
-    replace longmem = cond(missing(c_69_c),0,c_69_c) + cond(missing(c_69_d),0,c_69_d)
-    replace longmem = 1 if longmem > 1 & !missing(longmem)
+    if $country == 0 {
+        replace longmem = cond(missing(c_69_p), 0, c_69_p)
+    }
+    else {
+        replace longmem = cond(missing(c_69_c),0,c_69_c) + cond(missing(c_69_d),0,c_69_d)
+        replace longmem = 1 if longmem > 1 & !missing(longmem)
+    }
 }
 
 * Orientation - time
-rename c_3 month
-rename c_5 day
-rename c_1 year
+if "$run_pre_prep" == "yes" {
+    rename c_3_recoded month
+    rename c_5_recoded day
+    rename c_1_recoded year
+}
+else {
+    rename c_3 month
+    rename c_5 day
+    rename c_1 year
+}
 
 * Season (PR uses c_2_p_c; Cuba and DR use c_2_p_c + c_2_d)
 gen season = .
-if $country == 0 {
-    replace season = cond(missing(c_2_p_c), 0, c_2_p_c)
+if "$run_pre_prep" == "yes" {
+    if $country == 0 | $country == 2 {
+        replace season = c_2_p_c_recoded
+    }
+    else {
+        replace season = c_2_p_c_recoded + c_2_d_recoded
+        replace season = 1 if season > 1 & !missing(season)
+    }
 }
 else {
-    replace season = cond(missing(c_2_p_c),0,c_2_p_c) + cond(missing(c_2_d),0,c_2_d)
-    replace season = 1 if season > 1 & !missing(season)
+    if $country == 0 {
+        replace season = cond(missing(c_2_p_c), 0, c_2_p_c)
+    }
+    else {
+        replace season = cond(missing(c_2_p_c),0,c_2_p_c) + cond(missing(c_2_d),0,c_2_d)
+        replace season = 1 if season > 1 & !missing(season)
+    }
 }
 
 * Motor commands
-rename c_61 nod
-rename c_62 point
+if "$run_pre_prep" == "yes" {
+    rename c_61_recoded nod
+    rename c_62_recoded point
+}
+else {
+    rename c_61 nod
+    rename c_62 point
+}
 
 * Circle drawing - recode to binary
-rename cs_72_1 circle
-rename c_72_1 circle_diss
-* Disability codes handled below in conditional block
-replace circle = 1 if circle > 1 & circle != .
+if "$run_pre_prep" == "yes" {
+    rename cs_72_1_recoded circle
+    rename c_72_1 circle_diss
+    replace circle = 1 if circle > 1 & circle != .
+}
+else {
+    rename cs_72_1 circle
+    rename c_72_1 circle_diss
+    * Disability codes handled below in conditional block
+    replace circle = 1 if circle > 1 & circle != .
+}
 
 * Pentagon drawing (requires Ty's cleaned scoring)
 capture confirm variable cs_32_cleaned
@@ -86,12 +158,23 @@ if _rc != 0 {
     display as error "ERROR: cs_32_cleaned not found. Re-run Cog_Scoring_Read.do to generate this variable."
     error 111
 }
-rename cs_32_cleaned pentag
+if "$run_pre_prep" == "yes" {
+    rename cs_32_recoded pentag
+}
+else {
+    rename cs_32_cleaned pentag
+}
 rename c_32 pentag_diss
 
 * Animal naming
-rename cs_40 animals
-rename c_40 animals_diss
+if "$run_pre_prep" == "yes" {
+    rename cs_40_recoded animals
+    rename c_40 animals_diss
+}
+else {
+    rename cs_40 animals
+    rename c_40 animals_diss
+}
 
 *-------------------------------------------------------------------------------
 * WORD RECALL COMPONENTS
