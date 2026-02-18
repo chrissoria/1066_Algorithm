@@ -182,7 +182,7 @@ All imputations use OLS regression: fit on non-missing cases, then predict to fi
 **Primary model:**
 
 $$
-\widehat{cs{\_}72{\_}1} = \hat{\beta}_0 + \hat{\beta}_1 \cdot cs{\_}32 + \hat{\beta}_2 \cdot cs{\_}72{\_}2 + \hat{\beta}_3 \cdot cs{\_}72{\_}3 + \hat{\beta}_4 \cdot cs{\_}72{\_}4
+\widehat{\textrm{cs\_72\_1}} = \hat{\beta}_0 + \hat{\beta}_1 \cdot \textrm{cs\_32} + \hat{\beta}_2 \cdot \textrm{cs\_72\_2} + \hat{\beta}_3 \cdot \textrm{cs\_72\_3} + \hat{\beta}_4 \cdot \textrm{cs\_72\_4}
 $$
 
 Predictors: pentagon score and other visuospatial scoring items from the same drawing task.
@@ -190,7 +190,7 @@ Predictors: pentagon score and other visuospatial scoring items from the same dr
 **Fallback model** (for cases still missing after primary):
 
 $$
-\widehat{cs{\_}72{\_}1} = \hat{\beta}_0 + \hat{\vec{\beta}} \cdot \mathbf{I}(i{\_}f{\_}csid{\_}15) + \hat{\vec{\gamma}} \cdot \mathbf{I}(i{\_}f{\_}csid{\_}16)
+\widehat{\textrm{cs\_72\_1}} = \hat{\beta}_0 + \hat{\vec{\beta}} \cdot \mathbf{I}(\textrm{i\_f\_csid\_15}) + \hat{\vec{\gamma}} \cdot \mathbf{I}(\textrm{i\_f\_csid\_16})
 $$
 
 Predictors: informant-reported items on getting lost outside (`i_f_csid_15`) and inside (`i_f_csid_16`), entered as factor indicators.
@@ -198,7 +198,7 @@ Predictors: informant-reported items on getting lost outside (`i_f_csid_15`) and
 #### Imputation 2: Animal Naming (`cs_40`)
 
 $$
-\widehat{cs{\_}40} = \hat{\beta}_0 + \hat{\vec{\beta}} \cdot \mathbf{I}(i{\_}f{\_}csid{\_}9) + \hat{\vec{\gamma}} \cdot \mathbf{I}(i{\_}f{\_}csid{\_}10)
+\widehat{\textrm{cs\_40}} = \hat{\beta}_0 + \hat{\vec{\beta}} \cdot \mathbf{I}(\textrm{i\_f\_csid\_9}) + \hat{\vec{\gamma}} \cdot \mathbf{I}(\textrm{i\_f\_csid\_10})
 $$
 
 Predictors: informant-reported items on word-finding difficulty (`i_f_csid_9`) and using wrong words (`i_f_csid_10`), entered as factor indicators.
@@ -208,7 +208,7 @@ Predictors: informant-reported items on word-finding difficulty (`i_f_csid_9`) a
 **Primary model:**
 
 $$
-\widehat{cs{\_}32} = \hat{\beta}_0 + \hat{\beta}_1 \cdot cs{\_}72{\_}1 + \hat{\beta}_2 \cdot cs{\_}72{\_}2 + \hat{\beta}_3 \cdot cs{\_}72{\_}3 + \hat{\beta}_4 \cdot cs{\_}72{\_}4
+\widehat{\textrm{cs\_32}} = \hat{\beta}_0 + \hat{\beta}_1 \cdot \textrm{cs\_72\_1} + \hat{\beta}_2 \cdot \textrm{cs\_72\_2} + \hat{\beta}_3 \cdot \textrm{cs\_72\_3} + \hat{\beta}_4 \cdot \textrm{cs\_72\_4}
 $$
 
 Predictors: circle score and other visuospatial scoring items.
@@ -216,7 +216,7 @@ Predictors: circle score and other visuospatial scoring items.
 **Fallback model** (for cases still missing after primary):
 
 $$
-\widehat{cs{\_}32} = \hat{\beta}_0 + \hat{\vec{\beta}} \cdot \mathbf{I}(i{\_}f{\_}csid{\_}15) + \hat{\vec{\gamma}} \cdot \mathbf{I}(i{\_}f{\_}csid{\_}16)
+\widehat{\textrm{cs\_32}} = \hat{\beta}_0 + \hat{\vec{\beta}} \cdot \mathbf{I}(\textrm{i\_f\_csid\_15}) + \hat{\vec{\gamma}} \cdot \mathbf{I}(\textrm{i\_f\_csid\_16})
 $$
 
 Same informant-reported fallback predictors as circle drawing.
@@ -224,13 +224,13 @@ Same informant-reported fallback predictors as circle drawing.
 #### Imputation 4: Story Recall (`storytot`)
 
 $$
-\widehat{storytot} = \hat{\beta}_0 + \hat{\beta}_1 \cdot immed
+\widehat{\textrm{storytot}} = \hat{\beta}_0 + \hat{\beta}_1 \cdot \textrm{immed}
 $$
 
 where:
 
 $$
-immed = \sum_{k \in \{1,2,3\}} learn_{k}, \quad learn_{k} = \sum_{j=1}^{10} c_{(33+k-1),j}
+\textrm{immed} = \sum_{k \in \{1,2,3\}} \textrm{learn}_{k}, \quad \textrm{learn}_{k} = \sum_{j=1}^{10} c_{(33+k-1),j}
 $$
 
 Predictor: total immediate recall across three learning trials (0–30). This leverages the correlation between immediate learning and delayed story recall to recover cases where the story was not administered.
