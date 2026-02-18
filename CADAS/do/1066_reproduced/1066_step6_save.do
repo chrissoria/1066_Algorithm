@@ -20,7 +20,8 @@ keep pid relscore cogscore nametot count animals_diss animals animtot ///
      c_13 wordimm c_21 c_22 c_23 worddel miss1 miss3 misstot activ mental memory put ///
      kept frdname famname convers wordfind wordwrg past lastsee lastday ///
      orient lostout lostin chores hobby money change reason feed dress ///
-     toilet recall dem1066_score dem1066 dem1066_score_quint dem1066_quint immed ///
+     toilet recall dem1066_score dem1066 dem1066_score_quint dem1066_quint ///
+     cdr_binary cadas_dem1066_score cadas_dem1066 cadas_dem1066_ascribed immed ///
      learn1 learn2 learn3
 
 *-------------------------------------------------------------------------------
@@ -35,7 +36,8 @@ order pid relscore cogscore nametot count animals_diss animals animtot ///
       c_13 wordimm c_21 c_22 c_23 worddel miss1 miss3 misstot activ mental memory put ///
       kept frdname famname convers wordfind wordwrg past lastsee lastday ///
       orient lostout lostin chores hobby money change reason feed dress ///
-      toilet recall dem1066_score dem1066 dem1066_score_quint dem1066_quint immed ///
+      toilet recall dem1066_score dem1066 dem1066_score_quint dem1066_quint ///
+      cdr_binary cadas_dem1066_score cadas_dem1066 cadas_dem1066_ascribed immed ///
       learn1 learn2 learn3
 
 *-------------------------------------------------------------------------------
@@ -79,11 +81,53 @@ capture mkdir "`gdrive_path'"
 
 preserve
 
-* Count and display cases missing dem1066 classification
+* Count and display cases missing cogscore / dem1066
+quietly count if missing(cogscore)
+local miss_cogscore = r(N)
 quietly count if missing(dem1066)
 local n_missing = r(N)
+quietly count
+local n_total = r(N)
 display _newline(1)
-display "Cases with missing dem1066 classification: `n_missing'"
+display "Total observations: `n_total'"
+display "Missing cogscore: `miss_cogscore'"
+display "Missing dem1066 classification: `n_missing'"
+
+* Component-level breakdown
+display ""
+display "--- COMPONENT-LEVEL MISSING (among missing cogscore cases) ---"
+foreach var in nametot count animtot wordtot1 wordtot2 papertot storytot {
+    quietly count if missing(cogscore) & missing(`var')
+    local n = r(N)
+    display "  `var': `n' missing"
+}
+
+display ""
+display "--- CROSS-TAB: Components missing per case (among missing cogscore) ---"
+quietly {
+    gen _n_miss_components = 0
+    foreach var in nametot count animtot wordtot1 wordtot2 papertot storytot {
+        replace _n_miss_components = _n_miss_components + missing(`var')
+    }
+}
+tab _n_miss_components if missing(cogscore)
+drop _n_miss_components
+
+* Export missing cogscore summary to 1066_diagnostics
+display ""
+display "--- Exporting missing cogscore summary ---"
+quietly {
+    gen _miss_cogscore = missing(cogscore)
+    keep if _miss_cogscore == 1
+    keep pid nametot count animtot wordtot1 wordtot2 papertot storytot recall
+    capture export excel using "1066_diagnostics/missing_cogscore_summary.xlsx", replace firstrow(variables)
+    capture export excel using "`gdrive_path'/missing_cogscore_summary.xlsx", replace firstrow(variables)
+}
+display "  Exported: 1066_diagnostics/missing_cogscore_summary.xlsx"
+
+restore
+
+preserve
 
 * Keep only cases with missing dem1066
 keep if missing(dem1066)
@@ -198,17 +242,17 @@ if _N > 0 {
     capture rename c_66f historia_todos_bien
 
     * Export to local diagnostics folder
-    export delimited using "1066_diagnostics/1066_missing_cogscore_cases.csv", replace
+    export delimited using "1066_diagnostics/1066_missing_score_cases.csv", replace
 
     * Also copy to Google Drive
-    capture export delimited using "`gdrive_path'/1066_missing_cogscore_cases.csv", replace
+    capture export delimited using "`gdrive_path'/1066_missing_score_cases.csv", replace
 
-    display "Missing cogscore cases exported to:"
-    display "  - 1066_diagnostics/1066_missing_cogscore_cases.csv"
+    display "Missing dem1066 score cases exported to:"
+    display "  - 1066_diagnostics/1066_missing_score_cases.csv"
     display "  - Google Drive: 1066_DIAGNOSTIC_EXCELS/"
 }
 else {
-    display "No cases with missing cogscore components."
+    display "No cases with missing dem1066 classification."
 }
 
 restore
@@ -217,6 +261,6 @@ display _newline(1)
 display "STEP 6 complete: Data saved."
 display "  - 1066.dta"
 display "  - excel/1066.xlsx"
-display "  - 1066_diagnostics/1066_missing_cogscore_cases.csv"
-display "  - Google Drive: 1066_DIAGNOSTIC_EXCELS/1066_missing_cogscore_cases.csv"
+display "  - 1066_diagnostics/1066_missing_score_cases.csv"
+display "  - Google Drive: 1066_DIAGNOSTIC_EXCELS/1066_missing_score_cases.csv"
 display "--------------------------------------------------------------------------------"

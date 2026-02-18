@@ -121,6 +121,9 @@ gen dem1066 = .
 replace dem1066 = 1 if dem1066_score >= 0.5 & dem1066_score != .
 replace dem1066 = 0 if dem1066_score < 0.5 & dem1066_score != .
 
+label variable dem1066_score "10/66 dementia probability (continuous logit coefficients from 10/66 baseline, n=6791)"
+label variable dem1066 "10/66 dementia classification (1=dementia, 0=no; continuous logit coefficients from 10/66 baseline)"
+
 *-------------------------------------------------------------------------------
 * CALCULATE DEMENTIA - SAMPLE-SPECIFIC QUINTILE VERSION
 *-------------------------------------------------------------------------------
@@ -131,6 +134,9 @@ gen dem1066_score_quint = exp(-17.71921 + 2.76109*bcogscor_quint + 1.836585*brel
 gen dem1066_quint = .
 replace dem1066_quint = 1 if dem1066_score_quint >= 0.5 & dem1066_score_quint != .
 replace dem1066_quint = 0 if dem1066_score_quint < 0.5 & dem1066_score_quint != .
+
+label variable dem1066_score_quint "10/66 dementia probability (sample-specific quintile coefficients from 10/66 baseline)"
+label variable dem1066_quint "10/66 dementia classification (1=dementia, 0=no; sample-specific quintile coefficients)"
 
 *-------------------------------------------------------------------------------
 * CALCULATE DEMENTIA - FIXED CATEGORICAL VERSION (Original 10/66)
@@ -143,11 +149,83 @@ gen dem1066_categorical_orig = .
 replace dem1066_categorical_orig = 1 if dem1066_score_categorical_orig >= 0.5 & dem1066_score_categorical_orig != .
 replace dem1066_categorical_orig = 0 if dem1066_score_categorical_orig < 0.5 & dem1066_score_categorical_orig != .
 
-display "Dementia probability distribution:"
+label variable dem1066_score_categorical_orig "10/66 dementia probability (fixed quintile cutpoints & coefficients from 10/66 baseline)"
+label variable dem1066_categorical_orig "10/66 dementia classification (1=dementia, 0=no; fixed quintile cutpoints from 10/66 baseline)"
+
+*-------------------------------------------------------------------------------
+* CALCULATE DEMENTIA - CADAS-ESTIMATED COEFFICIENTS
+* Merge CDR (gold-standard clinical diagnosis), fit logit on CDR binary,
+* then predict dementia probability from CADAS-estimated coefficients.
+* CDR available for DR (country=1) and Cuba (country=2) only.
+*-------------------------------------------------------------------------------
+
+if $country == 1 | $country == 2 {
+
+    * Merge CDR data
+    if $country == 1 {
+        merge 1:1 pid using "$data_path/dr_CDR.dta", keepusing(dr_CDR_binary) keep(master match) nogen
+        rename dr_CDR_binary cdr_binary
+    }
+    else if $country == 2 {
+        merge 1:1 pid using "$data_path/Cuba_CDR.dta", keepusing(cuba_CDR_binary) keep(master match) nogen
+        rename cuba_CDR_binary cdr_binary
+    }
+
+    display _newline(1)
+    display "CDR binary distribution (gold standard):"
+    tab cdr_binary, miss
+
+    * Fit logit predicting CDR from cogscore, relscore, recall
+    logit cdr_binary cogscore relscore recall
+    predict cadas_dem1066_score
+
+    gen cadas_dem1066 = .
+    replace cadas_dem1066 = 1 if cadas_dem1066_score >= 0.5 & cadas_dem1066_score != .
+    replace cadas_dem1066 = 0 if cadas_dem1066_score < 0.5 & cadas_dem1066_score != .
+
+    gen cadas_dem1066_ascribed = .
+    replace cadas_dem1066_ascribed = 1 if cadas_dem1066_score >= 0.25 & cadas_dem1066_score != .
+    replace cadas_dem1066_ascribed = 0 if cadas_dem1066_score < 0.25 & cadas_dem1066_score != .
+
+    label variable cdr_binary "CDR clinical diagnosis (1=dementia CDR>0.5, 0=no CDR<=0.5)"
+    label variable cadas_dem1066_score "CADAS dementia probability (logit on CDR, CADAS-estimated coefficients)"
+    label variable cadas_dem1066 "CADAS dementia classification (1=dementia, 0=no; p>=0.5, logit on CDR)"
+    label variable cadas_dem1066_ascribed "CADAS ascribed dementia (1=dementia, 0=no; p>=0.25, logit on CDR)"
+
+    display _newline(1)
+    display "Dementia probability distribution (CADAS-estimated coefficients, logit on CDR):"
+    summarize cadas_dem1066_score
+
+    display _newline(1)
+    display "CADAS dementia classification (p>=0.5):"
+    tab cadas_dem1066, miss
+
+    display _newline(1)
+    display "CADAS ascribed dementia (p>=0.25):"
+    tab cadas_dem1066_ascribed, miss
+}
+else {
+    display _newline(1)
+    display "NOTE: CDR data not available for this country. Skipping CADAS-estimated model."
+
+    * Create empty variables so step 6 keep/order doesn't fail
+    gen cdr_binary = .
+    gen cadas_dem1066_score = .
+    gen cadas_dem1066 = .
+    gen cadas_dem1066_ascribed = .
+
+    label variable cdr_binary "CDR clinical diagnosis (not available for this country)"
+    label variable cadas_dem1066_score "CADAS dementia probability (not available - no CDR)"
+    label variable cadas_dem1066 "CADAS dementia classification (not available - no CDR)"
+    label variable cadas_dem1066_ascribed "CADAS ascribed dementia (not available - no CDR)"
+}
+
+display _newline(1)
+display "Dementia probability distribution (10/66 coefficients):"
 summarize dem1066_score
 
 display _newline(1)
-display "Dementia classification:"
+display "Dementia classification (10/66 coefficients):"
 tab dem1066, miss
 
 display "STEP 5 complete: Classification applied."

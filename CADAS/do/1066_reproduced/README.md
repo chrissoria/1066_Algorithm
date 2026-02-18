@@ -126,13 +126,21 @@ For each source variable, a `_recoded` copy is created with the following transf
 | `.` (system missing) | Not administered / unknown | `0` |
 | `.i` | Invalid skip | `0` |
 | `.v` | Valid skip | `0` |
-| `6` | Physical disability (could not) | `0` |
-| `7` | Refused | `0` |
+| `6` | Physical disability (could not perform) | `0` |
+| `7` | Physical disability (could not perform) | `0` |
 | `8` | Don't know | `0` |
-| `9` | Other disability | `0` |
-| `11` | Data entry error flag | `.` (set to missing) |
+| `9` | Refused | `0` |
 
-**Rationale:** Disability, refusal, and don't-know responses are treated as inability to perform the task correctly, scored as 0 (incorrect). This maximizes sample retention by avoiding listwise deletion from the COGSCORE formula.
+Additionally, out-of-range and data-entry-error values are recoded to missing (`.`) so they can be handled by imputation or excluded:
+
+| Original Value | Meaning | Recoded Value |
+|---------------|---------|---------------|
+| `11` | Data entry error flag | `.` (missing) |
+| `5`, `23` | Typos in circle drawing (`cs_72_1`) | `.` (missing) |
+| `777` | Refused/invalid in animal naming (`cs_40`) | `.` (missing) |
+| `> 45` | Out of range in animal naming (`cs_40`) | `.` (missing) |
+
+**Rationale:** Disability (codes 6, 7), don't-know (code 8), and refusal (code 9) responses are treated as inability to perform the task correctly, scored as 0 (incorrect). This maximizes sample retention by avoiding listwise deletion from the COGSCORE formula.
 
 **Exception — Story recall (`c_66a`–`c_66f`):** True system missing (`.`) is preserved as missing (not recoded to 0) so that `storytot` remains missing and becomes eligible for imputation from the learning trials. Only `.i`, `.v`, and codes 6–9 are recoded to 0.
 
@@ -174,7 +182,7 @@ All imputations use OLS regression: fit on non-missing cases, then predict to fi
 **Primary model:**
 
 $$
-\widehat{cs\_72\_1} = \hat{\beta}_0 + \hat{\beta}_1 \cdot cs\_32 + \hat{\beta}_2 \cdot cs\_72\_2 + \hat{\beta}_3 \cdot cs\_72\_3 + \hat{\beta}_4 \cdot cs\_72\_4
+\widehat{\text{cs\_72\_1}} = \hat{\beta}_0 + \hat{\beta}_1 \cdot \text{cs\_32} + \hat{\beta}_2 \cdot \text{cs\_72\_2} + \hat{\beta}_3 \cdot \text{cs\_72\_3} + \hat{\beta}_4 \cdot \text{cs\_72\_4}
 $$
 
 Predictors: pentagon score and other visuospatial scoring items from the same drawing task.
@@ -182,7 +190,7 @@ Predictors: pentagon score and other visuospatial scoring items from the same dr
 **Fallback model** (for cases still missing after primary):
 
 $$
-\widehat{cs\_72\_1} = \hat{\beta}_0 + \hat{\boldsymbol{\beta}} \cdot \mathbf{I}(i\_f\_csid\_15) + \hat{\boldsymbol{\gamma}} \cdot \mathbf{I}(i\_f\_csid\_16)
+\widehat{\text{cs\_72\_1}} = \hat{\beta}_0 + \hat{\vec{\beta}} \cdot \mathbf{I}(\text{i\_f\_csid\_15}) + \hat{\vec{\gamma}} \cdot \mathbf{I}(\text{i\_f\_csid\_16})
 $$
 
 Predictors: informant-reported items on getting lost outside (`i_f_csid_15`) and inside (`i_f_csid_16`), entered as factor indicators.
@@ -190,7 +198,7 @@ Predictors: informant-reported items on getting lost outside (`i_f_csid_15`) and
 #### Imputation 2: Animal Naming (`cs_40`)
 
 $$
-\widehat{cs\_40} = \hat{\beta}_0 + \hat{\boldsymbol{\beta}} \cdot \mathbf{I}(i\_f\_csid\_9) + \hat{\boldsymbol{\gamma}} \cdot \mathbf{I}(i\_f\_csid\_10)
+\widehat{\text{cs\_40}} = \hat{\beta}_0 + \hat{\vec{\beta}} \cdot \mathbf{I}(\text{i\_f\_csid\_9}) + \hat{\vec{\gamma}} \cdot \mathbf{I}(\text{i\_f\_csid\_10})
 $$
 
 Predictors: informant-reported items on word-finding difficulty (`i_f_csid_9`) and using wrong words (`i_f_csid_10`), entered as factor indicators.
@@ -200,7 +208,7 @@ Predictors: informant-reported items on word-finding difficulty (`i_f_csid_9`) a
 **Primary model:**
 
 $$
-\widehat{cs\_32} = \hat{\beta}_0 + \hat{\beta}_1 \cdot cs\_72\_1 + \hat{\beta}_2 \cdot cs\_72\_2 + \hat{\beta}_3 \cdot cs\_72\_3 + \hat{\beta}_4 \cdot cs\_72\_4
+\widehat{\text{cs\_32}} = \hat{\beta}_0 + \hat{\beta}_1 \cdot \text{cs\_72\_1} + \hat{\beta}_2 \cdot \text{cs\_72\_2} + \hat{\beta}_3 \cdot \text{cs\_72\_3} + \hat{\beta}_4 \cdot \text{cs\_72\_4}
 $$
 
 Predictors: circle score and other visuospatial scoring items.
@@ -208,7 +216,7 @@ Predictors: circle score and other visuospatial scoring items.
 **Fallback model** (for cases still missing after primary):
 
 $$
-\widehat{cs\_32} = \hat{\beta}_0 + \hat{\boldsymbol{\beta}} \cdot \mathbf{I}(i\_f\_csid\_15) + \hat{\boldsymbol{\gamma}} \cdot \mathbf{I}(i\_f\_csid\_16)
+\widehat{\text{cs\_32}} = \hat{\beta}_0 + \hat{\vec{\beta}} \cdot \mathbf{I}(\text{i\_f\_csid\_15}) + \hat{\vec{\gamma}} \cdot \mathbf{I}(\text{i\_f\_csid\_16})
 $$
 
 Same informant-reported fallback predictors as circle drawing.
@@ -222,7 +230,7 @@ $$
 where:
 
 $$
-immed = \sum_{k \in \{1,2,3\}} \text{learn}_k, \quad \text{learn}_k = \sum_{j=1}^{10} c\_\{33+k-1\}\_j
+\text{immed} = \sum_{k \in \{1,2,3\}} \text{learn}_{k}, \quad \text{learn}_{k} = \sum_{j=1}^{10} c_{(33+k-1),j}
 $$
 
 Predictor: total immediate recall across three learning trials (0–30). This leverages the correlation between immediate learning and delayed story recall to recover cases where the story was not administered.
