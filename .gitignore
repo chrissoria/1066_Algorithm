@@ -1,3 +1,5 @@
+.DS_Store
+
 ADAMS/data/
 
 # Intermediate data files from cadas_within analysis
