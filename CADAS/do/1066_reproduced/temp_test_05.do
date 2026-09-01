@@ -22,7 +22,7 @@ if `"`user'"' == "Chris" {
         global data_path "`path'/CUBA_out"
     }
 
-    global script_path "/Users/chrissoria/Documents/CADAS/Do/1066_reproduced"
+    global script_path "/Users/chrissoria/Documents/CADAS/Do/cog_algorithms"
 }
 
 cd "$data_path"

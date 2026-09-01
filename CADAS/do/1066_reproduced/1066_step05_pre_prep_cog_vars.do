@@ -340,3 +340,182 @@ if `n_still_missing' > 0 {
 
 display "--- cs_32_recoded (after imputation) ---"
 summarize cs_32_recoded
+
+*-------------------------------------------------------------------------------
+* WORD RECALL - IMMEDIATE (c_11, c_12, c_13): recode missing/disability/refusal to 0
+* These feed into wordimm → wordtot1
+*-------------------------------------------------------------------------------
+
+foreach var in c_11 c_12 c_13 {
+    gen `var'_recoded = `var'
+    replace `var'_recoded = 0 if missing(`var'_recoded)
+    replace `var'_recoded = 0 if `var'_recoded == 6
+    replace `var'_recoded = 0 if `var'_recoded == 7
+    replace `var'_recoded = 0 if `var'_recoded == 8 | `var'_recoded == 9
+    replace `var'_recoded = . if `var'_recoded == 11
+}
+
+foreach var in c_11 c_12 c_13 {
+    display _newline(1)
+    display "--- `var' (original) ---"
+    tab `var', miss
+    display "--- `var'_recoded ---"
+    tab `var'_recoded, miss
+}
+
+*-------------------------------------------------------------------------------
+* WORD RECALL - DELAYED (c_21, c_22, c_23): recode missing/disability/refusal to 0
+* These feed into worddel → wordtot2
+*-------------------------------------------------------------------------------
+
+foreach var in c_21 c_22 c_23 {
+    gen `var'_recoded = `var'
+    replace `var'_recoded = 0 if missing(`var'_recoded)
+    replace `var'_recoded = 0 if `var'_recoded == 6
+    replace `var'_recoded = 0 if `var'_recoded == 7
+    replace `var'_recoded = 0 if `var'_recoded == 8 | `var'_recoded == 9
+    replace `var'_recoded = . if `var'_recoded == 11
+}
+
+foreach var in c_21 c_22 c_23 {
+    display _newline(1)
+    display "--- `var' (original) ---"
+    tab `var', miss
+    display "--- `var'_recoded ---"
+    tab `var'_recoded, miss
+}
+
+*-------------------------------------------------------------------------------
+* STORY RECALL (c_66a-c_66f): recode .i/.v/disability/refusal to 0
+* Keep true missing (.) as missing so storytot stays missing → eligible for imputation
+* These feed into story → storytot
+*-------------------------------------------------------------------------------
+
+foreach var in c_66a c_66b c_66c c_66d c_66e c_66f {
+    gen `var'_recoded = `var'
+    replace `var'_recoded = 0 if `var'_recoded == .i
+    replace `var'_recoded = 0 if `var'_recoded == .v
+    replace `var'_recoded = 0 if `var'_recoded == 6
+    replace `var'_recoded = 0 if `var'_recoded == 7
+    replace `var'_recoded = 0 if `var'_recoded == 8 | `var'_recoded == 9
+    replace `var'_recoded = . if `var'_recoded == 11
+}
+
+foreach var in c_66a c_66b c_66c c_66d c_66e c_66f {
+    display _newline(1)
+    display "--- `var' (original) ---"
+    tab `var', miss
+    display "--- `var'_recoded ---"
+    tab `var'_recoded, miss
+}
+
+*-------------------------------------------------------------------------------
+* PAPER FOLDING (c_27, c_28, c_29): recode missing/disability/refusal to 0
+* These feed into paper → papertot
+*-------------------------------------------------------------------------------
+
+foreach var in c_27 c_28 c_29 {
+    gen `var'_recoded = `var'
+    replace `var'_recoded = 0 if missing(`var'_recoded)
+    replace `var'_recoded = 0 if `var'_recoded == 6
+    replace `var'_recoded = 0 if `var'_recoded == 7
+    replace `var'_recoded = 0 if `var'_recoded == 8 | `var'_recoded == 9
+    replace `var'_recoded = . if `var'_recoded == 11
+}
+
+foreach var in c_27 c_28 c_29 {
+    display _newline(1)
+    display "--- `var' (original) ---"
+    tab `var', miss
+    display "--- `var'_recoded ---"
+    tab `var'_recoded, miss
+}
+
+*-------------------------------------------------------------------------------
+* LEARNING TRIAL 1 (c_33_1–c_33_10): recode missing/disability/refusal to 0
+* These feed into learn1 → immed (imputation source for storytot)
+*-------------------------------------------------------------------------------
+
+foreach var in c_33_1 c_33_2 c_33_3 c_33_4 c_33_5 c_33_6 c_33_7 c_33_8 c_33_9 c_33_10 {
+    gen `var'_recoded = `var'
+    replace `var'_recoded = 0 if missing(`var'_recoded)
+    replace `var'_recoded = 0 if `var'_recoded == 6
+    replace `var'_recoded = 0 if `var'_recoded == 7
+    replace `var'_recoded = 0 if `var'_recoded == 8 | `var'_recoded == 9
+    replace `var'_recoded = . if `var'_recoded == 11
+}
+
+foreach var in c_33_1 c_33_2 c_33_3 c_33_4 c_33_5 c_33_6 c_33_7 c_33_8 c_33_9 c_33_10 {
+    display _newline(1)
+    display "--- `var' (original) ---"
+    tab `var', miss
+    display "--- `var'_recoded ---"
+    tab `var'_recoded, miss
+}
+
+*-------------------------------------------------------------------------------
+* LEARNING TRIAL 2 (c_34_1–c_34_10): recode missing/disability/refusal to 0
+* These feed into learn2 → immed (imputation source for storytot)
+*-------------------------------------------------------------------------------
+
+foreach var in c_34_1 c_34_2 c_34_3 c_34_4 c_34_5 c_34_6 c_34_7 c_34_8 c_34_9 c_34_10 {
+    gen `var'_recoded = `var'
+    replace `var'_recoded = 0 if missing(`var'_recoded)
+    replace `var'_recoded = 0 if `var'_recoded == 6
+    replace `var'_recoded = 0 if `var'_recoded == 7
+    replace `var'_recoded = 0 if `var'_recoded == 8 | `var'_recoded == 9
+    replace `var'_recoded = . if `var'_recoded == 11
+}
+
+foreach var in c_34_1 c_34_2 c_34_3 c_34_4 c_34_5 c_34_6 c_34_7 c_34_8 c_34_9 c_34_10 {
+    display _newline(1)
+    display "--- `var' (original) ---"
+    tab `var', miss
+    display "--- `var'_recoded ---"
+    tab `var'_recoded, miss
+}
+
+*-------------------------------------------------------------------------------
+* LEARNING TRIAL 3 (c_35_1–c_35_10): recode missing/disability/refusal to 0
+* These feed into learn3 → immed (imputation source for storytot)
+*-------------------------------------------------------------------------------
+
+foreach var in c_35_1 c_35_2 c_35_3 c_35_4 c_35_5 c_35_6 c_35_7 c_35_8 c_35_9 c_35_10 {
+    gen `var'_recoded = `var'
+    replace `var'_recoded = 0 if missing(`var'_recoded)
+    replace `var'_recoded = 0 if `var'_recoded == 6
+    replace `var'_recoded = 0 if `var'_recoded == 7
+    replace `var'_recoded = 0 if `var'_recoded == 8 | `var'_recoded == 9
+    replace `var'_recoded = . if `var'_recoded == 11
+}
+
+foreach var in c_35_1 c_35_2 c_35_3 c_35_4 c_35_5 c_35_6 c_35_7 c_35_8 c_35_9 c_35_10 {
+    display _newline(1)
+    display "--- `var' (original) ---"
+    tab `var', miss
+    display "--- `var'_recoded ---"
+    tab `var'_recoded, miss
+}
+
+*-------------------------------------------------------------------------------
+* NAME RECALL (c_0, c_65): recode missing/disability/refusal to 0
+* These feed into nametot
+*-------------------------------------------------------------------------------
+
+foreach var in c_0 c_65 {
+    gen `var'_recoded = `var'
+    replace `var'_recoded = 0 if missing(`var'_recoded)
+    replace `var'_recoded = 0 if `var'_recoded == 6
+    replace `var'_recoded = 0 if `var'_recoded == 7
+    replace `var'_recoded = 0 if `var'_recoded == 8 | `var'_recoded == 9
+    replace `var'_recoded = . if `var'_recoded == 11
+}
+
+foreach var in c_0 c_65 {
+    display _newline(1)
+    display "--- `var' (original) ---"
+    tab `var', miss
+    display "--- `var'_recoded ---"
+    tab `var'_recoded, miss
+}
+

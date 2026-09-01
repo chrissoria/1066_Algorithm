@@ -391,9 +391,9 @@ replace subcategory = "No dementia (dem1066 = 0)" in 15
 replace n = `n_nodem' in 15
 replace pct = 100 - `prev' in 15
 
-* Export to CSV (save to 1066_diagnostics subfolder)
-capture mkdir "1066_diagnostics"
-export delimited using "1066_diagnostics/1066_algo_sample_attrition.csv", replace
+* Export to CSV (save to cog_algorithms_diagnostics subfolder)
+capture mkdir "cog_algorithms_diagnostics"
+export delimited using "cog_algorithms_diagnostics/1066_algo_sample_attrition.csv", replace
 
 * Also copy to Google Drive
 if $country == 1 {
@@ -415,7 +415,7 @@ else if $country == 2 {
 capture mkdir "`gdrive_path'"
 capture export delimited using "`gdrive_path'/1066_algo_sample_attrition.csv", replace
 
-display "  Saved to: 1066_diagnostics/1066_algo_sample_attrition.csv"
+display "  Saved to: cog_algorithms_diagnostics/1066_algo_sample_attrition.csv"
 display "  Also saved to: Google Drive 1066_DIAGNOSTIC_EXCELS/"
 
 restore

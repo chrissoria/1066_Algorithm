@@ -65,9 +65,11 @@ $$
 | `1066_step6_save.do` | Save output, export diagnostics for missing scores |
 | `1066_step7_validate_vs_baseline.do` | Validation against 1066 baseline data |
 | `1066_step8_sample_attrition.do` | Sample attrition analysis |
+| `1066_cogtot27.do` | HRS-style TICS composite (0-27) + Langa-Weir dementia classification |
 | `diagnose_missing_cogscore.do` | Standalone diagnostic for missing cogscore cases |
 | `validate_cogscore_vars.do` | Validation script to check variable values |
 | `compare_new_vs_orig.do` | Compare refactored output to original |
+| `compare_scores.do` | Compare COGSCORE/RELSCORE components across runs |
 
 ## Configuration Options
 
@@ -78,9 +80,17 @@ global drop_missing_from_relscore "no"   // Drop cases with missing relscore ite
 global impute_recall "yes"               // Impute delayed recall from immediate
 global use_strict_pentag "no"            // Pentagon scoring: "yes" = only value 2, "no" = 1 and 2
 global run_pre_prep "yes"                // Run step 0.5 pre-preparation (recode + impute)
+global recode_disability_to "zero"       // RELSCORE disability items: "zero" or "missing"
 ```
 
 The `run_pre_prep` global is the master switch controlling whether disability codes, refusals, and missing values are recoded to 0 via `_recoded` variables in step 0.5. When set to `"no"`, step 1 falls back to inline recoding.
+
+`recode_disability_to` controls how step 3 handles the four informant-reported disability flags (`dressdiss`, `choredis`, `feeddiss`, `toildiss`):
+
+- `"zero"` (default) scores the item as 0, treating "cannot perform" as impairment. This is the behavior the algorithm has always used.
+- `"missing"` drops the item from the score instead. Step 3 then rebuilds `miss1`/`miss3`/`misstot` so that step 4's weighting factor `U = 30/(30 - misstot)` compensates for the dropped items.
+
+Step 3 errors out on any value other than these two rather than silently falling back to `"zero"`.
 
 ## CADAS-Specific Adaptations
 
@@ -112,6 +122,14 @@ replace longmem = 1 if longmem > 1 & !missing(longmem)
 The `circle` variable (circle drawing task) is included in the COGSCORE `count` component. This matches the original 1066 algorithm and the model that generated the coefficients.
 
 **Note:** Some earlier CADAS implementations omitted `circle` from count. The current implementation correctly includes it.
+
+### 4. Pentagon Variable (`cs_32`)
+
+`cs_32` arriving in this algorithm is already the **cleaned** pentagon score: manually re-scored drawings take priority, with the interviewer's field score as fallback. The swap happens upstream in `Read/Cog_Scoring_Read.do`, which renames the un-cleaned interviewer score to `cs_32_old` (internal QC only, dropped from the public release).
+
+This means the algorithm reads plain `cs_32` in both the pre-prep and non-pre-prep branches, and public users get a single pentagon variable they can use directly without needing the manual re-scoring spreadsheet. Earlier versions of this code required a separate `cs_32_cleaned` variable, which the pre-prep branch silently bypassed.
+
+Note that `cs_32` is coded 0/1 in CADAS, not 0/1/2 as in the original 10/66 instrument. `use_strict_pentag "yes"` looks for a value of 2 and therefore has no effect worth relying on here.
 
 ## Pre-Preparation: Recoding and Imputation (Step 0.5)
 
@@ -280,18 +298,18 @@ where:
 
 2. Run the master file:
 ```stata
-do "/Users/chrissoria/Documents/CADAS/do/1066_reproduced/1066_master.do"
+do "/Users/chrissoria/Documents/CADAS/do/cog_algorithms/1066_master.do"
 ```
 
 3. Output is saved to:
-   - `1066.dta` (Stata format)
-   - `excel/1066.xlsx` (Excel format)
+   - `cog_algorithms.dta` (Stata format)
+   - `excel/cog_algorithms.xlsx` (Excel format)
 
 ## Validation
 
 Run the validation script after the master file to check variable values:
 ```stata
-do "/Users/chrissoria/Documents/CADAS/do/1066_reproduced/validate_cogscore_vars.do"
+do "/Users/chrissoria/Documents/CADAS/do/cog_algorithms/validate_cogscore_vars.do"
 ```
 
 This checks that:

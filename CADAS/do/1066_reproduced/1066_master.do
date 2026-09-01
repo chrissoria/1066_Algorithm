@@ -30,7 +30,8 @@ if `"`user'"' == "Chris" {
         global data_path "`path'/CUBA_out"
     }
 
-    global script_path "/Users/chrissoria/Documents/CADAS/do/1066_reproduced"
+    global script_path "/Users/chrissoria/Documents/CADAS/Do/3_Derived/cog_algorithms"
+    global cuba_path "`path'/CUBA_out"
 }
 
 else if `"`user'"' == "Ty" {
@@ -48,7 +49,8 @@ else if `"`user'"' == "Ty" {
         global data_path "`path'/CUBA_out"
     }
 
-    global script_path "C:\Users\Ty\Desktop\CADAS Data do files\1066_reproduced"
+    global script_path "C:\Users\Ty\Desktop\CADAS Data do files\cog_algorithms"
+    global cuba_path "`path'\CUBA_out"
 }
 
 cd "$data_path"
@@ -63,10 +65,16 @@ global drop_missing_from_relscore "no"   // Drop cases with missing relscore ite
 global impute_recall "yes"                 // Impute delayed recall from immediate
 global use_strict_pentag "no"            // Pentagon scoring: "yes" = only value 2 correct, "no" = 1 and 2 both correct
 global run_pre_prep "yes"                // Run step 0.5 pre-preparation (recode missing/refusal to 0)
+global recode_disability_to "zero"       // RELSCORE disability items (dress/chores/feed/toilet): "zero" or "missing"
 
 * NOTE: Disability vs refusal codes are now handled separately in step1:
 *   - Disability codes (6, 8, 9 = could not) → recoded to 0
 *   - Refusal codes (7 = refused) → recoded to missing
+*
+* NOTE: recode_disability_to governs the SEPARATE informant-reported disability
+* flags in step3 (dressdiss, choredis, feeddiss, toildiss).  "zero" scores the
+* item as 0 (cannot perform = impaired); "missing" drops it from the score and
+* lets step 4's weighting factor U = 30/(30 - misstot) compensate.
 
 *-------------------------------------------------------------------------------
 * EXECUTE STEPS
@@ -110,6 +118,9 @@ do "$script_path/1066_step7_validate_vs_baseline.do"
 * Step 8: Sample attrition analysis (shows where cases drop off)
 do "$script_path/1066_step8_sample_attrition.do"
 
+* HRS-style cogtot27 (TICS 0-27) + Langa-Weir dementia classification
+do "$script_path/1066_cogtot27.do"
+
 *-------------------------------------------------------------------------------
 * FINAL SUMMARY
 *-------------------------------------------------------------------------------
@@ -136,5 +147,5 @@ display "DEMENTIA CLASSIFICATION (dem1066):"
 tab dem1066, miss
 
 display _newline(1)
-display "Algorithm complete. Data saved to 1066.dta"
+display "Algorithm complete. Data saved to cog_algorithms.dta"
 display "================================================================================"

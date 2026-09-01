@@ -1,14 +1,14 @@
 ********************************************************************************
 * VALIDATE COGSCORE VARIABLES
 * Check that all cogscore component variables have valid values
-* Run this AFTER running 1066_master.do, or it will load from saved 1066.dta
+* Run this AFTER running 1066_master.do, or it will load from saved cog_algorithms.dta
 ********************************************************************************
 
 * Load the 1066 data if not already in memory
 capture confirm variable cogscore
 if _rc {
-    display "Loading 1066.dta..."
-    use "1066.dta", clear
+    display "Loading cog_algorithms.dta..."
+    use "cog_algorithms.dta", clear
 }
 
 display _newline(2)

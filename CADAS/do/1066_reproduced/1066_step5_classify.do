@@ -15,8 +15,11 @@ display "-----------------------------------------------------------------------
 if "$impute_recall" == "yes" {
     gen recall_original = recall
     gen pred_recall = (0.344 * immed) - 0.339
-    replace recall = pred_recall if recall == 0
-    display "Recall imputed from immediate learning trials for cases with recall=0"
+    quietly count if missing(recall) & !missing(immed)
+    local n_imputed = r(N)
+    replace recall = pred_recall if missing(recall) & !missing(immed)
+    replace recall = 0 if recall < 0
+    display "Recall imputed from immediate learning trials for `n_imputed' cases with missing recall"
 }
 
 summarize recall
@@ -187,22 +190,84 @@ if $country == 1 | $country == 2 {
     replace cadas_dem1066_ascribed = 1 if cadas_dem1066_score >= 0.25 & cadas_dem1066_score != .
     replace cadas_dem1066_ascribed = 0 if cadas_dem1066_score < 0.25 & cadas_dem1066_score != .
 
+    * Rename to country-specific variable names
+    if $country == 1 {
+        rename cadas_dem1066_score cadas_dem1066_score_DR
+        rename cadas_dem1066 cadas_dem1066_DR
+        rename cadas_dem1066_ascribed cadas_dem1066_ascribed_DR
+    }
+
+    * Save Cuba estimates so they can be applied to other countries
+    if $country == 2 {
+        estimates save "$data_path/cuba_1066_logit.ster", replace
+        display _newline(1)
+        display "Cuba logit estimates saved to: $data_path/cuba_1066_logit.ster"
+    }
+
+    * Apply Cuba-estimated coefficients to DR data
+    if $country == 1 {
+        capture estimates use "$cuba_path/cuba_1066_logit.ster"
+        if _rc == 0 {
+            display _newline(1)
+            display "Applying Cuba-estimated logit coefficients to DR data..."
+            predict cadas_dem1066_score
+            gen cadas_dem1066 = .
+            replace cadas_dem1066 = 1 if cadas_dem1066_score >= 0.5 & cadas_dem1066_score != .
+            replace cadas_dem1066 = 0 if cadas_dem1066_score < 0.5 & cadas_dem1066_score != .
+            gen cadas_dem1066_ascribed = .
+            replace cadas_dem1066_ascribed = 1 if cadas_dem1066_score >= 0.25 & cadas_dem1066_score != .
+            replace cadas_dem1066_ascribed = 0 if cadas_dem1066_score < 0.25 & cadas_dem1066_score != .
+        }
+        else {
+            display _newline(1)
+            display "WARNING: Cuba logit estimates not found at $cuba_path/cuba_1066_logit.ster"
+            display "Run Cuba 1066 first to generate estimates. Variables set to missing."
+            gen cadas_dem1066_score = .
+            gen cadas_dem1066 = .
+            gen cadas_dem1066_ascribed = .
+        }
+    }
+
     label variable cdr_binary "CDR clinical diagnosis (1=dementia CDR>0.5, 0=no CDR<=0.5)"
-    label variable cadas_dem1066_score "CADAS dementia probability (logit on CDR, CADAS-estimated coefficients)"
-    label variable cadas_dem1066 "CADAS dementia classification (1=dementia, 0=no; p>=0.5, logit on CDR)"
-    label variable cadas_dem1066_ascribed "CADAS ascribed dementia (1=dementia, 0=no; p>=0.25, logit on CDR)"
+    if $country == 1 {
+        label variable cadas_dem1066_score_DR "CADAS dementia probability (logit trained on DR CDR subsample)"
+        label variable cadas_dem1066_DR "CADAS dementia classification (1=dementia, 0=no; p>=0.5, trained on DR CDR)"
+        label variable cadas_dem1066_ascribed_DR "CADAS ascribed dementia (1=dementia, 0=no; p>=0.25, trained on DR CDR)"
+        label variable cadas_dem1066_score "CADAS dementia probability (Cuba-estimated logit applied to DR)"
+        label variable cadas_dem1066 "CADAS dementia classification (1=dementia, 0=no; p>=0.5, Cuba coefficients)"
+        label variable cadas_dem1066_ascribed "CADAS ascribed dementia (1=dementia, 0=no; p>=0.25, Cuba coefficients)"
+    }
+    else {
+        label variable cadas_dem1066_score "CADAS dementia probability (logit on CDR, CADAS-estimated coefficients)"
+        label variable cadas_dem1066 "CADAS dementia classification (1=dementia, 0=no; p>=0.5, logit on CDR)"
+        label variable cadas_dem1066_ascribed "CADAS ascribed dementia (1=dementia, 0=no; p>=0.25, logit on CDR)"
+    }
 
     display _newline(1)
-    display "Dementia probability distribution (CADAS-estimated coefficients, logit on CDR):"
-    summarize cadas_dem1066_score
+    display "DR-trained classification (p>=0.5):"
+    if $country == 1 {
+        summarize cadas_dem1066_score_DR
+        tab cadas_dem1066_DR, miss
+    }
 
     display _newline(1)
-    display "CADAS dementia classification (p>=0.5):"
-    tab cadas_dem1066, miss
-
-    display _newline(1)
-    display "CADAS ascribed dementia (p>=0.25):"
-    tab cadas_dem1066_ascribed, miss
+    display "Cuba-coefficients classification (p>=0.5):"
+    if $country == 1 {
+        summarize cadas_dem1066_score
+        tab cadas_dem1066, miss
+        display _newline(1)
+        display "CADAS ascribed dementia - Cuba coefficients (p>=0.25):"
+        tab cadas_dem1066_ascribed, miss
+    }
+    else {
+        summarize cadas_dem1066_score
+        display _newline(1)
+        display "CADAS dementia classification (p>=0.5):"
+        tab cadas_dem1066, miss
+        display _newline(1)
+        display "CADAS ascribed dementia (p>=0.25):"
+        tab cadas_dem1066_ascribed, miss
+    }
 }
 else {
     display _newline(1)

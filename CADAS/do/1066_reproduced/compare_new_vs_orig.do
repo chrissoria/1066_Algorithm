@@ -14,7 +14,7 @@ display "=======================================================================
 * LOAD NEW VERSION
 *-------------------------------------------------------------------------------
 
-use "/Users/chrissoria/Documents/CADAS/Data/CUBA_out/1066.dta", clear
+use "/Users/chrissoria/Documents/CADAS/Data/CUBA_out/cog_algorithms.dta", clear
 
 * Rename to avoid conflicts
 rename cogscore new_cogscore

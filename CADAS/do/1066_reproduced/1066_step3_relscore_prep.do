@@ -46,48 +46,69 @@ rename i_f_csid_24_2 toildiss
 
 *-------------------------------------------------------------------------------
 * CREATE MISSING INDICATORS
+*
+* Wrapped in a program so the counts can be rebuilt after the disability recode
+* below.  When $recode_disability_to == "missing" that recode creates NEW
+* missing values in dress/chores/feed/toilet, and those have to be reflected in
+* miss1/miss3/misstot -- otherwise step 4's weighting factor
+* U = 30/(30 - misstot) never compensates for them and RELSCORE comes out
+* silently under-weighted.  Under the "zero" default the program runs exactly
+* once, so results are identical to the previous inline version.
 *-------------------------------------------------------------------------------
 
-* Missing indicators for 21 cognitive/behavioral items
-local miss1_variables "mental activ memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason"
+capture program drop _relscore_miss_counts
+program define _relscore_miss_counts
 
-foreach var of local miss1_variables {
-    gen missing_`var' = missing(`var')
-}
+    capture drop missing_*
+    capture drop miss1
+    capture drop miss3
+    capture drop all_miss
+    capture drop misstot
 
-* Sum of missing for 21 items
-egen miss1 = rowtotal(missing_mental missing_activ missing_memory /*
-    */ missing_put missing_kept missing_frdname missing_famname /*
-    */ missing_convers missing_wordfind missing_wordwrg missing_past /*
-    */ missing_lastsee missing_lastday missing_orient missing_lostout /*
-    */ missing_lostin missing_chores missing_hobby missing_money /*
-    */ missing_change missing_reason)
+    * Missing indicators for 21 cognitive/behavioral items
+    local miss1_variables "mental activ memory put kept frdname famname convers wordfind wordwrg past lastsee lastday orient lostout lostin chores hobby money change reason"
 
-* Missing indicators for 3 ADL items
-local miss3_variables "feed dress toilet"
+    foreach var of local miss1_variables {
+        gen missing_`var' = missing(`var')
+    }
 
-gen miss3 = 0
-foreach var of local miss3_variables {
-    replace miss3 = miss3 + missing(`var')
-}
+    * Sum of missing for 21 items
+    egen miss1 = rowtotal(missing_mental missing_activ missing_memory /*
+        */ missing_put missing_kept missing_frdname missing_famname /*
+        */ missing_convers missing_wordfind missing_wordwrg missing_past /*
+        */ missing_lastsee missing_lastday missing_orient missing_lostout /*
+        */ missing_lostin missing_chores missing_hobby missing_money /*
+        */ missing_change missing_reason)
 
-foreach var in feed dress toilet {
-    gen missing_`var' = missing(`var')
-}
+    * Missing indicators for 3 ADL items
+    local miss3_variables "feed dress toilet"
 
-* Total missing across all 24 items
-egen all_miss = rowtotal(missing_mental missing_activ missing_memory /*
-    */ missing_put missing_kept missing_frdname missing_famname /*
-    */ missing_convers missing_wordfind missing_wordwrg missing_past /*
-    */ missing_lastsee missing_lastday missing_orient missing_lostout /*
-    */ missing_lostin missing_chores missing_hobby missing_money /*
-    */ missing_change missing_reason missing_feed missing_dress missing_toilet)
+    gen miss3 = 0
+    foreach var of local miss3_variables {
+        replace miss3 = miss3 + missing(`var')
+    }
 
-* Set miss1 to missing if all items are missing
-replace miss1 = . if (all_miss == 24 & miss3 == .)
+    foreach var in feed dress toilet {
+        gen missing_`var' = missing(`var')
+    }
 
-* Calculate total missing score (ADL items weighted 3x)
-gen misstot = (miss3 * 3) + miss1
+    * Total missing across all 24 items
+    egen all_miss = rowtotal(missing_mental missing_activ missing_memory /*
+        */ missing_put missing_kept missing_frdname missing_famname /*
+        */ missing_convers missing_wordfind missing_wordwrg missing_past /*
+        */ missing_lastsee missing_lastday missing_orient missing_lostout /*
+        */ missing_lostin missing_chores missing_hobby missing_money /*
+        */ missing_change missing_reason missing_feed missing_dress missing_toilet)
+
+    * Set miss1 to missing if all items are missing
+    replace miss1 = . if (all_miss == 24 & miss3 == .)
+
+    * Calculate total missing score (ADL items weighted 3x)
+    gen misstot = (miss3 * 3) + miss1
+
+end
+
+_relscore_miss_counts
 
 display "Missing data summary:"
 summarize miss1 miss3 misstot
@@ -113,9 +134,24 @@ replace reason = 1 if reason == 2
 
 *-------------------------------------------------------------------------------
 * HANDLE DISABILITY RECODING
-* If disability is present, recode functional item based on global setting
-* Options: "zero" = recode to 0, "missing" = recode to missing
+* If the informant reports a physical disability for an item, recode that item
+* according to $recode_disability_to (set in 1066_master.do):
+*   "zero"    = score the item 0 (cannot perform = impaired).  DEFAULT.
+*   "missing" = drop the item from the score and let step 4's weighting factor
+*               U = 30/(30 - misstot) compensate for it.
 *-------------------------------------------------------------------------------
+
+* Default when this step is run standalone (i.e. master has not set the global)
+if "$recode_disability_to" == "" {
+    global recode_disability_to "zero"
+    display as text "NOTE: \$recode_disability_to not set; defaulting to zero."
+}
+
+* Fail loudly on a typo rather than silently falling through to "zero"
+if !inlist("$recode_disability_to", "zero", "missing") {
+    display as error "ERROR: \$recode_disability_to must be zero or missing (got: $recode_disability_to)"
+    error 198
+}
 
 if "$recode_disability_to" == "missing" {
     replace dress = . if dressdiss == 1
@@ -123,6 +159,12 @@ if "$recode_disability_to" == "missing" {
     replace feed = . if feeddiss == 1
     replace toilet = . if toildiss == 1
     display "Relscore disability items recoded to MISSING"
+
+    * Rebuild the missing counts so the new missings reach misstot -> U in step 4
+    _relscore_miss_counts
+
+    display "Missing data summary (after disability recode):"
+    summarize miss1 miss3 misstot
 }
 else {
     replace dress = 0 if dressdiss == 1

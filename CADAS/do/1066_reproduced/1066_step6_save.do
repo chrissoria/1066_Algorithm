@@ -1,6 +1,6 @@
 ********************************************************************************
 * STEP 6: SAVE OUTPUT
-* Keep relevant variables and save to 1066.dta and excel/1066.xlsx
+* Keep relevant variables and save to cog_algorithms.dta and excel/cog_algorithms.xlsx
 ********************************************************************************
 
 display _newline(1)
@@ -12,53 +12,85 @@ display "-----------------------------------------------------------------------
 * KEEP RELEVANT VARIABLES
 *-------------------------------------------------------------------------------
 
-keep pid relscore cogscore nametot count animals_diss animals animtot ///
-     wordtot1 wordtot2 paper papertot c_66a c_66b c_66c c_66d c_66e c_66f story ///
-     storytot pencil watch chair shoes knuckle elbow should bridge hammer ///
-     pray chemist repeat town street store address month day year nod point ///
-     circle circle_diss pentag pentag_diss pentag_strict chief longmem season c_11 c_12 ///
-     c_13 wordimm c_21 c_22 c_23 worddel miss1 miss3 misstot activ mental memory put ///
-     kept frdname famname convers wordfind wordwrg past lastsee lastday ///
-     orient lostout lostin chores hobby money change reason feed dress ///
-     toilet recall dem1066_score dem1066 dem1066_score_quint dem1066_quint ///
-     cdr_binary cadas_dem1066_score cadas_dem1066 cadas_dem1066_ascribed immed ///
-     learn1 learn2 learn3
+if $country == 1 {
+    keep pid relscore cogscore nametot count animals_diss animals animtot ///
+         wordtot1 wordtot2 paper papertot c_66a c_66b c_66c c_66d c_66e c_66f story ///
+         storytot pencil watch chair shoes knuckle elbow should bridge hammer ///
+         pray chemist repeat town street store address month day year nod point ///
+         circle circle_diss pentag pentag_diss pentag_strict chief longmem season c_11 c_12 ///
+         c_13 wordimm c_21 c_22 c_23 worddel miss1 miss3 misstot activ mental memory put ///
+         kept frdname famname convers wordfind wordwrg past lastsee lastday ///
+         orient lostout lostin chores hobby money change reason feed dress ///
+         toilet recall dem1066_score dem1066 dem1066_score_quint dem1066_quint ///
+         cdr_binary cadas_dem1066_score_DR cadas_dem1066_DR cadas_dem1066_ascribed_DR ///
+         cadas_dem1066_score cadas_dem1066 cadas_dem1066_ascribed immed ///
+         learn1 learn2 learn3
+}
+else {
+    keep pid relscore cogscore nametot count animals_diss animals animtot ///
+         wordtot1 wordtot2 paper papertot c_66a c_66b c_66c c_66d c_66e c_66f story ///
+         storytot pencil watch chair shoes knuckle elbow should bridge hammer ///
+         pray chemist repeat town street store address month day year nod point ///
+         circle circle_diss pentag pentag_diss pentag_strict chief longmem season c_11 c_12 ///
+         c_13 wordimm c_21 c_22 c_23 worddel miss1 miss3 misstot activ mental memory put ///
+         kept frdname famname convers wordfind wordwrg past lastsee lastday ///
+         orient lostout lostin chores hobby money change reason feed dress ///
+         toilet recall dem1066_score dem1066 dem1066_score_quint dem1066_quint ///
+         cdr_binary cadas_dem1066_score cadas_dem1066 cadas_dem1066_ascribed immed ///
+         learn1 learn2 learn3
+}
 
 *-------------------------------------------------------------------------------
 * ORDER VARIABLES
 *-------------------------------------------------------------------------------
 
-order pid relscore cogscore nametot count animals_diss animals animtot ///
-      wordtot1 wordtot2 paper papertot c_66a c_66b c_66c c_66d c_66e c_66f story ///
-      storytot pencil watch chair shoes knuckle elbow should bridge hammer ///
-      pray chemist repeat town street store address month day year nod point ///
-      circle circle_diss pentag pentag_diss pentag_strict chief longmem season c_11 c_12 ///
-      c_13 wordimm c_21 c_22 c_23 worddel miss1 miss3 misstot activ mental memory put ///
-      kept frdname famname convers wordfind wordwrg past lastsee lastday ///
-      orient lostout lostin chores hobby money change reason feed dress ///
-      toilet recall dem1066_score dem1066 dem1066_score_quint dem1066_quint ///
-      cdr_binary cadas_dem1066_score cadas_dem1066 cadas_dem1066_ascribed immed ///
-      learn1 learn2 learn3
+if $country == 1 {
+    order pid relscore cogscore nametot count animals_diss animals animtot ///
+          wordtot1 wordtot2 paper papertot c_66a c_66b c_66c c_66d c_66e c_66f story ///
+          storytot pencil watch chair shoes knuckle elbow should bridge hammer ///
+          pray chemist repeat town street store address month day year nod point ///
+          circle circle_diss pentag pentag_diss pentag_strict chief longmem season c_11 c_12 ///
+          c_13 wordimm c_21 c_22 c_23 worddel miss1 miss3 misstot activ mental memory put ///
+          kept frdname famname convers wordfind wordwrg past lastsee lastday ///
+          orient lostout lostin chores hobby money change reason feed dress ///
+          toilet recall dem1066_score dem1066 dem1066_score_quint dem1066_quint ///
+          cdr_binary cadas_dem1066_score_DR cadas_dem1066_DR cadas_dem1066_ascribed_DR ///
+          cadas_dem1066_score cadas_dem1066 cadas_dem1066_ascribed immed ///
+          learn1 learn2 learn3
+}
+else {
+    order pid relscore cogscore nametot count animals_diss animals animtot ///
+          wordtot1 wordtot2 paper papertot c_66a c_66b c_66c c_66d c_66e c_66f story ///
+          storytot pencil watch chair shoes knuckle elbow should bridge hammer ///
+          pray chemist repeat town street store address month day year nod point ///
+          circle circle_diss pentag pentag_diss pentag_strict chief longmem season c_11 c_12 ///
+          c_13 wordimm c_21 c_22 c_23 worddel miss1 miss3 misstot activ mental memory put ///
+          kept frdname famname convers wordfind wordwrg past lastsee lastday ///
+          orient lostout lostin chores hobby money change reason feed dress ///
+          toilet recall dem1066_score dem1066 dem1066_score_quint dem1066_quint ///
+          cdr_binary cadas_dem1066_score cadas_dem1066 cadas_dem1066_ascribed immed ///
+          learn1 learn2 learn3
+}
 
 *-------------------------------------------------------------------------------
 * EXPORT TO EXCEL
 *-------------------------------------------------------------------------------
 
 capture mkdir excel
-export excel using "excel/1066.xlsx", replace firstrow(variables)
+export excel using "excel/cog_algorithms.xlsx", replace firstrow(variables)
 
 *-------------------------------------------------------------------------------
 * SAVE STATA FILE
 *-------------------------------------------------------------------------------
 
-save 1066.dta, replace
+save cog_algorithms.dta, replace
 
 *-------------------------------------------------------------------------------
 * EXPORT CASES WITH MISSING ALGORITHM VARIABLES
 *-------------------------------------------------------------------------------
 
 * Create diagnostics folder if it doesn't exist
-capture mkdir "1066_diagnostics"
+capture mkdir "cog_algorithms_diagnostics"
 
 * Google Drive path for diagnostics
 if $country == 1 {
@@ -113,17 +145,17 @@ quietly {
 tab _n_miss_components if missing(cogscore)
 drop _n_miss_components
 
-* Export missing cogscore summary to 1066_diagnostics
+* Export missing cogscore summary to cog_algorithms_diagnostics
 display ""
 display "--- Exporting missing cogscore summary ---"
 quietly {
     gen _miss_cogscore = missing(cogscore)
     keep if _miss_cogscore == 1
     keep pid nametot count animtot wordtot1 wordtot2 papertot storytot recall
-    capture export excel using "1066_diagnostics/missing_cogscore_summary.xlsx", replace firstrow(variables)
+    capture export excel using "cog_algorithms_diagnostics/missing_cogscore_summary.xlsx", replace firstrow(variables)
     capture export excel using "`gdrive_path'/missing_cogscore_summary.xlsx", replace firstrow(variables)
 }
-display "  Exported: 1066_diagnostics/missing_cogscore_summary.xlsx"
+display "  Exported: cog_algorithms_diagnostics/missing_cogscore_summary.xlsx"
 
 restore
 
@@ -179,7 +211,7 @@ if _N > 0 {
 
     * Merge with cog_scoring.dta to get scoring variables
     merge 1:1 pid using `cog_scoring_unique', keepusing( ///
-        globalrecordid cs_72_1 cs_32_cleaned cs_40 ///
+        globalrecordid cs_72_1 cs_32 cs_40 ///
     ) keep(match) nogen
     rename globalrecordid cogscoring_recordid
 
@@ -222,7 +254,7 @@ if _N > 0 {
     capture rename c_72_1 dibujo_circulo
     capture rename cs_72_1 dibujo_circulo_score
     capture rename c_32 dibujo_pentagono
-    capture rename cs_32_cleaned dibujo_pentagono_score
+    capture rename cs_32 dibujo_pentagono_score
     capture rename c_40 fluidez_animales_intento
     capture rename cs_40 fluidez_animales_conteo
     capture rename c_11 recuerdo_inmediato_barco
@@ -242,13 +274,13 @@ if _N > 0 {
     capture rename c_66f historia_todos_bien
 
     * Export to local diagnostics folder
-    export delimited using "1066_diagnostics/1066_missing_score_cases.csv", replace
+    export delimited using "cog_algorithms_diagnostics/1066_missing_score_cases.csv", replace
 
     * Also copy to Google Drive
     capture export delimited using "`gdrive_path'/1066_missing_score_cases.csv", replace
 
     display "Missing dem1066 score cases exported to:"
-    display "  - 1066_diagnostics/1066_missing_score_cases.csv"
+    display "  - cog_algorithms_diagnostics/1066_missing_score_cases.csv"
     display "  - Google Drive: 1066_DIAGNOSTIC_EXCELS/"
 }
 else {
@@ -257,10 +289,88 @@ else {
 
 restore
 
+*-------------------------------------------------------------------------------
+* EXPORT DISCORDANT COGSCORE / RELSCORE CASES
+* Flags cases where informant report and cognitive test strongly disagree:
+*   - High cogscore (>29) + high relscore (>5): tests well, informant reports problems
+*-------------------------------------------------------------------------------
+
+preserve
+
+keep if !missing(cogscore) & !missing(relscore)
+keep if cogscore > 29 & relscore > 5
+
+quietly count
+local n_discordant = r(N)
+display _newline(1)
+display "--- DISCORDANT COGSCORE/RELSCORE CASES ---"
+display "  Total discordant: `n_discordant'"
+
+if `n_discordant' > 0 {
+    keep pid cogscore relscore recall dem1066 dem1066_score
+    order pid cogscore relscore recall dem1066 dem1066_score
+    sort relscore
+
+    capture export excel using "cog_algorithms_diagnostics/discordant_cogscore_relscore.xlsx", replace firstrow(variables)
+    capture export excel using "`gdrive_path'/discordant_cogscore_relscore.xlsx", replace firstrow(variables)
+    display "  Exported: cog_algorithms_diagnostics/discordant_cogscore_relscore.xlsx"
+}
+else {
+    display "  No discordant cases found."
+}
+
+restore
+
+*-------------------------------------------------------------------------------
+* EXPORT CDR-DISCORDANT CASES (Cuba only)
+* Cases with good cog (>29) + low relscore (<=5) but CDR=1 (dementia diagnosis)
+* These are people who test well and informant says fine, but CDR says dementia
+*-------------------------------------------------------------------------------
+
+if $country == 1 | $country == 2 {
+    preserve
+
+    keep if !missing(cogscore) & !missing(relscore) & !missing(cdr_binary)
+    keep if cogscore > 29 & relscore <= 5 & cdr_binary == 1
+
+    quietly count
+    local n_cdr_discord = r(N)
+
+    if $country == 1 {
+        local country_label "DR"
+    }
+    else {
+        local country_label "Cuba"
+    }
+
+    display _newline(1)
+    display "--- CDR-DISCORDANT CASES (`country_label': good cog + low rel but CDR=1) ---"
+    display "  Total: `n_cdr_discord'"
+
+    if `n_cdr_discord' > 0 {
+        keep pid cogscore relscore recall cdr_binary dem1066 dem1066_score
+        order pid cogscore relscore recall cdr_binary dem1066 dem1066_score
+        sort cogscore
+
+        capture export excel using "cog_algorithms_diagnostics/cdr_discordant_`country_label'.xlsx", replace firstrow(variables)
+        capture export excel using "`gdrive_path'/cdr_discordant_`country_label'.xlsx", replace firstrow(variables)
+        display "  Exported: cog_algorithms_diagnostics/cdr_discordant_`country_label'.xlsx"
+    }
+    else {
+        display "  No CDR-discordant cases found."
+    }
+
+    restore
+}
+
 display _newline(1)
 display "STEP 6 complete: Data saved."
-display "  - 1066.dta"
-display "  - excel/1066.xlsx"
-display "  - 1066_diagnostics/1066_missing_score_cases.csv"
-display "  - Google Drive: 1066_DIAGNOSTIC_EXCELS/1066_missing_score_cases.csv"
+display "  - cog_algorithms.dta"
+display "  - excel/cog_algorithms.xlsx"
+display "  - cog_algorithms_diagnostics/1066_missing_score_cases.csv"
+display "  - cog_algorithms_diagnostics/discordant_cogscore_relscore.xlsx"
+if $country == 1 | $country == 2 {
+    display "  - cog_algorithms_diagnostics/cdr_discordant_[DR/Cuba].xlsx"
+}
+display "  - Google Drive: 1066_DIAGNOSTIC_EXCELS/"
 display "--------------------------------------------------------------------------------"

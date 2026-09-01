@@ -49,7 +49,7 @@ local all_vars "pencil watch chair shoes knuckle elbow should bridge hammer pray
 display "Calculating CADAS statistics..."
 
 * Load CADAS 1066 output
-use 1066.dta, clear
+use cog_algorithms.dta, clear
 local cadas_n = _N
 
 * Set up postfile for CADAS stats
@@ -178,8 +178,8 @@ list variable cadas_mean baseline_mean mean_diff mean_pct_diff cadas_min cadas_m
 *-------------------------------------------------------------------------------
 
 display _newline(1)
-capture mkdir "$data_path/1066_diagnostics"
-export delimited using "$data_path/1066_diagnostics/validation_cadas_vs_1066.csv", replace
+capture mkdir "$data_path/cog_algorithms_diagnostics"
+export delimited using "$data_path/cog_algorithms_diagnostics/validation_cadas_vs_1066.csv", replace
 
 * Also copy to Google Drive
 if $country == 1 {
@@ -202,7 +202,7 @@ capture mkdir "`gdrive_path'"
 capture export delimited using "`gdrive_path'/validation_cadas_vs_1066.csv", replace
 
 display "Validation complete. Results saved to:"
-display "  - $data_path/1066_diagnostics/validation_cadas_vs_1066.csv"
+display "  - $data_path/cog_algorithms_diagnostics/validation_cadas_vs_1066.csv"
 display "  - Google Drive: 1066_DIAGNOSTIC_EXCELS/"
 
 *-------------------------------------------------------------------------------
@@ -320,9 +320,9 @@ if `n_flagged' > 0 {
 * Export country-specific CSV
 local country_file = lower("`country_name'")
 local country_file = subinstr("`country_file'", " ", "_", .)
-export delimited using "$data_path/1066_diagnostics/validation_cadas_vs_1066_`country_file'.csv", replace
+export delimited using "$data_path/cog_algorithms_diagnostics/validation_cadas_vs_1066_`country_file'.csv", replace
 capture export delimited using "`gdrive_path'/validation_cadas_vs_1066_`country_file'.csv", replace
-display "Country-specific validation saved to: 1066_diagnostics/validation_cadas_vs_1066_`country_file'.csv"
+display "Country-specific validation saved to: cog_algorithms_diagnostics/validation_cadas_vs_1066_`country_file'.csv"
 
 *-------------------------------------------------------------------------------
 * PLOT RELSCORE DISTRIBUTION COMPARISON
@@ -350,7 +350,7 @@ capture mkdir "`gdrive_plots'"
 display "Creating relscore distribution comparison plot..."
 
 * Load CADAS data and keep relscore
-use 1066.dta, clear
+use cog_algorithms.dta, clear
 keep relscore
 gen source = 1
 label define source_lbl 1 "CADAS `country_name'" 2 "1066 `country_name'"
@@ -427,7 +427,7 @@ display _newline(1)
 display "Creating cogscore distribution comparison plot..."
 
 * Load CADAS data and keep cogscore
-use 1066.dta, clear
+use cog_algorithms.dta, clear
 keep cogscore
 gen source = 1
 label define source_lbl2 1 "CADAS `country_name'" 2 "1066 `country_name'"
@@ -475,7 +475,7 @@ display _newline(1)
 display "Creating recall distribution comparison plot..."
 
 * Load CADAS data and keep recall
-use 1066.dta, clear
+use cog_algorithms.dta, clear
 keep recall
 gen source = 1
 label define source_lbl4 1 "CADAS `country_name'" 2 "1066 `country_name'"
@@ -627,5 +627,5 @@ capture graph export "`gdrive_plots'/education_comparison_`country_file'.png", r
 display "Education comparison plot saved to: plots/ and Google Drive"
 display "--------------------------------------------------------------------------------"
 
-* Reload 1066.dta for subsequent summary in master file
-use 1066.dta, clear
+* Reload cog_algorithms.dta for subsequent summary in master file
+use cog_algorithms.dta, clear

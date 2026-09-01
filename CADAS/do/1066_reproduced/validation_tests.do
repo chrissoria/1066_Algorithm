@@ -13,7 +13,7 @@ set more off
 
 * Paths
 local baseline_path "/Users/chrissoria/Documents/Research/CADAS_1066/1066/data/1066_Baseline_data.dta"
-local cadas_path "/Users/chrissoria/Documents/CADAS/Data/CUBA_out/1066.dta"
+local cadas_path "/Users/chrissoria/Documents/CADAS/Data/CUBA_out/cog_algorithms.dta"
 local cadas_socio "/Users/chrissoria/Documents/CADAS/Data/CUBA_out/socio.dta"
 
 * Model coefficients (from original 1066 training)
